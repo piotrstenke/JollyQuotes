@@ -3,10 +3,10 @@
 </div>
 
 <div align="right">
-    <a href="https://www.nuget.org/packages/Durian">
+    <a href="https://www.nuget.org/packages/JollyQuotes">
         <img src="https://img.shields.io/nuget/v/JollyQuotes?color=seagreen&style=flat-square" alt="Version"/>
     </a>
-    <a href="https://www.nuget.org/packages/Durian">
+    <a href="https://www.nuget.org/packages/JollyQuotes">
         <img src="https://img.shields.io/nuget/dt/JollyQuotes?color=blue&style=flat-square" alt="Downloads"/>
     </a> <br />
     <a href="https://github.com/piotrstenke/JollyQuotes/actions">
