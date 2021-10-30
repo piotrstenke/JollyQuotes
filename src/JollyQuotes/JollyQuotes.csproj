@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+    <TargetFramework>net5</TargetFramework>
+    <OutputType>Library</OutputType>
+    <Description>JollyQuotes provides a simple, class-oriented interface for quick and painless access to multiple quote generation APIs scattered all across the Internet.</Description>
+    <PackageTags>Quote;Generation;Interface</PackageTags>
+    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <Version>1.0.0</Version>
+    <RootNamespace>JollyQoutes</RootNamespace>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageReference Include="Roslynator.Analyzers" Version="3.2.2" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
