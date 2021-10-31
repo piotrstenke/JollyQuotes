@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -63,6 +64,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes(params string[]? tags)
 		{
 			return Array.Empty<KanyeQuote>();
@@ -70,6 +72,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes(string tag)
 		{
 			return Array.Empty<KanyeQuote>();
@@ -88,6 +91,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IAsyncEnumerable<KanyeQuote> DownloadAllQuotesAsync(params string[]? tags)
 		{
 			return AsyncEnumerable.Empty<KanyeQuote>();
@@ -95,6 +99,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IAsyncEnumerable<KanyeQuote> DownloadAllQuotesAsync(string tag)
 		{
 			return AsyncEnumerable.Empty<KanyeQuote>();
@@ -108,6 +113,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override KanyeQuote? DownloadRandomQuote(params string[]? tags)
 		{
 			return default;
@@ -115,6 +121,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override KanyeQuote? DownloadRandomQuote(string tag)
 		{
 			return default;
@@ -128,6 +135,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override Task<KanyeQuote?> DownloadRandomQuoteAsync(string tag)
 		{
 			return GetEmptyTask();
@@ -135,6 +143,7 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override Task<KanyeQuote?> DownloadRandomQuoteAsync(string[]? tags)
 		{
 			return GetEmptyTask();
