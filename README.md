@@ -1,23 +1,19 @@
-<div style="float:left">
-    <img src="img/logo-64.png" alt="JollyQuotes logo"/>
-</div>
+<img align="left" src="img/logo-64.png" alt="JollyQuotes logo"/>
 
 <div align="right">
-    <a href="https://www.nuget.org/packages/JollyQuotes">
-        <img src="https://img.shields.io/nuget/v/JollyQuotes?color=seagreen&style=flat-square" alt="Version"/>
-    </a>
-    <a href="https://www.nuget.org/packages/JollyQuotes">
-        <img src="https://img.shields.io/nuget/dt/JollyQuotes?color=blue&style=flat-square" alt="Downloads"/>
-    </a> <br />
-    <a href="https://github.com/piotrstenke/JollyQuotes/actions">
-        <img src="https://img.shields.io/github/workflow/status/piotrstenke/JollyQuotes/.NET?style=flat-square" alt="Build"/>
-    </a>
-    <a href="https://github.com//piotrstenke/JollyQuotes/blob/master/LICENSE.md">
-        <img src="https://img.shields.io/github/license/piotrstenke/JollyQuotes?color=orange&style=flat-square" alt="License"/>
-    </a>
+	<a href="https://www.nuget.org/packages/JollyQuotes">
+		<img src="https://img.shields.io/nuget/v/JollyQuotes?color=seagreen&style=flat-square" alt="Version"/>
+	</a>
+	<a href="https://www.nuget.org/packages/JollyQuotes">
+		<img src="https://img.shields.io/nuget/dt/JollyQuotes?color=blue&style=flat-square" alt="Downloads"/>
+	</a> <br />
+	<a href="https://github.com/piotrstenke/JollyQuotes/actions">
+		<img src="https://img.shields.io/github/workflow/status/piotrstenke/JollyQuotes/.NET?style=flat-square" alt="Build"/>
+	</a>
+	<a href="https://github.com//piotrstenke/JollyQuotes/blob/master/LICENSE.md">
+		<img src="https://img.shields.io/github/license/piotrstenke/JollyQuotes?color=orange&style=flat-square" alt="License"/>
+	</a>
 </div>
-
-<br/>
 
 # Jolly Quotes
 
