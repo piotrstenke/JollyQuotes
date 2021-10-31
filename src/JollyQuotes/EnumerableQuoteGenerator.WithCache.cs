@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,19 +10,8 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IEnumerableQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : EnumerableQuoteGenerator<T>
+		public new abstract class WithCache : RandomQuoteGenerator<T>.WithCache, IEnumerableQuoteGenerator
 		{
-			/// <summary>
-			/// Contains all the cached <see cref="IQuote"/>s.
-			/// </summary>
-			public BlockableQuoteCache<T> Cache { get; }
-
-			/// <summary>
-			/// Random number generator used to determine whether to pick quotes from the <see cref="Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
-			/// </summary>
-			public IPossibility Possibility { get; }
-
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
 			/// </summary>
@@ -29,8 +19,6 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(string source) : base(source)
 			{
-				Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
-				Possibility = new Possibility();
 			}
 
 			/// <summary>
@@ -38,20 +26,13 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, IPossibility possibility) : base(source)
+			protected WithCache(string source, IPossibility possibility) : base(source, possibility)
 			{
-				if (possibility is null)
-				{
-					throw Internals.Null(nameof(possibility));
-				}
-
-				Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
-				Possibility = possibility;
 			}
 
 			/// <summary>
@@ -61,15 +42,8 @@ namespace JollyQuotes
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache) : base(source)
+			protected WithCache(string source, BlockableQuoteCache<T> cache) : base(source, cache)
 			{
-				if (cache is null)
-				{
-					throw Internals.Null(nameof(cache));
-				}
-
-				Cache = cache;
-				Possibility = new Possibility();
 			}
 
 			/// <summary>
@@ -78,51 +52,21 @@ namespace JollyQuotes
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>. -or-
 			/// <paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility) : base(source)
+			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility) : base(source, cache, possibility)
 			{
-				if (cache is null)
-				{
-					throw Internals.Null(nameof(cache));
-				}
-
-				if (possibility is null)
-				{
-					throw Internals.Null(nameof(possibility));
-				}
-
-				Cache = cache;
-				Possibility = possibility;
-			}
-
-			/// <inheritdoc/>
-			public sealed override IEnumerable<T> GetAllQuotes()
-			{
-				return GetAllQuotes(QuoteInclude.All);
-			}
-
-			/// <inheritdoc/>
-			public sealed override IEnumerable<T> GetAllQuotes(string tag)
-			{
-				return GetAllQuotes(tag, QuoteInclude.All);
-			}
-
-			/// <inheritdoc/>
-			public sealed override IEnumerable<T> GetAllQuotes(params string[]? tags)
-			{
-				return GetAllQuotes(tags, QuoteInclude.All);
 			}
 
 			/// <summary>
 			/// Returns a collection of all possible quotes.
 			/// </summary>
 			/// <param name="which">Determines which quotes to include.</param>
-			public IEnumerable<T> GetAllQuotes(QuoteInclude which)
+			public IEnumerable<T> GetAllQuotes(QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -146,7 +90,7 @@ namespace JollyQuotes
 			/// <param name="tag">Tag to get all <see cref="IQuote"/>s associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			public IEnumerable<T> GetAllQuotes(string tag, QuoteInclude which)
+			public IEnumerable<T> GetAllQuotes(string tag, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -169,7 +113,7 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="tags">Tags to get all <see cref="IQuote"/> associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
-			public IEnumerable<T> GetAllQuotes(string[]? tags, QuoteInclude which)
+			public IEnumerable<T> GetAllQuotes(string[]? tags, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -187,180 +131,41 @@ namespace JollyQuotes
 				}
 			}
 
-			#region Copied from EnumerableQuoteGenerator<T>.WithCache
-
-			/// <inheritdoc/>
-			public sealed override T GetRandomQuote()
+			IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes()
 			{
-				return GetRandomQuote(QuoteInclude.All)!;
+				return GetAllQuotes().Cast<IQuote>();
 			}
 
-			/// <inheritdoc/>
-			public sealed override T? GetRandomQuote(string tag)
+			IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes(string tag)
 			{
-				return GetRandomQuote(tag, QuoteInclude.All);
+				return GetAllQuotes(tag).Cast<IQuote>();
 			}
 
-			/// <inheritdoc/>
-			public sealed override T? GetRandomQuote(params string[]? tags)
+			IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes(params string[]? tags)
 			{
-				return GetRandomQuote(tags, QuoteInclude.All);
+				return GetAllQuotes(tags).Cast<IQuote>();
 			}
 
-			/// <summary>
-			/// Generates a random quote.
-			/// </summary>
-			/// <param name="which">Determines which quotes to include in the search.</param>
-			public T? GetRandomQuote(QuoteInclude which)
+			IEnumerator<IQuote> IEnumerable<IQuote>.GetEnumerator()
 			{
-				switch (which)
+				foreach (T quote in GetAllQuotes())
 				{
-					case QuoteInclude.All:
-
-						if (Cache.IsEmpty || Possibility.Determine())
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							goto case QuoteInclude.Cached;
-						}
-
-					case QuoteInclude.Cached:
-						return Cache.GetRandomQuote();
-
-					case QuoteInclude.Download:
-						return DownloadRandomQuote();
-
-					default:
-						goto case QuoteInclude.All;
+					yield return quote;
 				}
 			}
 
-			/// <summary>
-			/// Generates a random quote associated with the specified tag.
-			/// </summary>
-			/// <param name="tag">Tag to generate a quote associated with.</param>
-			/// <param name="which">Determines which quotes to include.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			public T? GetRandomQuote(string tag, QuoteInclude which)
+			IEnumerator IEnumerable.GetEnumerator()
 			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-					{
-						if (Cache.IsEmpty || Possibility.Determine() || !Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							return quote;
-						}
-					}
-
-					case QuoteInclude.Cached:
-					{
-						if (Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							return quote;
-						}
-
-						return default;
-					}
-
-					case QuoteInclude.Download:
-						return DownloadRandomQuote(tag);
-
-					default:
-						goto case QuoteInclude.All;
-				}
+				return (this as IEnumerable<IQuote>).GetEnumerator();
 			}
 
 			/// <summary>
-			/// Generates a random quote associated with any of the specified <paramref name="tags"/>.
-			/// </summary>
-			/// <param name="tags">Tags to generate a quote associated with.</param>
-			/// <param name="which">Determines which quotes to include.</param>
-			public T? GetRandomQuote(string[]? tags, QuoteInclude which)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-
-						if (Cache.IsEmpty || Possibility.Determine() || GetQuoteFromCache() is not T quote)
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							return quote;
-						}
-
-					case QuoteInclude.Cached:
-						return GetQuoteFromCache();
-
-					case QuoteInclude.Download:
-						return DownloadRandomQuote(tags);
-
-					default:
-						goto case QuoteInclude.All;
-				}
-
-				T? GetQuoteFromCache()
-				{
-					if (tags is null)
-					{
-						return default;
-					}
-
-					foreach (string tag in tags)
-					{
-						if (Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							return quote;
-						}
-					}
-
-					return default;
-				}
-			}
-
-			/// <summary>
-			/// Downloads a quote from the <see cref="RandomQuoteGenerator{T}.Source"/>.
-			/// </summary>
-			protected abstract T DownloadRandomQuote();
-
-			/// <summary>
-			/// Downloads a quote associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.Source"/>.
-			/// </summary>
-			/// <param name="tag">Tag to download a quote associated with.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			protected virtual T? DownloadRandomQuote(string tag)
-			{
-				if (string.IsNullOrWhiteSpace(tag))
-				{
-					throw Internals.NullOrEmpty(nameof(tag));
-				}
-
-				return DownloadRandomQuote(new string[] { tag });
-			}
-
-			/// <summary>
-			/// Downloads a random quote associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.Source"/>.
-			/// </summary>
-			/// <param name="tags">Tags to download a quote associated with.</param>
-			protected abstract T? DownloadRandomQuote(params string[]? tags);
-
-			#endregion Copied from EnumerableQuoteGenerator<T>.WithCache
-
-			/// <summary>
-			/// Downloads all quotes available from the <see cref="RandomQuoteGenerator{T}.Source"/>
+			/// Downloads all quotes available from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>
 			/// </summary>
 			protected abstract IEnumerable<T> DownloadAllQuotes();
 
 			/// <summary>
-			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.Source"/>.
+			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tag">Tag to download all quotes associated with.</param>
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
@@ -375,7 +180,7 @@ namespace JollyQuotes
 			}
 
 			/// <summary>
-			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.Source"/>.
+			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download all quotes associated with.</param>
 			protected abstract IEnumerable<T> DownloadAllQuotes(params string[]? tags);

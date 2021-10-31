@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace JollyQuotes
 {
@@ -7,7 +8,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IRandomQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract class WithCache : RandomQuoteGenerator<T>
+		public abstract class WithCache : IRandomQuoteGenerator
 		{
 			/// <summary>
 			/// Container of all the cached <see cref="IQuote"/>s.
@@ -21,14 +22,25 @@ namespace JollyQuotes
 			public IPossibility Possibility { get; }
 
 			/// <summary>
+			/// Source of the quotes, e.g. a link, file name or raw text.
+			/// </summary>
+			public string Source { get; }
+
+			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
 			/// </summary>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source) : base(source)
+			protected WithCache(string source)
 			{
-				Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
-				Possibility = new Possibility();
+				if (string.IsNullOrWhiteSpace(source))
+				{
+					throw Internals.NullOrEmpty(nameof(source));
+				}
+
+				Source = source;
+				Cache = GetDefaultQuoteCache();
+				Possibility = GetDefaultPossibility();
 			}
 
 			/// <summary>
@@ -41,13 +53,19 @@ namespace JollyQuotes
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, IPossibility possibility) : base(source)
+			protected WithCache(string source, IPossibility possibility)
 			{
 				if (possibility is null)
 				{
 					throw Internals.Null(nameof(possibility));
 				}
 
+				if (string.IsNullOrWhiteSpace(source))
+				{
+					throw Internals.NullOrEmpty(nameof(source));
+				}
+
+				Source = source;
 				Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
 				Possibility = possibility;
 			}
@@ -59,13 +77,19 @@ namespace JollyQuotes
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache) : base(source)
+			protected WithCache(string source, BlockableQuoteCache<T> cache)
 			{
 				if (cache is null)
 				{
 					throw Internals.Null(nameof(cache));
 				}
 
+				if (string.IsNullOrWhiteSpace(source))
+				{
+					throw Internals.NullOrEmpty(nameof(source));
+				}
+
+				Source = source;
 				Cache = cache;
 				Possibility = new Possibility();
 			}
@@ -82,7 +106,7 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>. -or-
 			/// <paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility) : base(source)
+			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility)
 			{
 				if (cache is null)
 				{
@@ -94,33 +118,21 @@ namespace JollyQuotes
 					throw Internals.Null(nameof(possibility));
 				}
 
+				if (string.IsNullOrWhiteSpace(source))
+				{
+					throw Internals.NullOrEmpty(nameof(source));
+				}
+
+				Source = source;
 				Cache = cache;
 				Possibility = possibility;
-			}
-
-			/// <inheritdoc/>
-			public sealed override T GetRandomQuote()
-			{
-				return GetRandomQuote(QuoteInclude.All)!;
-			}
-
-			/// <inheritdoc/>
-			public sealed override T? GetRandomQuote(string tag)
-			{
-				return GetRandomQuote(tag, QuoteInclude.All);
-			}
-
-			/// <inheritdoc/>
-			public sealed override T? GetRandomQuote(params string[]? tags)
-			{
-				return GetRandomQuote(tags, QuoteInclude.All);
 			}
 
 			/// <summary>
 			/// Generates a random quote.
 			/// </summary>
 			/// <param name="which">Determines which quotes to include in the search.</param>
-			public T? GetRandomQuote(QuoteInclude which)
+			public T? GetRandomQuote(QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -152,7 +164,7 @@ namespace JollyQuotes
 			/// <param name="tag">Tag to generate a quote associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			public T? GetRandomQuote(string tag, QuoteInclude which)
+			public T? GetRandomQuote(string tag, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -191,7 +203,7 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="tags">Tags to generate a quote associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
-			public T? GetRandomQuote(string[]? tags, QuoteInclude which)
+			public T? GetRandomQuote(string[]? tags, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -233,6 +245,33 @@ namespace JollyQuotes
 
 					return default;
 				}
+			}
+
+			IQuote IRandomQuoteGenerator.GetRandomQuote()
+			{
+				return GetRandomQuote()!;
+			}
+
+			IQuote? IRandomQuoteGenerator.GetRandomQuote(string tag)
+			{
+				return GetRandomQuote(tag);
+			}
+
+			IQuote? IRandomQuoteGenerator.GetRandomQuote(params string[]? tags)
+			{
+				return GetRandomQuote(tags);
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			internal static IPossibility GetDefaultPossibility()
+			{
+				return new Possibility();
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			internal static BlockableQuoteCache<T> GetDefaultQuoteCache()
+			{
+				return new BlockableQuoteCache<T>(new QuoteCache<T>());
 			}
 
 			/// <summary>
