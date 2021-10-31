@@ -8,7 +8,7 @@ namespace JollyQuotes
 {
 	/// <inheritdoc cref="IQuoteGeneratorClient"/>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class QuoteGeneratorClient<T> : EnumerableQuoteGenerator<T>, IQuoteGeneratorClient, IDisposable where T : IQuote
+	public abstract partial class QuoteGeneratorClient<T> : RandomQuoteGenerator<T>, IQuoteGeneratorClient, IDisposable where T : IQuote
 	{
 		private bool _disposed;
 

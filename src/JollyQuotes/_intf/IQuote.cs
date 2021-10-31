@@ -15,7 +15,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Date at which the quote was said/written.
 		/// </summary>
-		DateTime Date { get; }
+		DateTime? Date { get; }
 
 		/// <summary>
 		/// Source of the quote, e.g. a link, file name or raw text.

@@ -35,6 +35,14 @@ namespace JollyQuotes
 		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes(string[])"/>
 		public abstract IEnumerable<T> GetAllQuotes(params string[]? tags);
 
+		/// <summary>
+		/// Returns an <see cref="IEnumerator{T}"/> that iterates through all the available <see cref="IQuote"/>s.
+		/// </summary>
+		public virtual IEnumerator<T> GetEnumerator()
+		{
+			return GetAllQuotes().GetEnumerator();
+		}
+
 		IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes()
 		{
 			return GetAllQuotes().Cast<IQuote>();
@@ -60,7 +68,7 @@ namespace JollyQuotes
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return (this as IEnumerable<IQuote>).GetEnumerator();
+			return GetEnumerator();
 		}
 	}
 }

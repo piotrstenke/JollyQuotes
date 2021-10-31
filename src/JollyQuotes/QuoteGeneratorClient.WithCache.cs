@@ -9,7 +9,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IQuoteGeneratorClient"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : EnumerableQuoteGenerator<T>.WithCache, IQuoteGeneratorClient, IDisposable
+		public new abstract class WithCache : RandomQuoteGenerator<T>.WithCache, IQuoteGeneratorClient, IDisposable
 		{
 			private bool _disposed;
 			private Task<T?>? _emptyTask;
@@ -199,16 +199,6 @@ namespace JollyQuotes
 					default:
 						goto case QuoteInclude.All;
 				}
-
-				Task<T?> GetEmptyTask()
-				{
-					if (_emptyTask is null)
-					{
-						_emptyTask = Task.FromResult(default(T))!;
-					}
-
-					return _emptyTask;
-				}
 			}
 
 			/// <summary>
@@ -320,7 +310,7 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="tag">Tag to download a quote associated with.</param>
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			protected virtual Task<T> DownloadRandomQuoteAsync(string tag)
+			protected virtual Task<T?> DownloadRandomQuoteAsync(string tag)
 			{
 				if (string.IsNullOrWhiteSpace(tag))
 				{
@@ -334,7 +324,20 @@ namespace JollyQuotes
 			/// Asynchronously downloads a random quote associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download a quote associated with.</param>
-			protected abstract Task<T> DownloadRandomQuoteAsync(string[]? tags);
+			protected abstract Task<T?> DownloadRandomQuoteAsync(string[]? tags);
+
+			/// <summary>
+			/// Returns a <see cref="Task{TResult}"/> with the <see cref="Task{TResult}.Result"/> set to <see langword="default"/>(<typeparamref name="T"/>).
+			/// </summary>
+			protected Task<T?> GetEmptyTask()
+			{
+				if (_emptyTask is null)
+				{
+					_emptyTask = Task.FromResult(default(T));
+				}
+
+				return _emptyTask;
+			}
 		}
 	}
 }

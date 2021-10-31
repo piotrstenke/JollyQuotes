@@ -131,6 +131,43 @@ namespace JollyQuotes
 				}
 			}
 
+			/// <summary>
+			/// Returns an <see cref="IEnumerator{T}"/> that iterates through all the available <see cref="IQuote"/>s.
+			/// </summary>
+			/// <param name="which">Determines which quotes to include.</param>
+			public IEnumerator<T> GetEnumerator(QuoteInclude which = QuoteInclude.All)
+			{
+				switch (which)
+				{
+					case QuoteInclude.All:
+						return YieldAll();
+
+					case QuoteInclude.Download:
+						return DownloadAndEnumerate();
+
+					case QuoteInclude.Cached:
+						return Cache.GetEnumerator();
+
+					default:
+						goto case QuoteInclude.All;
+				}
+
+				IEnumerator<T> YieldAll()
+				{
+					foreach (T quote in Cache)
+					{
+						yield return quote;
+					}
+
+					using IEnumerator<T> enumerator = DownloadAndEnumerate();
+
+					while (enumerator.MoveNext())
+					{
+						yield return enumerator.Current;
+					}
+				}
+			}
+
 			IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes()
 			{
 				return GetAllQuotes().Cast<IQuote>();
@@ -156,7 +193,7 @@ namespace JollyQuotes
 
 			IEnumerator IEnumerable.GetEnumerator()
 			{
-				return (this as IEnumerable<IQuote>).GetEnumerator();
+				return GetEnumerator();
 			}
 
 			/// <summary>
@@ -184,6 +221,14 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="tags">Tags to download all quotes associated with.</param>
 			protected abstract IEnumerable<T> DownloadAllQuotes(params string[]? tags);
+
+			/// <summary>
+			/// Downloads all available <see cref="IQuote"/>s and enumerates them.
+			/// </summary>
+			protected virtual IEnumerator<T> DownloadAndEnumerate()
+			{
+				return DownloadAllQuotes().GetEnumerator();
+			}
 		}
 	}
 }

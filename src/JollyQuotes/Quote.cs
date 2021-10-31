@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace JollyQuotes
 {
@@ -8,7 +9,9 @@ namespace JollyQuotes
 	/// Contains a quote, its author, source, date and related tags.
 	/// </summary>
 	/// <remarks>This class implements the <see cref="IEquatable{T}"/> interface - two instances are compare by their value, not reference.</remarks>
-	public sealed class Quote : IQuote, IEquatable<Quote>
+	[Serializable]
+	[JsonObject]
+	public sealed record Quote : IQuote
 	{
 		/// <summary>
 		/// Value used when an author of a quote is unknown.
@@ -21,20 +24,26 @@ namespace JollyQuotes
 		public static Quote Unknown => new();
 
 		/// <inheritdoc/>
+		[JsonProperty("author", Order = 1, Required = Required.Always)]
 		public string Author { get; }
 
 		/// <inheritdoc/>
-		public DateTime Date { get; }
+		[JsonProperty("date", Order = 2)]
+		[JsonConverter(typeof(Settings.DateOnlyConverter))]
+		public DateTime? Date { get; }
 
 		/// <inheritdoc/>
+		[JsonProperty("source", Order = 3, Required = Required.Always)]
 		public string Source { get; }
 
 		/// <summary>
 		/// Tags associated with the quote.
 		/// </summary>
+		[JsonProperty("tags", Order = 4, Required = Required.DisallowNull)]
 		public string[] Tags { get; }
 
 		/// <inheritdoc/>
+		[JsonProperty("quote", Order = 0, Required = Required.Always)]
 		public string Value { get; }
 
 		/// <summary>
@@ -67,7 +76,8 @@ namespace JollyQuotes
 		/// <param name="date">Date at which the quote was said/written.</param>
 		/// <param name="tags">Tags associated with the quote.</param>
 		/// <exception cref="ArgumentException"><paramref name="quote"/> or <paramref name="author"/> is <see langword="null"/> or empty.</exception>
-		public Quote(string quote, string author, string? source, DateTime date, params string[]? tags)
+		[JsonConstructor]
+		public Quote(string quote, string author, string? source, DateTime? date, params string[]? tags)
 		{
 			if (string.IsNullOrWhiteSpace(quote))
 			{
@@ -92,32 +102,6 @@ namespace JollyQuotes
 			Value = string.Empty;
 			Source = string.Empty;
 			Tags = Array.Empty<string>();
-		}
-
-		/// <summary>
-		/// Determines whether two <see cref="Quote"/>s are not equal.
-		/// </summary>
-		/// <param name="left"><see cref="Quote"/> to compare with.</param>
-		/// <param name="right"><see cref="Quote"/> to compare against.</param>
-		public static bool operator !=(Quote? left, Quote? right)
-		{
-			return !(left == right);
-		}
-
-		/// <summary>
-		/// Determines whether two <see cref="Quote"/>s are equal.
-		/// </summary>
-		/// <param name="left"><see cref="Quote"/> to compare with.</param>
-		/// <param name="right"><see cref="Quote"/> to compare against.</param>
-		public static bool operator ==(Quote? left, Quote? right)
-		{
-			return left is not null && left.Equals(right);
-		}
-
-		/// <inheritdoc/>
-		public override bool Equals(object? obj)
-		{
-			return obj is Quote other && Equals(other);
 		}
 
 		/// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
@@ -157,9 +141,9 @@ namespace JollyQuotes
 
 			builder.Append($"\"{Value}\", {Author}");
 
-			if (Date != default)
+			if (Date.HasValue)
 			{
-				builder.Append($", {Date.ToShortDateString()}");
+				builder.Append($", {Date.Value.ToShortDateString()}");
 			}
 
 			return builder.ToString();

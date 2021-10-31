@@ -14,5 +14,10 @@
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <PackageReference Include="Roslynator.Analyzers" Version="3.2.2" PrivateAssets="all" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+  </ItemGroup>
 
 </Project>

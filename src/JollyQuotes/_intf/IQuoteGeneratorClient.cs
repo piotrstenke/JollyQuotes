@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace JollyQuotes
 {
 	/// <summary>
-	/// Generates quotes using an external web API accessed by a <see cref="HttpClient"/>.
+	/// Provides mechanism for generating quotes through an external web API accessed by a <see cref="HttpClient"/>.
 	/// </summary>
 	public interface IQuoteGeneratorClient : IRandomQuoteGenerator
 	{
