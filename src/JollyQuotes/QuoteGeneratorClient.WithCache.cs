@@ -55,7 +55,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>.</exception>
 			protected WithCache(Uri uri, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(
 				RetrieveSourceFromUri(uri),
 				cache ?? GetDefaultQuoteCache(),
@@ -77,7 +77,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> cannot be <see langword="null"/> or empty.</exception>
 			protected WithCache(HttpClient client, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(
 				RetrieveSourceFromClient(client),
@@ -98,7 +98,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(HttpClient client, string source, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(
 				source,

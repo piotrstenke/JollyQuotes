@@ -44,7 +44,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>.</exception>
 			protected WithCache(Uri uri, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(uri, cache, possibility)
 			{
 			}
@@ -58,7 +58,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> cannot be <see langword="null"/> or empty.</exception>
 			protected WithCache(HttpClient client, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(client, cache, possibility)
 			{
@@ -74,7 +74,7 @@ namespace JollyQuotes
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="cache"/> is <see langword="null"/>. -or- <paramref name="possibility"/> is <see langword="null"/>.</exception>
+			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(HttpClient client, string source, BlockableQuoteCache<T>? cache = null, IPossibility? possibility = null) : base(client, source, cache, possibility)
 			{
@@ -84,9 +84,22 @@ namespace JollyQuotes
 			/// Returns a collection of all possible quotes.
 			/// </summary>
 			/// <param name="which">Determines which quotes to include.</param>
-			public virtual IEnumerable<T> GetAllQuotes(QuoteInclude which = QuoteInclude.All)
+			public IEnumerable<T> GetAllQuotes(QuoteInclude which = QuoteInclude.All)
 			{
-				return GetAllQuotesAsync(which).ToEnumerable();
+				switch (which)
+				{
+					case QuoteInclude.All:
+						return Cache.GetCached().Concat(DownloadAllQuotes());
+
+					case QuoteInclude.Cached:
+						return Cache.GetCached();
+
+					case QuoteInclude.Download:
+						return DownloadAllQuotes();
+
+					default:
+						goto case QuoteInclude.All;
+				}
 			}
 
 			/// <summary>
@@ -97,7 +110,20 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
 			public IEnumerable<T> GetAllQuotes(string tag, QuoteInclude which = QuoteInclude.All)
 			{
-				return GetAllQuotesAsync(tag, which).ToEnumerable();
+				switch (which)
+				{
+					case QuoteInclude.All:
+						return Cache.GetCached(tag).Concat(DownloadAllQuotes(tag));
+
+					case QuoteInclude.Cached:
+						return Cache.GetCached(tag);
+
+					case QuoteInclude.Download:
+						return DownloadAllQuotes(tag);
+
+					default:
+						goto case QuoteInclude.All;
+				}
 			}
 
 			/// <summary>
@@ -107,7 +133,20 @@ namespace JollyQuotes
 			/// <param name="which">Determines which quotes to include.</param>
 			public IEnumerable<T> GetAllQuotes(string[]? tags, QuoteInclude which = QuoteInclude.All)
 			{
-				return GetAllQuotesAsync(tags, which).ToEnumerable();
+				switch (which)
+				{
+					case QuoteInclude.All:
+						return Cache.GetCached(tags).Concat(DownloadAllQuotes(tags));
+
+					case QuoteInclude.Cached:
+						return Cache.GetCached(tags);
+
+					case QuoteInclude.Download:
+						return DownloadAllQuotes(tags);
+
+					default:
+						goto case QuoteInclude.All;
+				}
 			}
 
 			/// <summary>
