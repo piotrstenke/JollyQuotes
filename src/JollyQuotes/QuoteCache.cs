@@ -39,7 +39,6 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		/// <exception cref="ArgumentException">Quote with id already exists.</exception>
 		public void CacheQuote(T quote)
 		{
 			if (quote is null)
@@ -54,7 +53,7 @@ namespace JollyQuotes
 
 			if (!_cache.TryAdd(id, index))
 			{
-				throw new ArgumentException($"Quote with id '{id}' already exists", nameof(quote));
+				return;
 			}
 
 			_lookup.Add(quote);
@@ -267,7 +266,13 @@ namespace JollyQuotes
 
 		private bool InitializeCacheForTag(string tag, [NotNullWhen(true)] out List<int>? quoteIndices)
 		{
-			if (ScrapRemovedValuesAndUpdateTagCache(tag, out quoteIndices))
+			int startRemoveRange = ScrapRemovedValues();
+			return InitializeCacheForTag(tag, startRemoveRange, out quoteIndices);
+		}
+
+		private bool InitializeCacheForTag(string tag, int startRemoveRange, [NotNullWhen(true)] out List<int>? quoteIndices)
+		{
+			if (startRemoveRange > -1 && UpdateTagCache(tag, startRemoveRange, out quoteIndices))
 			{
 				InitializeTagsForRecentlyAdded(quoteIndices, tag);
 
@@ -276,7 +281,7 @@ namespace JollyQuotes
 					return true;
 				}
 			}
-			else
+			else if (_lookup.Count > 0)
 			{
 				quoteIndices = InitializeTagList(tag);
 
@@ -336,26 +341,11 @@ namespace JollyQuotes
 			return removed;
 		}
 
-		private void ScrapRemovedValues()
+		private int ScrapRemovedValues()
 		{
 			if (_removed.Count == 0)
 			{
-				return;
-			}
-
-			int startIndex = GetFirstScrapingIndex();
-			int startRemoveRange = ScrapRemovedValuesWithoutClearing(startIndex);
-
-			_lookup.RemoveRange(startRemoveRange, _lookup.Count - startRemoveRange);
-			_removed.Clear();
-		}
-
-		private bool ScrapRemovedValuesAndUpdateTagCache(string tag, [NotNullWhen(true)] out List<int>? quoteIndices)
-		{
-			if (_removed.Count == 0)
-			{
-				quoteIndices = null;
-				return false;
+				return -1;
 			}
 
 			int startIndex = GetFirstScrapingIndex();
@@ -364,19 +354,7 @@ namespace JollyQuotes
 			_lookup.RemoveRange(startRemoveRange, _lookup.Count - startRemoveRange);
 			_removed.Clear();
 
-			if (_tagCache.TryGetValue(tag, out quoteIndices))
-			{
-				int index = quoteIndices.FindIndex(q => q >= startRemoveRange);
-
-				if (index > -1)
-				{
-					quoteIndices.RemoveRange(index, quoteIndices.Count - index);
-				}
-
-				return true;
-			}
-
-			return false;
+			return startRemoveRange;
 		}
 
 		private int ScrapRemovedValuesWithoutClearing(int startIndex)
@@ -396,6 +374,23 @@ namespace JollyQuotes
 			}
 
 			return newIndex;
+		}
+
+		private bool UpdateTagCache(string tag, int startRemoveRange, [NotNullWhen(true)] out List<int>? quoteIndices)
+		{
+			if (_tagCache.TryGetValue(tag, out quoteIndices))
+			{
+				int index = quoteIndices.FindIndex(q => q >= startRemoveRange);
+
+				if (index > -1)
+				{
+					quoteIndices.RemoveRange(index, quoteIndices.Count - index);
+				}
+
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

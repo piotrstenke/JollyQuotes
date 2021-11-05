@@ -135,7 +135,7 @@ namespace JollyQuotes
 			/// Asynchronously generates a random quote.
 			/// </summary>
 			/// <param name="which">Determines which quotes to include.</param>
-			public Task<T> GetRandomQuoteAsync(QuoteInclude which = QuoteInclude.All)
+			public async Task<T> GetRandomQuoteAsync(QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -151,10 +151,14 @@ namespace JollyQuotes
 						}
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuoteAsync();
+					{
+						T quote = await DownloadRandomQuoteAsync();
+						CacheQuote(quote);
+						return quote;
+					}
 
 					case QuoteInclude.Cached:
-						return Task.FromResult(Cache.GetRandomQuote());
+						return Cache.GetRandomQuote();
 
 					default:
 						goto case QuoteInclude.All;
@@ -167,7 +171,7 @@ namespace JollyQuotes
 			/// <param name="tag">Tag to generate a quote associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			public Task<T?> GetRandomQuoteAsync(string tag, QuoteInclude which = QuoteInclude.All)
+			public async Task<T?> GetRandomQuoteAsync(string tag, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -179,7 +183,7 @@ namespace JollyQuotes
 						}
 						else
 						{
-							return Task.FromResult(quote)!;
+							return quote;
 						}
 					}
 
@@ -187,14 +191,23 @@ namespace JollyQuotes
 					{
 						if (Cache.TryGetRandomQuote(tag, out T? quote))
 						{
-							return Task.FromResult(quote)!;
+							return quote;
 						}
 
-						return GetEmptyTask();
+						return default;
 					}
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuoteAsync(tag)!;
+					{
+						T? quote = await DownloadRandomQuoteAsync(tag);
+
+						if (quote is not null)
+						{
+							CacheQuote(quote);
+						}
+
+						return quote;
+					}
 
 					default:
 						goto case QuoteInclude.All;
@@ -206,26 +219,36 @@ namespace JollyQuotes
 			/// </summary>
 			/// <param name="tags">Tags to generate a quote associated with.</param>
 			/// <param name="which">Determines which quotes to include.</param>
-			public Task<T?> GetRandomQuoteAsync(string[]? tags, QuoteInclude which = QuoteInclude.All)
+			public async Task<T?> GetRandomQuoteAsync(string[]? tags, QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
 					case QuoteInclude.All:
-
+					{
 						if (Cache.IsEmpty || Possibility.Determine() || GetQuoteFromCache() is not T quote)
 						{
 							goto case QuoteInclude.Download;
 						}
 						else
 						{
-							return Task.FromResult(quote)!;
+							return quote;
 						}
+					}
 
 					case QuoteInclude.Cached:
-						return Task.FromResult(GetQuoteFromCache());
+						return GetQuoteFromCache();
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuoteAsync(tags)!;
+					{
+						T? quote = await DownloadRandomQuoteAsync(tags);
+
+						if (quote is not null)
+						{
+							CacheQuote(quote);
+						}
+
+						return quote;
+					}
 
 					default:
 						goto case QuoteInclude.All;

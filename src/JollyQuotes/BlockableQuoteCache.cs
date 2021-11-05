@@ -76,7 +76,7 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		///  <exception cref="InvalidOperationException">Blocked cache cannot be modified.</exception>
+		/// <exception cref="InvalidOperationException">Blocked cache cannot be modified.</exception>
 		public void CacheQuote(T quote)
 		{
 			if (CanBeModified())

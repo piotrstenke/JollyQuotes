@@ -151,7 +151,9 @@ namespace JollyQuotes
 						return Cache.GetRandomQuote();
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuote();
+						T quote = DownloadRandomQuote();
+						CacheQuote(quote);
+						return quote;
 
 					default:
 						goto case QuoteInclude.All;
@@ -191,7 +193,16 @@ namespace JollyQuotes
 					}
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuote(tag);
+					{
+						T? quote = DownloadRandomQuote(tag);
+
+						if (quote is not null)
+						{
+							CacheQuote(quote);
+						}
+
+						return quote;
+					}
 
 					default:
 						goto case QuoteInclude.All;
@@ -208,7 +219,7 @@ namespace JollyQuotes
 				switch (which)
 				{
 					case QuoteInclude.All:
-
+					{
 						if (Cache.IsEmpty || Possibility.Determine() || GetQuoteFromCache() is not T quote)
 						{
 							goto case QuoteInclude.Download;
@@ -217,12 +228,22 @@ namespace JollyQuotes
 						{
 							return quote;
 						}
+					}
 
 					case QuoteInclude.Cached:
 						return GetQuoteFromCache();
 
 					case QuoteInclude.Download:
-						return DownloadRandomQuote(tags);
+					{
+						T? quote = DownloadRandomQuote(tags);
+
+						if (quote is not null)
+						{
+							CacheQuote(quote);
+						}
+
+						return quote;
+					}
 
 					default:
 						goto case QuoteInclude.All;
@@ -272,6 +293,18 @@ namespace JollyQuotes
 			internal static BlockableQuoteCache<T> GetDefaultQuoteCache()
 			{
 				return new BlockableQuoteCache<T>(new QuoteCache<T>());
+			}
+
+			/// <summary>
+			/// Adds the specified <paramref name="quote"/> to the <see cref="Cache"/> if <see cref="BlockableQuoteCache{T}.IsBlocked"/> is <see langword="false"/>.
+			/// </summary>
+			/// <param name="quote"><see cref="IQuote"/> to cache.</param>
+			protected void CacheQuote(T quote)
+			{
+				if (!Cache.IsBlocked)
+				{
+					Cache.CacheQuote(quote);
+				}
 			}
 
 			/// <summary>

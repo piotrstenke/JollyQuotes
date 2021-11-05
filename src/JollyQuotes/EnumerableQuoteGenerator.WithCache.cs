@@ -77,7 +77,11 @@ namespace JollyQuotes
 						return Cache.GetCached();
 
 					case QuoteInclude.Download:
-						return DownloadAllQuotes();
+						return DownloadAllQuotes().Select(q =>
+						{
+							CacheQuote(q);
+							return q;
+						});
 
 					default:
 						goto case QuoteInclude.All;
@@ -101,7 +105,11 @@ namespace JollyQuotes
 						return Cache.GetCached(tag);
 
 					case QuoteInclude.Download:
-						return DownloadAllQuotes(tag);
+						return DownloadAllQuotes(tag).Select(q =>
+						{
+							CacheQuote(q);
+							return q;
+						});
 
 					default:
 						goto case QuoteInclude.All;
@@ -124,11 +132,24 @@ namespace JollyQuotes
 						return Cache.GetCached(tags);
 
 					case QuoteInclude.Download:
-						return DownloadAllQuotes(tags);
+						return DownloadAllQuotes(tags).Select(q =>
+						{
+							CacheQuote(q);
+							return q;
+						});
 
 					default:
 						goto case QuoteInclude.All;
 				}
+			}
+
+			/// <summary>
+			/// Returns a <see cref="CachingEnumerator{T}"/> that downloads iterates through all available <see cref="IQuote"/>s. The <see cref="IQuote"/> are cached upon calling <see cref="CachingEnumerator{T}.MoveNext"/>.
+			/// </summary>
+			public CachingEnumerator<T> GetCachingEnumerator()
+			{
+				IEnumerator<T> enumerator = DownloadAndEnumerate();
+				return new CachingEnumerator<T>(enumerator, Cache);
 			}
 
 			/// <summary>
@@ -143,7 +164,7 @@ namespace JollyQuotes
 						return YieldAll();
 
 					case QuoteInclude.Download:
-						return DownloadAndEnumerate();
+						return GetCachingEnumerator();
 
 					case QuoteInclude.Cached:
 						return Cache.GetEnumerator();
@@ -159,7 +180,7 @@ namespace JollyQuotes
 						yield return quote;
 					}
 
-					using IEnumerator<T> enumerator = DownloadAndEnumerate();
+					using CachingEnumerator<T> enumerator = GetCachingEnumerator();
 
 					while (enumerator.MoveNext())
 					{
