@@ -12,10 +12,15 @@ namespace JollyQuotes
 		public new abstract class WithCache : RandomQuoteGenerator<T>.WithCache, IQuoteGeneratorClient, IDisposable
 		{
 			private bool _disposed;
-			private Task<T?>? _emptyTask;
 
 			/// <inheritdoc/>
 			public HttpClient BaseClient { get; }
+
+			/// <summary>
+			/// Determines whether to dispose the <see cref="BaseClient"/> when <see cref="Dispose()"/> is called.
+			/// </summary>
+			/// <remarks>The default value is <see langword="true"/>.</remarks>
+			public bool DisposeClient { get; set; } = true;
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
@@ -132,163 +137,6 @@ namespace JollyQuotes
 			}
 
 			/// <summary>
-			/// Asynchronously generates a random quote.
-			/// </summary>
-			/// <param name="which">Determines which quotes to include.</param>
-			public async Task<T> GetRandomQuoteAsync(QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-
-						if (Cache.IsEmpty || Possibility.Determine())
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							goto case QuoteInclude.Cached;
-						}
-
-					case QuoteInclude.Download:
-					{
-						T quote = await DownloadRandomQuoteAsync();
-						CacheQuote(quote);
-						return quote;
-					}
-
-					case QuoteInclude.Cached:
-						return Cache.GetRandomQuote();
-
-					default:
-						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Asynchronously generates a random quote associated with the specified tag.
-			/// </summary>
-			/// <param name="tag">Tag to generate a quote associated with.</param>
-			/// <param name="which">Determines which quotes to include.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			public async Task<T?> GetRandomQuoteAsync(string tag, QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-					{
-						if (Cache.IsEmpty || Possibility.Determine() || !Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							return quote;
-						}
-					}
-
-					case QuoteInclude.Cached:
-					{
-						if (Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							return quote;
-						}
-
-						return default;
-					}
-
-					case QuoteInclude.Download:
-					{
-						T? quote = await DownloadRandomQuoteAsync(tag);
-
-						if (quote is not null)
-						{
-							CacheQuote(quote);
-						}
-
-						return quote;
-					}
-
-					default:
-						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Asynchronously generates a random quote associated with any of the specified <paramref name="tags"/>.
-			/// </summary>
-			/// <param name="tags">Tags to generate a quote associated with.</param>
-			/// <param name="which">Determines which quotes to include.</param>
-			public async Task<T?> GetRandomQuoteAsync(string[]? tags, QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-					{
-						if (Cache.IsEmpty || Possibility.Determine() || GetQuoteFromCache() is not T quote)
-						{
-							goto case QuoteInclude.Download;
-						}
-						else
-						{
-							return quote;
-						}
-					}
-
-					case QuoteInclude.Cached:
-						return GetQuoteFromCache();
-
-					case QuoteInclude.Download:
-					{
-						T? quote = await DownloadRandomQuoteAsync(tags);
-
-						if (quote is not null)
-						{
-							CacheQuote(quote);
-						}
-
-						return quote;
-					}
-
-					default:
-						goto case QuoteInclude.All;
-				}
-
-				T? GetQuoteFromCache()
-				{
-					if (tags is null)
-					{
-						return default;
-					}
-
-					foreach (string tag in tags)
-					{
-						if (Cache.TryGetRandomQuote(tag, out T? quote))
-						{
-							return quote;
-						}
-					}
-
-					return default;
-				}
-			}
-
-			Task<IQuote> IQuoteGeneratorClient.GetRandomQuoteAsync()
-			{
-				return GetRandomQuoteAsync().ContinueWith(t => t.Result as IQuote);
-			}
-
-			Task<IQuote?> IQuoteGeneratorClient.GetRandomQuoteAsync(params string[]? tags)
-			{
-				return GetRandomQuoteAsync(tags).ContinueWith(t => t.Result as IQuote);
-			}
-
-			Task<IQuote?> IQuoteGeneratorClient.GetRandomQuoteAsync(string tag)
-			{
-				return GetRandomQuoteAsync(tag).ContinueWith(t => t.Result as IQuote);
-			}
-
-			/// <summary>
 			/// Releases the resources held by the client.
 			/// </summary>
 			/// <param name="disposing">Determines whether this method was called directly (<see langword="true"/>) or from destructor (<see langword="false"/>).</param>
@@ -296,70 +144,13 @@ namespace JollyQuotes
 			{
 				if (!_disposed)
 				{
-					if (disposing)
+					if (disposing && DisposeClient)
 					{
 						BaseClient.Dispose();
 					}
 
 					_disposed = true;
 				}
-			}
-
-			/// <inheritdoc/>
-			protected override T DownloadRandomQuote()
-			{
-				return DownloadRandomQuoteAsync().Result;
-			}
-
-			/// <inheritdoc/>
-			protected override T? DownloadRandomQuote(string tag)
-			{
-				return DownloadRandomQuoteAsync(tag).Result;
-			}
-
-			/// <inheritdoc/>
-			protected override T? DownloadRandomQuote(params string[]? tags)
-			{
-				return DownloadRandomQuoteAsync(tags).Result;
-			}
-
-			/// <summary>
-			/// Asynchronously downloads a quote from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
-			/// </summary>
-			protected abstract Task<T> DownloadRandomQuoteAsync();
-
-			/// <summary>
-			/// Asynchronously downloads a quote associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
-			/// </summary>
-			/// <param name="tag">Tag to download a quote associated with.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			protected virtual Task<T?> DownloadRandomQuoteAsync(string tag)
-			{
-				if (string.IsNullOrWhiteSpace(tag))
-				{
-					throw Internals.NullOrEmpty(nameof(tag));
-				}
-
-				return DownloadRandomQuoteAsync(new string[] { tag });
-			}
-
-			/// <summary>
-			/// Asynchronously downloads a random quote associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
-			/// </summary>
-			/// <param name="tags">Tags to download a quote associated with.</param>
-			protected abstract Task<T?> DownloadRandomQuoteAsync(string[]? tags);
-
-			/// <summary>
-			/// Returns a <see cref="Task{TResult}"/> with the <see cref="Task{TResult}.Result"/> set to <see langword="default"/>(<typeparamref name="T"/>).
-			/// </summary>
-			protected Task<T?> GetEmptyTask()
-			{
-				if (_emptyTask is null)
-				{
-					_emptyTask = Task.FromResult(default(T));
-				}
-
-				return _emptyTask;
 			}
 		}
 	}

@@ -96,6 +96,11 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
 			public IEnumerable<T> GetAllQuotes(string tag, QuoteInclude which = QuoteInclude.All)
 			{
+				if (string.IsNullOrWhiteSpace(tag))
+				{
+					throw Internals.NullOrEmpty(nameof(tag));
+				}
+
 				switch (which)
 				{
 					case QuoteInclude.All:

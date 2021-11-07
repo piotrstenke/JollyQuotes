@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 
 namespace JollyQuotes
 {
-	/// <inheritdoc cref="IEnumerableQuoteGeneratorClient"/>
+	/// <summary>
+	/// <see cref="IRandomQuoteGenerator"/> that combines functionality of the <see cref="IEnumerableQuoteGenerator"/> and <see cref="IQuoteGeneratorClient"/> interfaces.
+	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class EnumerableQuoteGeneratorClient<T> : QuoteGeneratorClient<T>, IEnumerableQuoteGeneratorClient where T : IQuote
+	public abstract partial class EnumerableQuoteGeneratorClient<T> : QuoteGeneratorClient<T>, IEnumerableQuoteGenerator where T : IQuote
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EnumerableQuoteGeneratorClient{T}"/> class with a <paramref name="source"/> specified.
@@ -57,48 +58,21 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes()"/>
-		public virtual IEnumerable<T> GetAllQuotes()
-		{
-			return GetAllQuotesAsync().ToEnumerable();
-		}
+		public abstract IEnumerable<T> GetAllQuotes();
 
 		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes(string)"/>
 		public virtual IEnumerable<T> GetAllQuotes(string tag)
-		{
-			return GetAllQuotesAsync(tag).ToEnumerable();
-		}
-
-		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes(string[])"/>
-		public virtual IEnumerable<T> GetAllQuotes(params string[]? tags)
-		{
-			return GetAllQuotesAsync(tags).ToEnumerable();
-		}
-
-		/// <inheritdoc cref="IEnumerableQuoteGeneratorClient.GetAllQuotesAsync()"/>
-		public abstract IAsyncEnumerable<T> GetAllQuotesAsync();
-
-		/// <inheritdoc cref="IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(string)"/>
-		public virtual IAsyncEnumerable<T> GetAllQuotesAsync(string tag)
 		{
 			if (string.IsNullOrWhiteSpace(tag))
 			{
 				throw Internals.NullOrEmpty(nameof(tag));
 			}
 
-			return GetAllQuotesAsync(new string[] { tag });
+			return GetAllQuotes(new string[] { tag });
 		}
 
-		/// <inheritdoc cref="IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(string[])"/>
-		public abstract IAsyncEnumerable<T> GetAllQuotesAsync(params string[]? tags);
-
-		/// <summary>
-		/// Returns an <see cref="IAsyncEnumerator{T}"/> that asynchronously iterates through all the available <see cref="IQuote"/>s.
-		/// </summary>
-		/// <param name="cancellationToken">A <see cref="CancellationToken"/> that may be used to cancel the asynchronous iteration.</param>
-		public virtual IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-		{
-			return GetAllQuotesAsync().GetAsyncEnumerator(cancellationToken);
-		}
+		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes(string[])"/>
+		public abstract IEnumerable<T> GetAllQuotes(params string[]? tags);
 
 		/// <summary>
 		/// Returns an <see cref="IEnumerator{T}"/> that iterates through all the available <see cref="IQuote"/>s.
@@ -121,50 +95,6 @@ namespace JollyQuotes
 		IEnumerable<IQuote> IEnumerableQuoteGenerator.GetAllQuotes(params string[]? tags)
 		{
 			return GetAllQuotes(tags).Cast<IQuote>();
-		}
-
-		async IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync()
-		{
-			await foreach (T quote in GetAllQuotesAsync())
-			{
-				yield return quote;
-			}
-		}
-
-		IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(string tag)
-		{
-			if (string.IsNullOrWhiteSpace(tag))
-			{
-				throw Internals.NullOrEmpty(nameof(tag));
-			}
-
-			return Yield();
-
-			async IAsyncEnumerable<IQuote> Yield()
-			{
-				await foreach (T quote in GetAllQuotesAsync(tag))
-				{
-					yield return quote;
-				}
-			}
-		}
-
-		async IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(params string[]? tags)
-		{
-			await foreach (T quote in GetAllQuotesAsync(tags))
-			{
-				yield return quote;
-			}
-		}
-
-		async IAsyncEnumerator<IQuote> IAsyncEnumerable<IQuote>.GetAsyncEnumerator(CancellationToken cancellationToken)
-		{
-			await using IAsyncEnumerator<T> enumerator = GetAsyncEnumerator(cancellationToken);
-
-			while (await enumerator.MoveNextAsync())
-			{
-				yield return enumerator.Current;
-			}
 		}
 
 		IEnumerator<IQuote> IEnumerable<IQuote>.GetEnumerator()

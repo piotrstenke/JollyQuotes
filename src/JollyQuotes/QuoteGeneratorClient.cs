@@ -16,6 +16,12 @@ namespace JollyQuotes
 		public HttpClient BaseClient { get; }
 
 		/// <summary>
+		/// Determines whether to dispose the <see cref="BaseClient"/> when <see cref="Dispose()"/> is called.
+		/// </summary>
+		/// <remarks>The default value is <see langword="true"/>.</remarks>
+		public bool DisposeClient { get; set; } = true;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteGeneratorClient{T}"/> class with a <paramref name="source"/> specified.
 		/// </summary>
 		/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
@@ -62,7 +68,7 @@ namespace JollyQuotes
 		/// Initializes a new instance of the <see cref="QuoteGeneratorClient{T}"/> class with an underlaying <paramref name="client"/> and <paramref name="source"/> specified.
 		/// </summary>
 		/// <param name="client">Underlaying client that is used to access required resources.</param>
-		/// <param name="source"></param>
+		/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		protected QuoteGeneratorClient(HttpClient client, string source) : base(source)
@@ -92,56 +98,6 @@ namespace JollyQuotes
 			GC.SuppressFinalize(this);
 		}
 
-		/// <inheritdoc/>
-		public override T GetRandomQuote()
-		{
-			return GetRandomQuoteAsync().Result;
-		}
-
-		/// <inheritdoc/>
-		public override T? GetRandomQuote(string tag)
-		{
-			return GetRandomQuoteAsync(tag).Result;
-		}
-
-		/// <inheritdoc/>
-		public override T? GetRandomQuote(params string[]? tags)
-		{
-			return GetRandomQuoteAsync(tags).Result;
-		}
-
-		/// <inheritdoc cref="IQuoteGeneratorClient.GetRandomQuoteAsync()"/>
-		public abstract Task<T> GetRandomQuoteAsync();
-
-		/// <inheritdoc cref="IQuoteGeneratorClient.GetRandomQuoteAsync(string)"/>
-		public Task<T?> GetRandomQuoteAsync(string tag)
-		{
-			if (string.IsNullOrWhiteSpace(tag))
-			{
-				throw Internals.NullOrEmpty(nameof(tag));
-			}
-
-			return GetRandomQuoteAsync(new string[] { tag });
-		}
-
-		/// <inheritdoc cref="IQuoteGeneratorClient.GetRandomQuoteAsync(string[])"/>
-		public abstract Task<T?> GetRandomQuoteAsync(params string[]? tags);
-
-		Task<IQuote> IQuoteGeneratorClient.GetRandomQuoteAsync()
-		{
-			return GetRandomQuoteAsync().ContinueWith(t => t.Result as IQuote);
-		}
-
-		Task<IQuote?> IQuoteGeneratorClient.GetRandomQuoteAsync(params string[]? tags)
-		{
-			return GetRandomQuoteAsync(tags).ContinueWith(t => t.Result as IQuote);
-		}
-
-		Task<IQuote?> IQuoteGeneratorClient.GetRandomQuoteAsync(string tag)
-		{
-			return GetRandomQuoteAsync(tag).ContinueWith(t => t.Result as IQuote);
-		}
-
 		/// <summary>
 		/// Releases the resources held by the client.
 		/// </summary>
@@ -150,7 +106,7 @@ namespace JollyQuotes
 		{
 			if (!_disposed)
 			{
-				if (disposing)
+				if (disposing && DisposeClient)
 				{
 					BaseClient.Dispose();
 				}

@@ -113,6 +113,7 @@ namespace JollyQuotes
 				other.Author == Author &&
 				other.Source == Source &&
 				other.Date == Date &&
+				other.Tags.Length == Tags.Length &&
 				other.Tags.SequenceEqual(Tags);
 		}
 

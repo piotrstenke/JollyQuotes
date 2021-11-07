@@ -132,7 +132,7 @@ namespace JollyQuotes
 			/// Generates a random quote.
 			/// </summary>
 			/// <param name="which">Determines which quotes to include in the search.</param>
-			public T? GetRandomQuote(QuoteInclude which = QuoteInclude.All)
+			public T GetRandomQuote(QuoteInclude which = QuoteInclude.All)
 			{
 				switch (which)
 				{
@@ -168,6 +168,11 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
 			public T? GetRandomQuote(string tag, QuoteInclude which = QuoteInclude.All)
 			{
+				if (string.IsNullOrWhiteSpace(tag))
+				{
+					throw Internals.NullOrEmpty(nameof(tag));
+				}
+
 				switch (which)
 				{
 					case QuoteInclude.All:

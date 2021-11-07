@@ -15,13 +15,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{F6567141
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC9E460D-13B4-4EFC-9593-9E616B66EF66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JollyQoutes.KanyeRest", "src\JollyQoutes.KanyeRest\JollyQoutes.KanyeRest.csproj", "{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JollyQoutes.KanyeRest", "src\JollyQoutes.KanyeRest\JollyQoutes.KanyeRest.csproj", "{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{AC16590A-A42C-4E10-9F79-2E4A6A1889F8}"
 	ProjectSection(SolutionItems) = preProject
 		img\logo-256.png = img\logo-256.png
 		img\logo-64.png = img\logo-64.png
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JollyQuotes.TronaldDump", "src\JollyQuotes.TronaldDump\JollyQuotes.TronaldDump.csproj", "{016D208B-7A48-42F7-BA54-3A3D7A6E127B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,10 @@ Global
 		{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{016D208B-7A48-42F7-BA54-3A3D7A6E127B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{016D208B-7A48-42F7-BA54-3A3D7A6E127B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{016D208B-7A48-42F7-BA54-3A3D7A6E127B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{016D208B-7A48-42F7-BA54-3A3D7A6E127B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FC84ACFB-A21C-4DC9-93A5-1B27C138F025} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
 		{232B9FD6-5EA7-41BD-8065-6A1326E3AD85} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
+		{016D208B-7A48-42F7-BA54-3A3D7A6E127B} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {58868B01-6B15-409D-AABE-048B9F97F9D8}

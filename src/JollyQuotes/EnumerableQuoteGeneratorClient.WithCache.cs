@@ -10,9 +10,10 @@ namespace JollyQuotes
 	public abstract partial class EnumerableQuoteGeneratorClient<T> where T : IQuote
 	{
 		/// <summary>
-		/// <see cref="IEnumerableQuoteGeneratorClient"/> that provides a mechanism for caching <see cref="IQuote"/>s.
+		/// <see cref="IRandomQuoteGenerator"/> that combines functionality of the <see cref="IEnumerableQuoteGenerator"/> and <see cref="IQuoteGeneratorClient"/> interfaces
+		/// and provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : QuoteGeneratorClient<T>.WithCache, IEnumerableQuoteGeneratorClient
+		public new abstract class WithCache : QuoteGeneratorClient<T>.WithCache, IEnumerableQuoteGenerator
 		{
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
@@ -114,6 +115,11 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
 			public IEnumerable<T> GetAllQuotes(string tag, QuoteInclude which = QuoteInclude.All)
 			{
+				if (string.IsNullOrWhiteSpace(tag))
+				{
+					throw Internals.NullOrEmpty(nameof(tag));
+				}
+
 				switch (which)
 				{
 					case QuoteInclude.All:
@@ -158,135 +164,6 @@ namespace JollyQuotes
 
 					default:
 						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Returns an asynchronous collection of all possible quotes.
-			/// </summary>
-			/// <param name="which">Determines which quotes to include.</param>
-			public IAsyncEnumerable<T> GetAllQuotesAsync(QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-						return Cache.GetCached().ToAsyncEnumerable().Concat(DownloadAllQuotesAsync());
-
-					case QuoteInclude.Download:
-						return DownloadAllQuotesAsync().Select(q =>
-						{
-							CacheQuote(q);
-							return q;
-						});
-
-					case QuoteInclude.Cached:
-						return Cache.GetCached().ToAsyncEnumerable();
-
-					default:
-						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Returns an asynchronous collection of all possible quotes associated with the specified <paramref name="tag"/>.
-			/// </summary>
-			/// <param name="tag">Tag to get all <see cref="IQuote"/>s associated with.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			/// <param name="which">Determines which quotes to include.</param>
-			public IAsyncEnumerable<T> GetAllQuotesAsync(string tag, QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-						return Cache.GetCached(tag).ToAsyncEnumerable().Concat(DownloadAllQuotesAsync(tag));
-
-					case QuoteInclude.Download:
-						return DownloadAllQuotesAsync(tag).Select(q =>
-						{
-							CacheQuote(q);
-							return q;
-						});
-
-					case QuoteInclude.Cached:
-						return Cache.GetCached(tag).ToAsyncEnumerable();
-
-					default:
-						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Returns an asynchronous collection of all possible quotes associated with any of the specified <paramref name="tags"/>.
-			/// </summary>
-			/// <param name="tags">Tags to get all <see cref="IQuote"/> associated with.</param>
-			/// <param name="which">Determines which quotes to include.</param>
-			public IAsyncEnumerable<T> GetAllQuotesAsync(string[]? tags, QuoteInclude which = QuoteInclude.All)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-						return Cache.GetCached(tags).ToAsyncEnumerable().Concat(DownloadAllQuotesAsync(tags));
-
-					case QuoteInclude.Download:
-						return DownloadAllQuotesAsync(tags).Select(q =>
-						{
-							CacheQuote(q);
-							return q;
-						});
-
-					case QuoteInclude.Cached:
-						return Cache.GetCached(tags).ToAsyncEnumerable();
-
-					default:
-						goto case QuoteInclude.All;
-				}
-			}
-
-			/// <summary>
-			/// Returns an <see cref="IAsyncEnumerator{T}"/> that asynchronously iterates through all the available <see cref="IQuote"/>s.
-			/// </summary>
-			/// <param name="which">Determines which quotes to include.</param>
-			/// <param name="cancellationToken">A <see cref="CancellationToken"/> that may be used to cancel the asynchronous iteration.</param>
-			public IAsyncEnumerator<T> GetAsyncEnumerator(QuoteInclude which = QuoteInclude.All, CancellationToken cancellationToken = default)
-			{
-				switch (which)
-				{
-					case QuoteInclude.All:
-						return YieldAll();
-
-					case QuoteInclude.Download:
-						return YieldDownloaded().GetAsyncEnumerator(cancellationToken);
-
-					case QuoteInclude.Cached:
-						return Cache.ToAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
-
-					default:
-						goto case QuoteInclude.All;
-				}
-
-				async IAsyncEnumerator<T> YieldAll()
-				{
-					foreach (T quote in Cache)
-					{
-						yield return quote;
-					}
-
-					await foreach (T quote in YieldDownloaded())
-					{
-						yield return quote;
-					}
-				}
-
-				async IAsyncEnumerable<T> YieldDownloaded()
-				{
-					await using IAsyncEnumerator<T> enumerator = DownloadAndAsyncEnumerate(cancellationToken);
-
-					while (await enumerator.MoveNextAsync())
-					{
-						T quote = enumerator.Current;
-						CacheQuote(quote);
-						yield return quote;
-					}
 				}
 			}
 
@@ -351,50 +228,6 @@ namespace JollyQuotes
 				return GetAllQuotes(tags).Cast<IQuote>();
 			}
 
-			async IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync()
-			{
-				await foreach (T quote in GetAllQuotesAsync())
-				{
-					yield return quote;
-				}
-			}
-
-			IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(string tag)
-			{
-				if (string.IsNullOrWhiteSpace(tag))
-				{
-					throw Internals.NullOrEmpty(nameof(tag));
-				}
-
-				return Yield();
-
-				async IAsyncEnumerable<IQuote> Yield()
-				{
-					await foreach (T quote in GetAllQuotesAsync(tag))
-					{
-						yield return quote;
-					}
-				}
-			}
-
-			async IAsyncEnumerable<IQuote> IEnumerableQuoteGeneratorClient.GetAllQuotesAsync(params string[]? tags)
-			{
-				await foreach (T quote in GetAllQuotesAsync(tags))
-				{
-					yield return quote;
-				}
-			}
-
-			async IAsyncEnumerator<IQuote> IAsyncEnumerable<IQuote>.GetAsyncEnumerator(CancellationToken cancellationToken)
-			{
-				await using IAsyncEnumerator<T> enumerator = GetAsyncEnumerator(cancellationToken: cancellationToken);
-
-				while (await enumerator.MoveNextAsync())
-				{
-					yield return enumerator.Current;
-				}
-			}
-
 			IEnumerator<IQuote> IEnumerable<IQuote>.GetEnumerator()
 			{
 				foreach (T quote in GetAllQuotes())
@@ -411,10 +244,7 @@ namespace JollyQuotes
 			/// <summary>
 			/// Downloads all quotes available from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>
 			/// </summary>
-			protected virtual IEnumerable<T> DownloadAllQuotes()
-			{
-				return DownloadAllQuotesAsync().ToEnumerable();
-			}
+			protected abstract IEnumerable<T> DownloadAllQuotes();
 
 			/// <summary>
 			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
@@ -423,52 +253,19 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
 			protected virtual IEnumerable<T> DownloadAllQuotes(string tag)
 			{
-				return DownloadAllQuotesAsync(tag).ToEnumerable();
+				if (string.IsNullOrWhiteSpace(tag))
+				{
+					throw Internals.NullOrEmpty(nameof(tag));
+				}
+
+				return DownloadAllQuotes(tag);
 			}
 
 			/// <summary>
 			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download all quotes associated with.</param>
-			protected virtual IEnumerable<T> DownloadAllQuotes(params string[]? tags)
-			{
-				return DownloadAllQuotesAsync(tags).ToEnumerable();
-			}
-
-			/// <summary>
-			/// Asynchronously downloads all quotes available from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>
-			/// </summary>
-			protected abstract IAsyncEnumerable<T> DownloadAllQuotesAsync();
-
-			/// <summary>
-			/// Asynchronously downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
-			/// </summary>
-			/// <param name="tag">Tag to download all quotes associated with.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			protected virtual IAsyncEnumerable<T> DownloadAllQuotesAsync(string tag)
-			{
-				if (string.IsNullOrWhiteSpace(tag))
-				{
-					throw Internals.NullOrEmpty(nameof(tag));
-				}
-
-				return DownloadAllQuotesAsync(new string[] { tag });
-			}
-
-			/// <summary>
-			/// Asynchronously downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
-			/// </summary>
-			/// <param name="tags">Tags to download all quotes associated with.</param>
-			protected abstract IAsyncEnumerable<T> DownloadAllQuotesAsync(params string[]? tags);
-
-			/// <summary>
-			/// Downloads all available <see cref="IQuote"/>s and asynchronously enumerates them.
-			/// </summary>
-			/// <param name="cancellationToken">A <see cref="CancellationToken"/> that may be used to cancel the asynchronous iteration.</param>
-			protected virtual IAsyncEnumerator<T> DownloadAndAsyncEnumerate(CancellationToken cancellationToken = default)
-			{
-				return DownloadAllQuotesAsync().GetAsyncEnumerator(cancellationToken);
-			}
+			protected abstract IEnumerable<T> DownloadAllQuotes(params string[]? tags);
 
 			/// <summary>
 			/// Downloads all available <see cref="IQuote"/>s and enumerates them.

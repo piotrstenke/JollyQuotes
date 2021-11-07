@@ -1,7 +1,7 @@
 ﻿namespace JollyQuotes.KanyeRest
 {
 	/// <summary>
-	/// Contains links to all <c>kanye.rest</c> resources.
+	/// Contains links to important <c>kanye.rest</c> resources.
 	/// </summary>
 	public static class KanyeResources
 	{
@@ -16,12 +16,12 @@
 		public const string Database = "https://github.com/ajzbc/kanye.rest/blob/master/quotes.json";
 
 		/// <summary>
-		/// GitHub page.
+		/// Link to the GitHub page of <c>kanye.rest</c> app.
 		/// </summary>
 		public const string GitHubPage = "https://github.com/ajzbc/kanye.rest";
 
 		/// <summary>
-		/// Main page.
+		/// Main page of <c>kanye.rest</c>.
 		/// </summary>
 		public const string MainPage = "https://kanye.rest";
 	}

@@ -18,6 +18,8 @@ namespace JollyQuotes
 		private readonly Dictionary<string, List<int>> _tagCache;
 		private int _recentlyAdded;
 
+		// TODO: Make _recentlyAdded for every tag in the cache
+
 		/// <inheritdoc/>
 		public bool IsEmpty => NumCached == 0;
 

@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace JollyQuotes.KanyeRest
 {
 	/// <summary>
 	/// <see cref="IRandomQuoteGenerator"/> that generates real-life quotes of everybody's favorite rapper, Kanye West, using the <c>kanye.rest</c> API.
 	/// </summary>
-	public class KanyeQuoteGenerator : EnumerableQuoteGeneratorClient<KanyeQuote>.WithCache
+	public class KanyeQuoteGenerator : EnumerableQuoteGeneratorClient<KanyeQuote>.WithCache, IKanyeRestService
 	{
 		private const string ERROR_TAGS_NOT_SUPPORTED = "kanye.rest does not support tags";
 
@@ -56,6 +53,16 @@ namespace JollyQuotes.KanyeRest
 		{
 		}
 
+		IEnumerable<KanyeQuote> IKanyeRestService.GetAllQuotes()
+		{
+			return GetAllQuotes();
+		}
+
+		KanyeQuote IKanyeRestService.GetRandomQuote()
+		{
+			return GetRandomQuote()!;
+		}
+
 		/// <inheritdoc/>
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes()
 		{
@@ -64,7 +71,6 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes(params string[]? tags)
 		{
 			return Array.Empty<KanyeQuote>();
@@ -72,48 +78,19 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes(string tag)
 		{
 			return Array.Empty<KanyeQuote>();
 		}
 
 		/// <inheritdoc/>
-		protected override async IAsyncEnumerable<KanyeQuote> DownloadAllQuotesAsync()
-		{
-			KanyeQuote[] quotes = await BaseClient.DownloadAndDeserialize<KanyeQuote[]>(KanyeResources.Database);
-
-			foreach (KanyeQuote quote in quotes)
-			{
-				yield return quote;
-			}
-		}
-
-		/// <inheritdoc/>
-		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		protected override IAsyncEnumerable<KanyeQuote> DownloadAllQuotesAsync(params string[]? tags)
-		{
-			return AsyncEnumerable.Empty<KanyeQuote>();
-		}
-
-		/// <inheritdoc/>
-		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		protected override IAsyncEnumerable<KanyeQuote> DownloadAllQuotesAsync(string tag)
-		{
-			return AsyncEnumerable.Empty<KanyeQuote>();
-		}
-
-		/// <inheritdoc/>
 		protected override KanyeQuote DownloadRandomQuote()
 		{
-			return DownloadRandomQuoteAsync().Result;
+			return BaseClient.DownloadAndDeserialize<KanyeQuote>(KanyeResources.APIPage).Result;
 		}
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override KanyeQuote? DownloadRandomQuote(params string[]? tags)
 		{
 			return default;
@@ -121,32 +98,9 @@ namespace JollyQuotes.KanyeRest
 
 		/// <inheritdoc/>
 		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
 		protected override KanyeQuote? DownloadRandomQuote(string tag)
 		{
 			return default;
-		}
-
-		/// <inheritdoc/>
-		protected override Task<KanyeQuote> DownloadRandomQuoteAsync()
-		{
-			return BaseClient.DownloadAndDeserialize<KanyeQuote>(KanyeResources.APIPage);
-		}
-
-		/// <inheritdoc/>
-		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		protected override Task<KanyeQuote?> DownloadRandomQuoteAsync(string tag)
-		{
-			return GetEmptyTask();
-		}
-
-		/// <inheritdoc/>
-		[Obsolete(ERROR_TAGS_NOT_SUPPORTED)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		protected override Task<KanyeQuote?> DownloadRandomQuoteAsync(string[]? tags)
-		{
-			return GetEmptyTask();
 		}
 	}
 }
