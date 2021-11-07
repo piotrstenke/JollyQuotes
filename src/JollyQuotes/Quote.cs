@@ -11,7 +11,7 @@ namespace JollyQuotes
 	/// <remarks>This class implements the <see cref="IEquatable{T}"/> interface - two instances are compare by their value, not reference.</remarks>
 	[Serializable]
 	[JsonObject]
-	public sealed record Quote : IQuote
+	public sealed record Quote : IQuoteWithTags
 	{
 		/// <summary>
 		/// Value used when an author of a quote is unknown.
@@ -153,16 +153,6 @@ namespace JollyQuotes
 		int IQuote.GetId()
 		{
 			return GetHashCode();
-		}
-
-		bool IQuote.HasTag(string tag)
-		{
-			if (string.IsNullOrWhiteSpace(tag))
-			{
-				throw Internals.NullOrEmpty(nameof(tag));
-			}
-
-			return Array.IndexOf(Tags, tag) != -1;
 		}
 	}
 }

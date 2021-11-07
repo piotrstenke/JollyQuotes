@@ -7,7 +7,7 @@ namespace JollyQuotes.KanyeRest
 	/// <summary>
 	/// <see cref="IRandomQuoteGenerator"/> that generates real-life quotes of everybody's favorite rapper, Kanye West, using the <c>kanye.rest</c> API.
 	/// </summary>
-	public class KanyeQuoteGenerator : EnumerableQuoteGeneratorClient<KanyeQuote>.WithCache, IKanyeRestService
+	public class KanyeQuoteGenerator : EnumerableQuoteClient<KanyeQuote>.WithCache, IKanyeRestService
 	{
 		private const string ERROR_TAGS_NOT_SUPPORTED = "kanye.rest does not support tags";
 
@@ -66,7 +66,7 @@ namespace JollyQuotes.KanyeRest
 		/// <inheritdoc/>
 		protected override IEnumerable<KanyeQuote> DownloadAllQuotes()
 		{
-			return BaseClient.DownloadAndDeserialize<KanyeQuote[]>(KanyeResources.Database).Result;
+			return Resolver.Resolve<KanyeQuote[]>(KanyeResources.Database);
 		}
 
 		/// <inheritdoc/>
@@ -86,7 +86,7 @@ namespace JollyQuotes.KanyeRest
 		/// <inheritdoc/>
 		protected override KanyeQuote DownloadRandomQuote()
 		{
-			return BaseClient.DownloadAndDeserialize<KanyeQuote>(KanyeResources.APIPage).Result;
+			return Resolver.Resolve<KanyeQuote>(KanyeResources.APIPage);
 		}
 
 		/// <inheritdoc/>

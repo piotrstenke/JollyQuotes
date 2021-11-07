@@ -3,7 +3,7 @@
 namespace JollyQuotes
 {
 	/// <summary>
-	/// A pair of <see cref="string"/>s representing an actual quote and its author.
+	/// Defines an actual quote along with additional data, such as the quote's author or its source.
 	/// </summary>
 	public interface IQuote
 	{

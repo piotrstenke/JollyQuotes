@@ -16,49 +16,17 @@ namespace JollyQuotes
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
 			/// </summary>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source) : base(source)
-			{
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified and <paramref name="possibility"/>.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
-			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="possibility"/> is <see langword="null"/>.</exception>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, IPossibility possibility) : base(source, possibility)
-			{
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> and an underlaying <paramref name="cache"/> specified.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
-			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>.</exception>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache) : base(source, cache)
-			{
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/>, underlaying <paramref name="cache"/> and <paramref name="possibility"/> specified.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>. -or-
-			/// <paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility) : base(source, cache, possibility)
+			protected WithCache(
+				string source,
+				IQuoteCache<T>? cache = null,
+				IPossibility? possibility = null
+			) : base(source, cache, possibility)
 			{
 			}
 

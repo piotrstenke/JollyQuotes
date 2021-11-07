@@ -3,7 +3,7 @@
 namespace JollyQuotes
 {
 	/// <summary>
-	/// Provides mechanism for generating quotes.
+	/// Provides mechanism for generating random quotes.
 	/// </summary>
 	public interface IRandomQuoteGenerator
 	{

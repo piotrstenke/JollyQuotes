@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace JollyQuotes
 {
@@ -30,102 +29,38 @@ namespace JollyQuotes
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
 			/// </summary>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source)
-			{
-				if (string.IsNullOrWhiteSpace(source))
-				{
-					throw Internals.NullOrEmpty(nameof(source));
-				}
-
-				Source = source;
-				Cache = GetDefaultQuoteCache();
-				Possibility = GetDefaultPossibility();
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified and <paramref name="possibility"/>.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="Cache"/>
-			/// or <see cref="Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
-			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="possibility"/> is <see langword="null"/>.</exception>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, IPossibility possibility)
-			{
-				if (possibility is null)
-				{
-					throw Internals.Null(nameof(possibility));
-				}
-
-				if (string.IsNullOrWhiteSpace(source))
-				{
-					throw Internals.NullOrEmpty(nameof(source));
-				}
-
-				Source = source;
-				Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
-				Possibility = possibility;
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> and an underlaying <paramref name="cache"/> specified.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
-			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
-			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>.</exception>
-			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache)
-			{
-				if (cache is null)
-				{
-					throw Internals.Null(nameof(cache));
-				}
-
-				if (string.IsNullOrWhiteSpace(source))
-				{
-					throw Internals.NullOrEmpty(nameof(source));
-				}
-
-				Source = source;
-				Cache = cache;
-				Possibility = new Possibility();
-			}
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/>, underlaying <paramref name="cache"/> and <paramref name="possibility"/> specified.
-			/// </summary>
-			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
 			/// Random number generator used to determine whether to pick quotes from the <see cref="Cache"/>
 			/// or <see cref="Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
-			/// <exception cref="ArgumentNullException"><paramref name="cache"/> is <see langword="null"/>. -or-
-			/// <paramref name="possibility"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-			protected WithCache(string source, BlockableQuoteCache<T> cache, IPossibility possibility)
+			protected WithCache(
+				string source,
+				IQuoteCache<T>? cache = null,
+				IPossibility? possibility = null
+			)
 			{
-				if (cache is null)
-				{
-					throw Internals.Null(nameof(cache));
-				}
-
-				if (possibility is null)
-				{
-					throw Internals.Null(nameof(possibility));
-				}
-
 				if (string.IsNullOrWhiteSpace(source))
 				{
 					throw Internals.NullOrEmpty(nameof(source));
 				}
 
 				Source = source;
-				Cache = cache;
-				Possibility = possibility;
+				Possibility = possibility ?? new Possibility();
+
+				if (cache is null)
+				{
+					Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
+				}
+				else if (cache is BlockableQuoteCache<T> b)
+				{
+					Cache = b;
+				}
+				else
+				{
+					Cache = new BlockableQuoteCache<T>(cache);
+				}
 			}
 
 			/// <summary>
@@ -286,18 +221,6 @@ namespace JollyQuotes
 			IQuote? IRandomQuoteGenerator.GetRandomQuote(params string[]? tags)
 			{
 				return GetRandomQuote(tags);
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static IPossibility GetDefaultPossibility()
-			{
-				return new Possibility();
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static BlockableQuoteCache<T> GetDefaultQuoteCache()
-			{
-				return new BlockableQuoteCache<T>(new QuoteCache<T>());
 			}
 
 			/// <summary>

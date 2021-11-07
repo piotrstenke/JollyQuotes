@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="KanyeQuoteGenerator.cs~RF13b132ff.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\JollyQuotes\JollyQuotes.csproj" />
   </ItemGroup>
 
