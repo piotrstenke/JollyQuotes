@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -83,7 +84,29 @@ namespace JollyQuotes
 		/// <param name="source">Link to the json data.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		/// <exception cref="InvalidOperationException">Object could not be deserialized from <paramref name="source"/>.</exception>
-		public async Task<T> ResolveAsync<T>(string source)
+		public Task<T> ResolveAsync<T>(string source)
+		{
+			return TryResolveAsync<T>(source).ContinueWith(t =>
+			{
+				if (t.Result is null)
+				{
+					throw new InvalidOperationException($"Object could not be deserialized from source '{source}'");
+				}
+
+				return t.Result;
+			});
+		}
+
+		/// <inheritdoc/>
+		public bool TryResolve<T>(string source, [NotNullWhen(true)] out T? resource)
+		{
+			resource = TryResolveAsync<T>(source).Result;
+
+			return resource is not null;
+		}
+
+		/// <inheritdoc/>
+		public async Task<T?> TryResolveAsync<T>(string source)
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
@@ -92,14 +115,7 @@ namespace JollyQuotes
 
 			HttpResponseMessage response = await BaseClient.GetAsync(source);
 			string json = await response.Content.ReadAsStringAsync();
-			T? t = JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
-
-			if (t is null)
-			{
-				throw new InvalidOperationException($"Object could not be deserialized from source '{source}'");
-			}
-
-			return t;
+			return JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
 		}
 
 		/// <summary>
