@@ -37,12 +37,12 @@ namespace JollyQuotes
 		{
 			if (enumerator is null)
 			{
-				throw Internals.Null(nameof(enumerator));
+				throw Throw.Null(nameof(enumerator));
 			}
 
 			if (cache is null)
 			{
-				throw Internals.Null(nameof(cache));
+				throw Throw.Null(nameof(cache));
 			}
 
 			Enumerator = enumerator;

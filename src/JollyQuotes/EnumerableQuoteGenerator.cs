@@ -26,7 +26,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(tag))
 			{
-				throw Internals.NullOrEmpty(nameof(tag));
+				throw Throw.NullOrEmpty(nameof(tag));
 			}
 
 			return GetAllQuotes(new string[] { tag });

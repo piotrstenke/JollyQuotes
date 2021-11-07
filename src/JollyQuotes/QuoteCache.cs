@@ -45,7 +45,7 @@ namespace JollyQuotes
 		{
 			if (quote is null)
 			{
-				throw Internals.Null(nameof(quote));
+				throw Throw.Null(nameof(quote));
 			}
 
 			ScrapRemovedValues();
@@ -85,7 +85,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrEmpty(tag))
 			{
-				throw Internals.NullOrEmpty(nameof(tag));
+				throw Throw.NullOrEmpty(nameof(tag));
 			}
 
 			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))
@@ -172,7 +172,7 @@ namespace JollyQuotes
 		{
 			if (quote is null)
 			{
-				throw Internals.Null(nameof(quote));
+				throw Throw.Null(nameof(quote));
 			}
 
 			return _cache.ContainsKey(quote.GetId());
@@ -183,7 +183,7 @@ namespace JollyQuotes
 		{
 			if (quote is null)
 			{
-				throw Internals.Null(nameof(quote));
+				throw Throw.Null(nameof(quote));
 			}
 
 			return RemoveQuoteInternal(quote);
@@ -194,7 +194,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrEmpty(tag))
 			{
-				throw Internals.NullOrEmpty(nameof(tag));
+				throw Throw.NullOrEmpty(nameof(tag));
 			}
 
 			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))
@@ -215,7 +215,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrEmpty(tag))
 			{
-				throw Internals.NullOrEmpty(nameof(tag));
+				throw Throw.NullOrEmpty(nameof(tag));
 			}
 
 			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))

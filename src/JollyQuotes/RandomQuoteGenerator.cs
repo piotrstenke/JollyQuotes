@@ -20,7 +20,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
-				throw Internals.NullOrEmpty(nameof(source));
+				throw Throw.NullOrEmpty(nameof(source));
 			}
 
 			Source = source;
@@ -34,7 +34,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(tag))
 			{
-				throw Internals.NullOrEmpty(nameof(tag));
+				throw Throw.NullOrEmpty(nameof(tag));
 			}
 
 			return GetRandomQuote(new string[] { tag });

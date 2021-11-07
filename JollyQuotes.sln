@@ -14,6 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{F6567141
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC9E460D-13B4-4EFC-9593-9E616B66EF66}"
+	ProjectSection(SolutionItems) = preProject
+		src\Throw.cs = src\Throw.cs
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JollyQoutes.KanyeRest", "src\JollyQoutes.KanyeRest\JollyQoutes.KanyeRest.csproj", "{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}"
 EndProject
@@ -23,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{AC16590A-A42
 		img\logo-64.png = img\logo-64.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JollyQuotes.TronaldDump", "src\JollyQuotes.TronaldDump\JollyQuotes.TronaldDump.csproj", "{016D208B-7A48-42F7-BA54-3A3D7A6E127B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JollyQuotes.TronaldDump", "src\JollyQuotes.TronaldDump\JollyQuotes.TronaldDump.csproj", "{016D208B-7A48-42F7-BA54-3A3D7A6E127B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

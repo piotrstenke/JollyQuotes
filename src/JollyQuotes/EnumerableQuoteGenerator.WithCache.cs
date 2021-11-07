@@ -66,7 +66,7 @@ namespace JollyQuotes
 			{
 				if (string.IsNullOrWhiteSpace(tag))
 				{
-					throw Internals.NullOrEmpty(nameof(tag));
+					throw Throw.NullOrEmpty(nameof(tag));
 				}
 
 				switch (which)
@@ -204,7 +204,7 @@ namespace JollyQuotes
 			{
 				if (string.IsNullOrWhiteSpace(tag))
 				{
-					throw Internals.NullOrEmpty(nameof(tag));
+					throw Throw.NullOrEmpty(nameof(tag));
 				}
 
 				return DownloadAllQuotes(new string[] { tag });

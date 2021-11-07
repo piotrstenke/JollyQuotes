@@ -33,7 +33,7 @@ namespace JollyQuotes
 			{
 				if (resolver is null)
 				{
-					throw Internals.Null(nameof(resolver));
+					throw Throw.Null(nameof(resolver));
 				}
 
 				Resolver = resolver;

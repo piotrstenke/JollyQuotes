@@ -56,7 +56,7 @@ namespace JollyQuotes
 		{
 			if (cache is null)
 			{
-				throw Internals.Null(nameof(cache));
+				throw Throw.Null(nameof(cache));
 			}
 
 			_cache = cache;

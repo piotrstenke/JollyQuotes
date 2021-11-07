@@ -42,7 +42,7 @@ namespace JollyQuotes
 		{
 			if (client is null)
 			{
-				throw Internals.Null(nameof(client));
+				throw Throw.Null(nameof(client));
 			}
 
 			BaseClient = client;
@@ -87,7 +87,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
-				throw Internals.NullOrEmpty(nameof(source));
+				throw Throw.NullOrEmpty(nameof(source));
 			}
 
 			HttpResponseMessage response = await BaseClient.GetAsync(source);
