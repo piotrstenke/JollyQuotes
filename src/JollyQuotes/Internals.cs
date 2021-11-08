@@ -38,7 +38,7 @@ namespace JollyQuotes
 
 			if (client.BaseAddress is not null)
 			{
-				throw new ArgumentException($"Base address of a HtppClient must be null", nameof(client));
+				throw new ArgumentException("Base address of a HtppClient must be null", nameof(client));
 			}
 
 			return client;

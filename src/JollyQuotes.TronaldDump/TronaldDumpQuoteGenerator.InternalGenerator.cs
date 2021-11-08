@@ -34,7 +34,9 @@ namespace JollyQuotes.TronaldDump
 			[Obsolete(ERROR_ENUMERABLE_NOT_SUPPORTED)]
 			protected override IEnumerable<TronaldDumpQuote> DownloadAllQuotes()
 			{
+#pragma warning disable RCS1079 // Throwing of new NotImplementedException.
 				throw new NotImplementedException();
+#pragma warning restore RCS1079 // Throwing of new NotImplementedException.
 			}
 
 			/// <inheritdoc/>
@@ -53,7 +55,9 @@ namespace JollyQuotes.TronaldDump
 			[Obsolete(ERROR_ENUMERABLE_NOT_SUPPORTED)]
 			protected override IEnumerator<TronaldDumpQuote> DownloadAndEnumerate()
 			{
+#pragma warning disable RCS1079 // Throwing of new NotImplementedException.
 				throw new NotImplementedException();
+#pragma warning restore RCS1079 // Throwing of new NotImplementedException.
 			}
 
 			/// <inheritdoc/>

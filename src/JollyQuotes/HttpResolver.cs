@@ -93,10 +93,10 @@ namespace JollyQuotes
 		/// </exception>
 		public virtual async Task<T> ResolveAsync<T>(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source);
+			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 
-			string json = await response.Content.ReadAsStringAsync();
+			string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			T? t = JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
 
 			if (t is null)
@@ -126,10 +126,10 @@ namespace JollyQuotes
 		/// <exception cref="HttpRequestException">The HTTP response is unsuccessful.</exception>
 		public async Task<Stream> ResolveStreamAsync(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source);
+			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 
-			return await response.Content.ReadAsStreamAsync();
+			return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -157,14 +157,14 @@ namespace JollyQuotes
 		/// </exception>
 		public virtual async Task<T?> TryResolveAsync<T>(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source);
+			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 
 			if (!response.IsSuccessStatusCode)
 			{
 				return default;
 			}
 
-			string json = await response.Content.ReadAsStringAsync();
+			string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			return JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
 		}
 
@@ -188,14 +188,14 @@ namespace JollyQuotes
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		public async Task<Stream?> TryResolveStreamAsync(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source);
+			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 
 			if (!response.IsSuccessStatusCode)
 			{
 				return null;
 			}
 
-			return await response.Content.ReadAsStreamAsync();
+			return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -222,7 +222,7 @@ namespace JollyQuotes
 				throw Error.NullOrEmpty(nameof(source));
 			}
 
-			return await BaseClient.GetAsync(source);
+			return await BaseClient.GetAsync(source).ConfigureAwait(false);
 		}
 	}
 }

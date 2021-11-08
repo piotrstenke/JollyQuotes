@@ -13,7 +13,7 @@
 		/// <summary>
 		/// Link to the database of all available quotes.
 		/// </summary>
-		public const string Database = "https://github.com/ajzbc/kanye.rest/blob/master/quotes.json";
+		public const string Database = "https://raw.githubusercontent.com/ajzbc/kanye.rest/master/quotes.json";
 
 		/// <summary>
 		/// Link to the GitHub page of <c>kanye.rest</c> app.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace JollyQuotes.KanyeRest
 		/// <inheritdoc/>
 		public Task<List<KanyeQuote>> GetAllQuotes()
 		{
-			return Resolver.ResolveAsync<List<KanyeQuote>>(KanyeResources.Database);
+			return Resolver.ResolveAsync<List<string>>(KanyeResources.Database).ContinueWith(t => t.Result.ConvertAll(q => new KanyeQuote(q)));
 		}
 
 		/// <inheritdoc/>
