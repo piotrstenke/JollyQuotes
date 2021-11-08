@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
+
+using static JollyQuotes.Internals;
 
 namespace JollyQuotes.KanyeRest
 {
@@ -23,7 +24,9 @@ namespace JollyQuotes.KanyeRest
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		public KanyeQuoteGenerator(HttpClient client) : base(Internals.GetResolverFromClient(client, out IResourceResolver resolver), _baseAddress)
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/>.</exception>
+		public KanyeQuoteGenerator(HttpClient client)
+			: base(GetResolverFromClient(EnsureNullAddress(client), out IResourceResolver resolver), _baseAddress)
 		{
 			Service = new KanyeRestService(resolver);
 		}
@@ -34,7 +37,9 @@ namespace JollyQuotes.KanyeRest
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
 		/// <param name="service"><see cref="IKanyeRestService"/> that is used to perform actions using the <c>kanye.rest</c> API.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="service"/> is <see langword="null"/>.</exception>
-		public KanyeQuoteGenerator(HttpClient client, IKanyeRestService service) : base(client, _baseAddress)
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/>.</exception>
+		public KanyeQuoteGenerator(HttpClient client, IKanyeRestService service)
+			: base(EnsureNullAddress(client), _baseAddress)
 		{
 			if (service is null)
 			{
@@ -56,12 +61,13 @@ namespace JollyQuotes.KanyeRest
 		/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 		/// </param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="service"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/>.</exception>
 		public KanyeQuoteGenerator(
 			HttpClient client,
 			IKanyeRestService service,
 			IQuoteCache<KanyeQuote>? cache = null,
 			IPossibility? possibility = null
-		) : base(client, _baseAddress, cache, possibility)
+		) : base(EnsureNullAddress(client), _baseAddress, cache, possibility)
 		{
 			if (service is null)
 			{
@@ -131,7 +137,7 @@ namespace JollyQuotes.KanyeRest
 		/// <see cref="KanyeRestService"/> that is used to perform actions using the <c>kanye.rest</c> API.
 		/// <para>The value of <see cref="KanyeRestService.Resolver"/> is used as the target <see cref="QuoteResolver{T}.Resolver"/></para>.
 		/// </param>
-		public KanyeQuoteGenerator(KanyeRestService service) : base(Internals.GetResolverFromService(service), _baseAddress)
+		public KanyeQuoteGenerator(KanyeRestService service) : base(GetResolverFromService(service), _baseAddress)
 		{
 			Service = service;
 		}

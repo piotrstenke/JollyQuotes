@@ -18,8 +18,11 @@ namespace JollyQuotes.KanyeRest
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/>.</exception>
 		public KanyeRestService(HttpClient client)
 		{
+			Internals.EnsureNullAddress(client);
+
 			Resolver = new HttpResolver(client);
 		}
 

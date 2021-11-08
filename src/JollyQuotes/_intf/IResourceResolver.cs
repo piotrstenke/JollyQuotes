@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 
 namespace JollyQuotes

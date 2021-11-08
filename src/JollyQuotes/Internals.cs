@@ -29,6 +29,21 @@ namespace JollyQuotes
 			return new HttpResolver(new HttpClient() { BaseAddress = uri });
 		}
 
+		public static HttpClient EnsureNullAddress(HttpClient client)
+		{
+			if (client is null)
+			{
+				throw Error.Null(nameof(client));
+			}
+
+			if (client.BaseAddress is not null)
+			{
+				throw new ArgumentException($"Base address of a HtppClient must be null", nameof(client));
+			}
+
+			return client;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IResourceResolver GetResolverFromClient(HttpClient client, out IResourceResolver resolver)
 		{
@@ -86,6 +101,40 @@ namespace JollyQuotes
 			}
 
 			return str;
+		}
+
+		public static HttpClient SetAddress(HttpClient client, string address)
+		{
+			if (client is null)
+			{
+				throw Error.Null(nameof(client));
+			}
+
+			if (client.BaseAddress is not null && client.BaseAddress.OriginalString != address)
+			{
+				throw new ArgumentException($"BaseAddress of a HttpClient must be null or equal to '{address}'");
+			}
+
+			client.BaseAddress = new Uri(address);
+
+			return client;
+		}
+
+		public static HttpClient SetAddress(HttpClient client, string address, string addressSource)
+		{
+			if (client is null)
+			{
+				throw Error.Null(nameof(client));
+			}
+
+			if (client.BaseAddress is not null && client.BaseAddress.OriginalString != address)
+			{
+				throw new ArgumentException($"BaseAddress of a HttpClient must be null or equal to the value of {addressSource}");
+			}
+
+			client.BaseAddress = new Uri(address);
+
+			return client;
 		}
 	}
 }
