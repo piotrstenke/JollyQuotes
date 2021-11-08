@@ -22,7 +22,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Determines whether to dispose the <see cref="BaseClient"/> when <see cref="Dispose()"/> is called.
 		/// </summary>
-		/// <remarks>The default value is <see langword="true"/>.</remarks>
+		/// <remarks>The default value is <see langword="false"/>.</remarks>
 		public bool DisposeClient { get; set; }
 
 		/// <summary>
@@ -30,7 +30,7 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used to access the requested resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		public HttpResolver(HttpClient client) : this(client, true)
+		public HttpResolver(HttpClient client) : this(client, false)
 		{
 		}
 

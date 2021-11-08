@@ -111,7 +111,7 @@ namespace JollyQuotes
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with an underlaying <paramref name="resolver"/> and <paramref name="source"/> specified.
 			/// </summary>
-			/// <param name="resolver"><see cref="JollyQuotes.HttpResolver"/> that is used to access the requested resources.</param>
+			/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">

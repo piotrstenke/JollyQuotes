@@ -73,7 +73,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EnumerableQuoteClient{T}"/> class with an underlaying <paramref name="resolver"/> and <paramref name="source"/> specified.
 		/// </summary>
-		/// <param name="resolver"><see cref="JollyQuotes.HttpResolver"/> that is used to access the requested resources.</param>
+		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
 		/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>

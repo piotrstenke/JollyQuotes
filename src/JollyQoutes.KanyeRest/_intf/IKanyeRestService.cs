@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JollyQuotes.KanyeRest
 {
@@ -10,11 +11,11 @@ namespace JollyQuotes.KanyeRest
 		/// <summary>
 		/// Returns all available <see cref="KanyeQuote"/>s.
 		/// </summary>
-		IEnumerable<KanyeQuote> GetAllQuotes();
+		Task<List<KanyeQuote>> GetAllQuotes();
 
 		/// <summary>
 		/// Returns a random <see cref="KanyeQuote"/>.
 		/// </summary>
-		KanyeQuote GetRandomQuote();
+		Task<KanyeQuote> GetRandomQuote();
 	}
 }
