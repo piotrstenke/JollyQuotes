@@ -199,22 +199,32 @@ namespace JollyQuotes
 			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tag">Tag to download all quotes associated with.</param>
-			/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-			protected virtual IEnumerable<T> DownloadAllQuotes(string tag)
-			{
-				if (string.IsNullOrWhiteSpace(tag))
-				{
-					throw Throw.NullOrEmpty(nameof(tag));
-				}
-
-				return DownloadAllQuotes(new string[] { tag });
-			}
+			protected abstract IEnumerable<T> DownloadAllQuotes(string tag);
 
 			/// <summary>
 			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download all quotes associated with.</param>
-			protected abstract IEnumerable<T> DownloadAllQuotes(params string[]? tags);
+			protected virtual IEnumerable<T> DownloadAllQuotes(params string[]? tags)
+			{
+				if (tags is null || tags.Length == 0)
+				{
+					return Array.Empty<T>();
+				}
+
+				return Yield();
+
+				IEnumerable<T> Yield()
+				{
+					foreach (string tag in tags)
+					{
+						foreach (T quote in GetAllQuotes(tag))
+						{
+							yield return quote;
+						}
+					}
+				}
+			}
 
 			/// <summary>
 			/// Downloads all available <see cref="IQuote"/>s and enumerates them.

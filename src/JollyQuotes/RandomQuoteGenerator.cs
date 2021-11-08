@@ -30,18 +30,26 @@ namespace JollyQuotes
 		public abstract T GetRandomQuote();
 
 		/// <inheritdoc cref="IRandomQuoteGenerator.GetRandomQuote(string)"/>
-		public virtual T? GetRandomQuote(string tag)
-		{
-			if (string.IsNullOrWhiteSpace(tag))
-			{
-				throw Throw.NullOrEmpty(nameof(tag));
-			}
-
-			return GetRandomQuote(new string[] { tag });
-		}
+		public abstract T? GetRandomQuote(string tag);
 
 		/// <inheritdoc cref="IRandomQuoteGenerator.GetRandomQuote(string[])"/>
-		public abstract T? GetRandomQuote(params string[]? tags);
+		public virtual T? GetRandomQuote(params string[]? tags)
+		{
+			if (tags is null || tags.Length == 0)
+			{
+				return default;
+			}
+
+			foreach (string tag in tags)
+			{
+				if (GetRandomQuote(tag) is T t)
+				{
+					return t;
+				}
+			}
+
+			return default;
+		}
 
 		IQuote IRandomQuoteGenerator.GetRandomQuote()
 		{
