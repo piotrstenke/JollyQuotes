@@ -45,7 +45,7 @@ namespace JollyQuotes
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IResourceResolver GetResolverFromClient(HttpClient client, out IResourceResolver resolver)
+		public static IResourceResolver GetResolverFromClient(HttpClient client, out IStreamResolver resolver)
 		{
 			resolver = new HttpResolver(client);
 			return resolver;

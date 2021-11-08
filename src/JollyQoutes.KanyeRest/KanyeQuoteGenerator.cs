@@ -26,7 +26,7 @@ namespace JollyQuotes.KanyeRest
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/>.</exception>
 		public KanyeQuoteGenerator(HttpClient client)
-			: base(GetResolverFromClient(EnsureNullAddress(client), out IResourceResolver resolver), _baseAddress)
+			: base(GetResolverFromClient(EnsureNullAddress(client), out IStreamResolver resolver), _baseAddress)
 		{
 			Service = new KanyeRestService(resolver);
 		}

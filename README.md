@@ -25,6 +25,9 @@ Currently, **JollyQuotes** provides access to the following APIs:
 
  - [kanye.rest](https://kanye.rest/)
  - [Tronald Dump](https://www.tronalddump.io/)
+
+The following APIs are not yet supported, but will be in the future:
+
  - [quotable](https://github.com/lukePeavey/quotable)
 
 If you have any suggestions regarding additional API support, feel free to ask or create your own push request!
