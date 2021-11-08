@@ -66,7 +66,7 @@ namespace JollyQuotes
 			{
 				if (string.IsNullOrWhiteSpace(tag))
 				{
-					throw Throw.NullOrEmpty(nameof(tag));
+					throw Error.NullOrEmpty(nameof(tag));
 				}
 
 				switch (which)

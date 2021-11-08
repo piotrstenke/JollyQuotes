@@ -1,9 +1,9 @@
 ﻿namespace JollyQuotes
 {
 	/// <summary>
-	/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for generating quotes through an external API using an <see cref="IResourceResolver"/>.
+	/// Performs actions on <see cref="IQuote"/>s using an external API accessed by an <see cref="IResourceResolver"/>.
 	/// </summary>
-	public interface IQuoteResolver : IRandomQuoteGenerator
+	public interface IQuoteService
 	{
 		/// <summary>
 		/// <see cref="IResourceResolver"/> that is used to access requested resources.

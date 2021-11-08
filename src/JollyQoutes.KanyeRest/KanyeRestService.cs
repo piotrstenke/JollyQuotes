@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace JollyQuotes.KanyeRest
 {
 	/// <inheritdoc cref="IKanyeRestService"/>
-	public class KanyeRestService : IKanyeRestService
+	public class KanyeRestService : IKanyeRestService, IQuoteService
 	{
 		/// <summary>
 		/// <see cref="IResourceResolver"/> that is used to access requested <c>kanye.rest</c> resources.
@@ -32,7 +32,7 @@ namespace JollyQuotes.KanyeRest
 		{
 			if (resolver is null)
 			{
-				throw new ArgumentNullException(nameof(resolver));
+				throw Error.Null(nameof(resolver));
 			}
 
 			Resolver = resolver;

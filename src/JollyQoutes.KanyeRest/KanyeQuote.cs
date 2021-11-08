@@ -33,7 +33,7 @@ namespace JollyQuotes.KanyeRest
 		{
 			if (string.IsNullOrWhiteSpace(quote))
 			{
-				throw new ArgumentException($"{nameof(quote)} cannot be null or empty", nameof(quote));
+				throw Error.NullOrEmpty(nameof(quote));
 			}
 
 			Quote = quote;

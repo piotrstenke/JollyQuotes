@@ -14,9 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{F6567141
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC9E460D-13B4-4EFC-9593-9E616B66EF66}"
-	ProjectSection(SolutionItems) = preProject
-		src\Throw.cs = src\Throw.cs
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JollyQoutes.KanyeRest", "src\JollyQoutes.KanyeRest\JollyQoutes.KanyeRest.csproj", "{232B9FD6-5EA7-41BD-8065-6A1326E3AD85}"
 EndProject

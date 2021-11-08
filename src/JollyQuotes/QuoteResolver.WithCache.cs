@@ -5,7 +5,7 @@ namespace JollyQuotes
 	public abstract partial class QuoteResolver<T> where T : IQuote
 	{
 		/// <summary>
-		/// <see cref="IQuoteResolver"/> that provides a mechanism for caching <see cref="IQuote"/>s.
+		/// <see cref="IRandomQuoteGenerator"/> that generates random quotes using an external API accessed by an <see cref="IResourceResolver"/> and provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
 		public new abstract class WithCache : RandomQuoteGenerator<T>.WithCache
 		{
@@ -33,7 +33,7 @@ namespace JollyQuotes
 			{
 				if (resolver is null)
 				{
-					throw Throw.Null(nameof(resolver));
+					throw Error.Null(nameof(resolver));
 				}
 
 				Resolver = resolver;

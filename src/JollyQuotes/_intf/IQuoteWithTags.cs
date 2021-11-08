@@ -17,7 +17,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(tag))
 			{
-				throw Throw.NullOrEmpty(nameof(tag));
+				throw Error.NullOrEmpty(nameof(tag));
 			}
 
 			return Array.IndexOf(Tags, tag) != -1;

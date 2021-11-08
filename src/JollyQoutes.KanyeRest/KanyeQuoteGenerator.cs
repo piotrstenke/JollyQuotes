@@ -23,7 +23,7 @@ namespace JollyQuotes.KanyeRest
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		public KanyeQuoteGenerator(HttpClient client) : base(GetResolver(client, out IResourceResolver resolver), _baseAddress)
+		public KanyeQuoteGenerator(HttpClient client) : base(Internals.GetResolverFromClient(client, out IResourceResolver resolver), _baseAddress)
 		{
 			Service = new KanyeRestService(resolver);
 		}
@@ -38,7 +38,7 @@ namespace JollyQuotes.KanyeRest
 		{
 			if (service is null)
 			{
-				throw new ArgumentNullException(nameof(service));
+				throw Error.Null(nameof(service));
 			}
 
 			Service = service;
@@ -59,13 +59,13 @@ namespace JollyQuotes.KanyeRest
 		public KanyeQuoteGenerator(
 			HttpClient client,
 			IKanyeRestService service,
-			IQuoteCache<KanyeQuote>? cache,
-			IPossibility? possibility
+			IQuoteCache<KanyeQuote>? cache = null,
+			IPossibility? possibility = null
 		) : base(client, _baseAddress, cache, possibility)
 		{
 			if (service is null)
 			{
-				throw new ArgumentNullException(nameof(service));
+				throw Error.Null(nameof(service));
 			}
 
 			Service = service;
@@ -91,7 +91,7 @@ namespace JollyQuotes.KanyeRest
 		{
 			if (service is null)
 			{
-				throw new ArgumentNullException(nameof(service));
+				throw Error.Null(nameof(service));
 			}
 
 			Service = service;
@@ -112,13 +112,13 @@ namespace JollyQuotes.KanyeRest
 		public KanyeQuoteGenerator(
 			IResourceResolver resolver,
 			IKanyeRestService service,
-			IQuoteCache<KanyeQuote>? cache,
-			IPossibility? possibility
+			IQuoteCache<KanyeQuote>? cache = null,
+			IPossibility? possibility = null
 		) : base(resolver, _baseAddress, cache, possibility)
 		{
 			if (service is null)
 			{
-				throw new ArgumentNullException(nameof(service));
+				throw Error.Null(nameof(service));
 			}
 
 			Service = service;
@@ -131,7 +131,7 @@ namespace JollyQuotes.KanyeRest
 		/// <see cref="KanyeRestService"/> that is used to perform actions using the <c>kanye.rest</c> API.
 		/// <para>The value of <see cref="KanyeRestService.Resolver"/> is used as the target <see cref="QuoteResolver{T}.Resolver"/></para>.
 		/// </param>
-		public KanyeQuoteGenerator(KanyeRestService service) : base(GetResolver(service), _baseAddress)
+		public KanyeQuoteGenerator(KanyeRestService service) : base(Internals.GetResolverFromService(service), _baseAddress)
 		{
 			Service = service;
 		}
@@ -174,24 +174,6 @@ namespace JollyQuotes.KanyeRest
 		protected override KanyeQuote? DownloadRandomQuote(string tag)
 		{
 			return default;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static IResourceResolver GetResolver(KanyeRestService service)
-		{
-			if (service is null)
-			{
-				throw new ArgumentNullException(nameof(service));
-			}
-
-			return service.Resolver;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static IResourceResolver GetResolver(HttpClient client, out IResourceResolver resolver)
-		{
-			resolver = new HttpResolver(client);
-			return resolver;
 		}
 	}
 }

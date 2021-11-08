@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace JollyQuotes
 {
-	internal static class Throw
+	internal static class Error
 	{
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

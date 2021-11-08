@@ -34,7 +34,7 @@ namespace JollyQuotes
 			{
 				if (resolver is null)
 				{
-					throw Throw.Null(nameof(resolver));
+					throw Error.Null(nameof(resolver));
 				}
 
 				Resolver = resolver;

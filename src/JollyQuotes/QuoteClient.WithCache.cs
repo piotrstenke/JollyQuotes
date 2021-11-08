@@ -7,11 +7,16 @@ namespace JollyQuotes
 	public abstract partial class QuoteClient<T> where T : IQuote
 	{
 		/// <summary>
-		/// <see cref="IQuoteResolver"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
+		/// <see cref="IRandomQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
 		/// and a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
 		public new abstract class WithCache : QuoteResolver<T>.WithCache
 		{
+			/// <summary>
+			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
+			/// </summary>
+			public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
+
 			/// <summary>
 			/// Returns the <see cref="QuoteResolver{T}.WithCache.Resolver"/> as a <see cref="JollyQuotes.HttpResolver"/>.
 			/// </summary>
@@ -22,11 +27,6 @@ namespace JollyQuotes
 			/// </summary>
 			[MemberNotNullWhen(true, nameof(HttpResolver), nameof(BaseClient))]
 			public bool IsHttpBased => Resolver is HttpResolver;
-
-			/// <summary>
-			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
-			/// </summary>
-			public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.

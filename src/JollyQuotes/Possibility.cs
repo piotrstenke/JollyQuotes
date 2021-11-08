@@ -95,7 +95,7 @@ namespace JollyQuotes
 		{
 			if (random is null)
 			{
-				throw Throw.Null(nameof(random));
+				throw Error.Null(nameof(random));
 			}
 
 			Random = random;
@@ -113,7 +113,7 @@ namespace JollyQuotes
 		{
 			if (random is null)
 			{
-				throw Throw.Null(nameof(random));
+				throw Error.Null(nameof(random));
 			}
 
 			Random = random;
@@ -136,7 +136,7 @@ namespace JollyQuotes
 		{
 			if (random is null)
 			{
-				throw Throw.Null(nameof(random));
+				throw Error.Null(nameof(random));
 			}
 
 			Bound(upperLimit, step);
@@ -152,7 +152,7 @@ namespace JollyQuotes
 		{
 			if (upperLimit < 1)
 			{
-				throw Throw.MustBeGreaterThan(nameof(upperLimit), 0);
+				throw Error.MustBeGreaterThan(nameof(upperLimit), 0);
 			}
 
 			UpperLimit = upperLimit;
@@ -172,17 +172,17 @@ namespace JollyQuotes
 		{
 			if (step < 1)
 			{
-				throw Throw.MustBeGreaterThan(nameof(step), 0);
+				throw Error.MustBeGreaterThan(nameof(step), 0);
 			}
 
 			if (upperLimit < 1)
 			{
-				throw Throw.MustBeGreaterThan(nameof(upperLimit), 0);
+				throw Error.MustBeGreaterThan(nameof(upperLimit), 0);
 			}
 
 			if (upperLimit < step)
 			{
-				throw Throw.MustBeGreaterThanOrEqualTo(nameof(upperLimit), nameof(step));
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(upperLimit), nameof(step));
 			}
 
 			Step = step;

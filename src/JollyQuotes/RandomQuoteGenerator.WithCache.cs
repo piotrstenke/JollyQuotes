@@ -43,7 +43,7 @@ namespace JollyQuotes
 			{
 				if (string.IsNullOrWhiteSpace(source))
 				{
-					throw Throw.NullOrEmpty(nameof(source));
+					throw Error.NullOrEmpty(nameof(source));
 				}
 
 				Source = source;
@@ -105,7 +105,7 @@ namespace JollyQuotes
 			{
 				if (string.IsNullOrWhiteSpace(tag))
 				{
-					throw Throw.NullOrEmpty(nameof(tag));
+					throw Error.NullOrEmpty(nameof(tag));
 				}
 
 				switch (which)

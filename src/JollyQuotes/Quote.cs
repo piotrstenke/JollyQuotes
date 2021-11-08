@@ -81,12 +81,12 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(quote))
 			{
-				throw Throw.NullOrEmpty(nameof(quote));
+				throw Error.NullOrEmpty(nameof(quote));
 			}
 
 			if (string.IsNullOrWhiteSpace(author))
 			{
-				throw Throw.NullOrEmpty(nameof(author));
+				throw Error.NullOrEmpty(nameof(author));
 			}
 
 			Value = quote;

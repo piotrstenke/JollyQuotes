@@ -20,7 +20,7 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
-				throw Throw.NullOrEmpty(nameof(source));
+				throw Error.NullOrEmpty(nameof(source));
 			}
 
 			Source = source;
