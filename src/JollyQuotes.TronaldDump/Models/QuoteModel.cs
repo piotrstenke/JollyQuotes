@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -105,8 +106,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// </exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
-		/// <paramref name="value"/> is <see langword="null"/> or empty. -or-
-		/// <paramref name="tags"/> is empty.
+		/// <paramref name="value"/> is <see langword="null"/> or empty.
 		/// </exception>
 		[JsonConstructor]
 		public QuoteModel(
@@ -144,11 +144,6 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(embedded));
 			}
 
-			if (tags.Length == 0)
-			{
-				throw Error.Empty(nameof(tags));
-			}
-
 			Id = id;
 			Value = value;
 			Tags = tags;
@@ -159,22 +154,50 @@ namespace JollyQuotes.TronaldDump.Models
 			UpdatedAt = updatedAt;
 		}
 
-#pragma warning disable IDE0051 // Remove unused private members
-		private bool PrintMembers(StringBuilder builder)
-#pragma warning restore IDE0051 // Remove unused private members
+		/// <inheritdoc/>
+		public override int GetHashCode()
 		{
-			builder.Append($"{nameof(Id)} = {Id}, ");
-			builder.Append($"{nameof(Value)} = \"{Value}\", ");
-			builder.Append($"{nameof(AppearedAt)} = {AppearedAt}, ");
-			builder.Append($"{nameof(CreatedAt)} = {CreatedAt}, ");
-			builder.Append($"{nameof(UpdatedAt)} = {UpdatedAt}, ");
-			Internals.PrintArray(builder, nameof(Tags), Tags);
-			builder.Append(", ");
+			HashCode hash = new();
 
-			builder.Append($"{nameof(Links)} = {Links}, ");
-			builder.Append($"{nameof(Embedded)} = {{ {Embedded} }}");
+			hash.Add(Id);
+			hash.Add(Value);
+			hash.Add(AppearedAt);
+			hash.Add(CreatedAt);
+			hash.Add(UpdatedAt);
+			hash.Add(Links);
+			hash.Add(Embedded);
 
-			return true;
+			foreach (string tag in Tags)
+			{
+				hash.Add(tag);
+			}
+
+			return hash.ToHashCode();
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(QuoteModel? other)
+		{
+			if (other is null)
+			{
+				return false;
+			}
+
+			if (ReferenceEquals(other, this))
+			{
+				return true;
+			}
+
+			return
+				other.Id == Id &&
+				other.AppearedAt == AppearedAt &&
+				other.CreatedAt == CreatedAt &&
+				other.UpdatedAt == UpdatedAt &&
+				other.Value == Value &&
+				other.Links == Links &&
+				other.Tags.Length == Tags.Length &&
+				other.Tags.SequenceEqual(Tags) &&
+				other.Embedded == Embedded;
 		}
 	}
 }

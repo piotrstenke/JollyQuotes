@@ -119,33 +119,6 @@ namespace JollyQuotes.TronaldDump.Models
 			return new ArgumentException($"{paramName} must be either null or not empty", paramName);
 		}
 
-#pragma warning disable IDE0051 // Remove unused private members
-		private bool PrintMembers(StringBuilder builder)
-#pragma warning restore IDE0051 // Remove unused private members
-		{
-			WriteStringProperty(nameof(Query), Query);
-			WriteStringProperty(nameof(Tag), Tag);
-			builder.Append($"{nameof(Page)} = {Page}");
-
-			return true;
-
-			void WriteStringProperty(string propName, string? propValue)
-			{
-				builder.Append($"{propName} = ");
-
-				if (propValue is null)
-				{
-					builder.Append("null");
-				}
-				else
-				{
-					builder.Append($"\"{propValue}\"");
-				}
-
-				builder.Append(", ");
-			}
-		}
-
 		private static string? JoinPhrases(string[]? phrases)
 		{
 			if (phrases is null || phrases.Length == 0)

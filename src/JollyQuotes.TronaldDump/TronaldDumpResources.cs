@@ -25,6 +25,21 @@
 		/// </summary>
 		public const int MaxItemsPerPage = 10;
 
+		/// <summary>
+		/// Format of a meme image returned by <see cref="ITronaldDumpService.GetRandomMeme"/>.
+		/// </summary>
+		public const string MemeFormat = "JPEG";
+
+		/// <summary>
+		/// Height in pixels of a meme image returned by <see cref="ITronaldDumpService.GetRandomMeme"/>.
+		/// </summary>
+		public const int MemeHeight = 768;
+
+		/// <summary>
+		/// Width in pixels of a meme image returned by <see cref="ITronaldDumpService.GetRandomMeme"/>.
+		/// </summary>
+		public const int MemeWidth = 1024;
+
 		internal const string BaseAddress = APIPage;
 
 		internal const string BaseAddressSource =

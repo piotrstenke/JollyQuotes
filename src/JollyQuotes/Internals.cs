@@ -62,30 +62,6 @@ namespace JollyQuotes
 			return service.Resolver;
 		}
 
-		public static void PrintArray(StringBuilder builder, string propertyName, object[] array)
-		{
-			builder.Append(propertyName);
-			builder.Append(" = { ");
-
-			if (array.Length > 0)
-			{
-				builder.Append(" 0 = ");
-				builder.Append(array[0].ToString());
-
-				for (int i = 1; i < array.Length; i++)
-				{
-					builder.Append(", ");
-					builder.Append(i);
-					builder.Append(" = ");
-					builder.Append(array[i].ToString());
-				}
-
-				builder.Append(' ');
-			}
-
-			builder.Append('}');
-		}
-
 		public static string RetrieveSourceFromClient(HttpClient client)
 		{
 			if (client is null)

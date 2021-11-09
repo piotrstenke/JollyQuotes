@@ -70,13 +70,5 @@ namespace JollyQuotes.TronaldDump.Models
 
 			return hash.ToHashCode();
 		}
-
-#pragma warning disable IDE0051 // Remove unused private members
-		private bool PrintMembers(StringBuilder builder)
-#pragma warning restore IDE0051 // Remove unused private members
-		{
-			Internals.PrintArray(builder, nameof(Quotes), Quotes);
-			return true;
-		}
 	}
 }

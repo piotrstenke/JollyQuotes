@@ -32,44 +32,44 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link that was used to retrieve this tag.
 		/// </summary>
 		[JsonProperty("_links", Order = 3, Required = Required.Always)]
-		public SelfLinkModel Link { get; }
+		public SelfLinkModel Links { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="link"/> and creation date specified.
+		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="links"/> and creation date specified.
 		/// </summary>
 		/// <param name="value">Actual tag.</param>
-		/// <param name="link">Link that was used to retrieve this tag.</param>
+		/// <param name="links">Link that was used to retrieve this tag.</param>
 		/// <param name="createdAt">Date the tag was added to the database at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
-		public TagModel(string value, SelfLinkModel link, DateTime createdAt) : this(value, link, createdAt, createdAt)
+		public TagModel(string value, SelfLinkModel links, DateTime createdAt) : this(value, links, createdAt, createdAt)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="link"/> and dates of creation and last update specified.
+		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="links"/> and dates of creation and last update specified.
 		/// </summary>
 		/// <param name="value">Actual tag.</param>
-		/// <param name="link">Link that was used to retrieve this tag.</param>
+		/// <param name="links">Link that was used to retrieve this tag.</param>
 		/// <param name="createdAt">Date the tag was added to the database at.</param>
 		/// <param name="updatedAt">Date the tag was updated at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
 		[JsonConstructor]
-		public TagModel(string value, SelfLinkModel link, DateTime createdAt, DateTime updatedAt)
+		public TagModel(string value, SelfLinkModel links, DateTime createdAt, DateTime updatedAt)
 		{
 			if (string.IsNullOrWhiteSpace(value))
 			{
 				throw Error.NullOrEmpty(nameof(value));
 			}
 
-			if (link is null)
+			if (links is null)
 			{
-				throw Error.Null(nameof(link));
+				throw Error.Null(nameof(links));
 			}
 
 			Value = value;
-			Link = link;
+			Links = links;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 		}

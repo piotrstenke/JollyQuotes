@@ -2,18 +2,19 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using JollyQuotes.KanyeRest;
 
-using static JollyQuotes.KanyeRest.Tests.Internals;
+using static JollyQuotes.Tests.Internals;
 
-namespace JollyQuotes.KanyeRest.Tests
+namespace JollyQuotes.Tests
 {
-	public class ServiceTests
+	public class KanyeRestTests
 	{
-		private readonly KanyeRestService _service;
+		private readonly IKanyeRestService _service;
 
-		public ServiceTests()
+		public KanyeRestTests()
 		{
-			_service = new KanyeRestService(HttpClient);
+			_service = new KanyeRestService(GlobalClient);
 		}
 
 		[Fact]
@@ -21,8 +22,10 @@ namespace JollyQuotes.KanyeRest.Tests
 		{
 			List<KanyeQuote> quotes = await _service.GetAllQuotes();
 
-			HttpResolver resolver = new(HttpClient);
-			List<KanyeQuote> all = resolver.Resolve<List<string>>(KanyeResources.Database).ConvertAll(q => new KanyeQuote(q)).ToList();
+			List<KanyeQuote> all = (await GlobalResolver
+				.ResolveAsync<List<string>>(KanyeResources.Database))
+				.ConvertAll(q => new KanyeQuote(q))
+				.ToList();
 
 			Assert.Equal(quotes, all);
 		}

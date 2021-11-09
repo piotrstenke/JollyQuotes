@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>JollyQoutes.KanyeRest</_Parameter1>
+      <_Parameter1>JollyQuotes.KanyeRest</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>JollyQuotes.TronaldDump</_Parameter1>

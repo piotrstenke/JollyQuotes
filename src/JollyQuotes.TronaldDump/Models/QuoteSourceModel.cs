@@ -58,18 +58,18 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="url">URL of the actual quote source.</param>
 		/// <param name="filename">Name of file associated with the quote.</param>
 		/// <param name="remarks">Remarks about the quote source.</param>
-		/// <param name="link">Link to the quote source data.</param>
+		/// <param name="links">Link to the quote source data.</param>
 		/// <param name="createdAt">Date the quote source was added to the database at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty. -or- <paramref name="url"/> is <see langword="null"/> or empty.</exception>
 		public QuoteSourceModel(
 			string id,
 			string url,
 			string? filename,
 			string? remarks,
-			SelfLinkModel link,
+			SelfLinkModel links,
 			DateTime createdAt
-		) : this(id, url, filename, remarks, link, createdAt, createdAt)
+		) : this(id, url, filename, remarks, links, createdAt, createdAt)
 		{
 		}
 
@@ -80,10 +80,10 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="url">URL of the actual quote source.</param>
 		/// <param name="filename">Name of file associated with the quote.</param>
 		/// <param name="remarks">Remarks about the quote source.</param>
-		/// <param name="link">Link to the quote source data.</param>
+		/// <param name="links">Link to the quote source data.</param>
 		/// <param name="createdAt">Date the quote source was added to the database at.</param>
 		/// <param name="updatedAt">Date the quote source was last updated at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty. -or- <paramref name="url"/> is <see langword="null"/> or empty.</exception>
 		[JsonConstructor]
 		public QuoteSourceModel(
@@ -91,7 +91,7 @@ namespace JollyQuotes.TronaldDump.Models
 			string url,
 			string? filename,
 			string? remarks,
-			SelfLinkModel link,
+			SelfLinkModel links,
 			DateTime createdAt,
 			DateTime updatedAt)
 		{
@@ -105,9 +105,9 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.NullOrEmpty(nameof(url));
 			}
 
-			if (link is null)
+			if (links is null)
 			{
-				throw Error.Null(nameof(link));
+				throw Error.Null(nameof(links));
 			}
 
 			Id = id;
@@ -116,7 +116,7 @@ namespace JollyQuotes.TronaldDump.Models
 			UpdatedAt = updatedAt;
 			FileName = filename;
 			Remarks = remarks;
-			Links = link;
+			Links = links;
 		}
 	}
 }

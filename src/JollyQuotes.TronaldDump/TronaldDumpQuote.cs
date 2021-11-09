@@ -183,20 +183,6 @@ namespace JollyQuotes.TronaldDump
 			return hash.ToHashCode();
 		}
 
-#pragma warning disable IDE0051 // Remove unused private members
-		private bool PrintMembers(StringBuilder builder)
-#pragma warning restore IDE0051 // Remove unused private members
-		{
-			builder.Append($"{nameof(Id)} = {Id}, ");
-			builder.Append($"{nameof(Value)} = {Value}, ");
-			builder.Append($"{nameof(Source)} = {Source}, ");
-			builder.Append($"{nameof(AppearedAt)} = {AppearedAt}, ");
-			builder.Append($"{nameof(CreatedAt)} = {CreatedAt}, ");
-			builder.Append($"{nameof(UpdatedAt)} = {UpdatedAt}, ");
-			Internals.PrintArray(builder, nameof(Tags), Tags);
-			return true;
-		}
-
 		int IQuote.GetId()
 		{
 			return Id.GetHashCode();

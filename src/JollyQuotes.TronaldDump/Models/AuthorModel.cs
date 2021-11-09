@@ -53,15 +53,15 @@ namespace JollyQuotes.TronaldDump.Models
 		public DateTime UpdatedAt { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="link"/> and date of creation and last update specified.
+		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="links"/> and date of creation and last update specified.
 		/// </summary>
 		/// <param name="id">Id of the author.</param>
 		/// <param name="name">Name of the author.</param>
 		/// <param name="slug">Slugified version of the <see cref="Name"/>.</param>
 		/// <param name="bio">Bio of the author.</param>
-		/// <param name="link">Link to the author data.</param>
+		/// <param name="links">Link to the author data.</param>
 		/// <param name="createdAt">Date the data of the author was created at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="name"/> is <see langword="null"/> or empty. -or-
@@ -72,23 +72,23 @@ namespace JollyQuotes.TronaldDump.Models
 			string name,
 			string slug,
 			string? bio,
-			SelfLinkModel link,
+			SelfLinkModel links,
 			DateTime createdAt
-		) : this(id, name, slug, bio, link, createdAt, createdAt)
+		) : this(id, name, slug, bio, links, createdAt, createdAt)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="link"/> and date of creation specified.
+		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="links"/> and date of creation specified.
 		/// </summary>
 		/// <param name="id">Id of the author.</param>
 		/// <param name="name">Name of the author.</param>
 		/// <param name="slug">Slugified version of the <see cref="Name"/>.</param>
 		/// <param name="bio">Bio of the author.</param>
-		/// <param name="link">Link to the author data.</param>
+		/// <param name="links">Link to the author data.</param>
 		/// <param name="createdAt">Date the data of the author was created at.</param>
 		/// <param name="updatedAt">Date the data of the author was updated at.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="link"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="name"/> is <see langword="null"/> or empty. -or-
@@ -100,7 +100,7 @@ namespace JollyQuotes.TronaldDump.Models
 			string name,
 			string slug,
 			string? bio,
-			SelfLinkModel link,
+			SelfLinkModel links,
 			DateTime createdAt,
 			DateTime updatedAt)
 		{
@@ -119,16 +119,16 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.NullOrEmpty(nameof(slug));
 			}
 
-			if (link is null)
+			if (links is null)
 			{
-				throw Error.Null(nameof(link));
+				throw Error.Null(nameof(links));
 			}
 
 			Id = id;
 			Name = name;
 			Slug = slug;
 			Bio = bio;
-			Links = link;
+			Links = links;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 		}
