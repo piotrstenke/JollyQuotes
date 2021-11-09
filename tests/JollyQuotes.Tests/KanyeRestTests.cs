@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 using JollyQuotes.KanyeRest;
-
+using Xunit;
 using static JollyQuotes.Tests.Internals;
 
 namespace JollyQuotes.Tests

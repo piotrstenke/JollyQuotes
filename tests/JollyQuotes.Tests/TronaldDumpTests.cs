@@ -1,15 +1,13 @@
-﻿using Xunit;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using JollyQuotes.TronaldDump;
 using JollyQuotes.TronaldDump.Models;
-using System.Threading.Tasks;
 using SixLabors.ImageSharp;
-
-using static JollyQuotes.Tests.Internals;
-
-using System.Linq;
-using System.IO;
 using SixLabors.ImageSharp.Formats;
-using System;
+using Xunit;
+using static JollyQuotes.Tests.Internals;
 
 namespace JollyQuotes.Tests
 {
@@ -88,12 +86,85 @@ namespace JollyQuotes.Tests
 		[Fact]
 		public async Task Returns_Tag_By_Value()
 		{
-			SearchResultModel<TagListModel> searchResult = await _resolver.ResolveAsync<SearchResultModel<TagListModel>>("tag");
-			TagModel[] allTags = searchResult.Embedded.Tags;
-			int randomIndex = RandomNumber.Next(0, allTags.Length);
-
-			TagModel expected = allTags[randomIndex];
+			TagModel expected = await GetRandomTag();
 			TagModel actual = await _service.GetTag(expected.Value);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_By_Query_With_Multiple_Phrases()
+		{
+			string[] phrases = new string[] { "Crooked", "Hillary", "is" };
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?query={string.Join('+', phrases)}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrases, null));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_By_Query_With_Single_Phrase()
+		{
+			const string phrase = "when";
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?query={phrase}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, null));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_By_Tag()
+		{
+			TagModel randomTag = await GetRandomTag();
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?tag={randomTag.Value}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(null as string, randomTag.Value));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_By_Tag_And_Multiple_Phrases()
+		{
+			string[] phrases = new string[] { "Crooked", "Hillary", "is" };
+
+			TagModel randomTag = await GetRandomTag();
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?tag={randomTag.Value}&query={string.Join('+', phrases)}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrases, randomTag.Value));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_By_Tag_And_Single_Phrase()
+		{
+			const string phrase = "when";
+
+			TagModel randomTag = await GetRandomTag();
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?tag={randomTag.Value}&query={phrase}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, randomTag.Value));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public async Task Search_Quote_With_Next_Page()
+		{
+			const string phrase = "when";
+			const int page = 1;
+
+			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?query={phrase}&page={page}");
+
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, null, page));
 
 			Assert.Equal(expected, actual);
 		}
@@ -101,6 +172,15 @@ namespace JollyQuotes.Tests
 		private Task<QuoteModel> GetRandomQuote()
 		{
 			return _resolver.ResolveAsync<QuoteModel>("random/quote");
+		}
+
+		private async Task<TagModel> GetRandomTag()
+		{
+			SearchResultModel<TagListModel> searchResult = await _resolver.ResolveAsync<SearchResultModel<TagListModel>>("tag");
+			TagModel[] allTags = searchResult.Embedded.Tags;
+			int randomIndex = RandomNumber.Next(0, allTags.Length);
+
+			return allTags[randomIndex];
 		}
 	}
 }

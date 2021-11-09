@@ -8,7 +8,7 @@ namespace JollyQuotes.TronaldDump.Models
 	/// </summary>
 	[Serializable]
 	[JsonObject]
-	public class PageHierarchyModel
+	public sealed record PageHierarchyModel
 	{
 		/// <summary>
 		/// Link to the first page in the hierarchy.

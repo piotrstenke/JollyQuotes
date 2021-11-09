@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.TronaldDump.Models
@@ -104,7 +103,7 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Exc_CannotBeEmpty(nameof(tag));
 			}
 
-			if (page < 1)
+			if (page < 0)
 			{
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(page), 0);
 			}
