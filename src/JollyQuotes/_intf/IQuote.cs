@@ -23,6 +23,11 @@ namespace JollyQuotes
 		string Source { get; }
 
 		/// <summary>
+		/// Tags that are applicable to this quote.
+		/// </summary>
+		string[] Tags { get; }
+
+		/// <summary>
 		/// Actual quote.
 		/// </summary>
 		string Value { get; }
@@ -31,12 +36,5 @@ namespace JollyQuotes
 		/// Returns a unique id of the quote. Best used by calling <see cref="object.GetHashCode()"/>.
 		/// </summary>
 		int GetId();
-
-		/// <summary>
-		/// Determines whether the quote can be accessed using the specified <paramref name="tag"/>.
-		/// </summary>
-		/// <param name="tag">Tag to check whether the quote can be accessed by.</param>
-		/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-		bool HasTag(string tag);
 	}
 }

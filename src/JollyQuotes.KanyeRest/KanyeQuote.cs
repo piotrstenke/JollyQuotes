@@ -23,6 +23,7 @@ namespace JollyQuotes.KanyeRest
 		DateTime? IQuote.Date => default;
 		string IQuote.Source => _source;
 		string IQuote.Value => Quote;
+		string[] IQuote.Tags => Array.Empty<string>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="KanyeQuote"/> class with a <paramref name="quote"/> specified.
@@ -48,11 +49,6 @@ namespace JollyQuotes.KanyeRest
 		int IQuote.GetId()
 		{
 			return GetHashCode();
-		}
-
-		bool IQuote.HasTag(string tag)
-		{
-			return false;
 		}
 	}
 }

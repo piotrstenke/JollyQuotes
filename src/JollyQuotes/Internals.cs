@@ -6,6 +6,11 @@ namespace JollyQuotes
 {
 	internal static class Internals
 	{
+		private static readonly Random _global = new();
+
+		[ThreadStatic]
+		private static Random? _local;
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static HttpResolver CreateResolver(string source)
 		{
@@ -59,6 +64,23 @@ namespace JollyQuotes
 			}
 
 			return service.Resolver;
+		}
+
+		public static int RandomNumber(int min, int max)
+		{
+			if (_local is null)
+			{
+				int seed;
+
+				lock (_global)
+				{
+					seed = _global.Next();
+				}
+
+				_local = new Random(seed);
+			}
+
+			return _local.Next(min, max);
 		}
 
 		public static string RetrieveSourceFromClient(HttpClient client)

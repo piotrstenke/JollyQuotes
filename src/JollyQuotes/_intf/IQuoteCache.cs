@@ -18,7 +18,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Adds the specified <paramref name="quote"/> to the cache.
 		/// </summary>
-		/// <param name="quote"><see cref="IQuote"/> to cache.</param>
+		/// <param name="quote"><see cref="IQuote"/> to add to the cache.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="quote"/> is <see langword="null"/>.</exception>
 		void CacheQuote(T quote);
 

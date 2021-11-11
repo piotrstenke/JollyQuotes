@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,14 +12,86 @@ namespace JollyQuotes
 	/// <typeparam name="T">Type of quotes this class can store.</typeparam>
 	public class QuoteCache<T> : IQuoteCache<T> where T : IQuote
 	{
-		private readonly Dictionary<int, int> _cache;
-		private readonly List<T> _lookup;
-		private readonly Random _random;
-		private readonly HashSet<int> _removed;
-		private readonly Dictionary<string, List<int>> _tagCache;
-		private int _recentlyAdded;
+		private sealed class IndexComparer : IComparer<int>
+		{
+			public int Compare(int x, int y)
+			{
+				return y.CompareTo(x);
+			}
+		}
 
-		// TODO: Make _recentlyAdded for every tag in the cache
+		private sealed class TagCacheEntry : IEnumerable<int>
+		{
+			private readonly List<int> _lookup;
+			private readonly Dictionary<int, int> _map;
+
+			public int Count => _map.Count;
+
+			public bool IsEmpty => Count == 0;
+
+			public TagCacheEntry()
+			{
+				_lookup = new();
+				_map = new();
+			}
+
+			public void Add(int index)
+			{
+				if (_map.TryAdd(index, _lookup.Count))
+				{
+					_lookup.Add(index);
+				}
+			}
+
+			public void Clear()
+			{
+				_map.Clear();
+				_lookup.Clear();
+			}
+
+			public List<int>.Enumerator GetEnumerator()
+			{
+				return _lookup.GetEnumerator();
+			}
+
+			public int GetLookupIndex(int at)
+			{
+				return _lookup[at];
+			}
+
+			public bool Remove(int lookupIndex)
+			{
+				if (_map.Remove(lookupIndex, out int value))
+				{
+					_lookup.RemoveAt(value);
+					return true;
+				}
+
+				return false;
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+
+			IEnumerator<int> IEnumerable<int>.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+		}
+
+		private readonly IndexComparer _comparer;
+		private readonly object _lockObject = new();
+		private readonly List<T> _lookup;
+
+		// key - IQuote.GetId(), value - index in _lookup
+		private readonly Dictionary<int, int> _map;
+
+		private readonly List<int> _removed;
+
+		// key - tag, value - list of indices of quotes with that tag
+		private readonly Dictionary<string, TagCacheEntry> _tagCache;
 
 		/// <inheritdoc/>
 		public bool IsEmpty => NumCached == 0;
@@ -26,81 +99,126 @@ namespace JollyQuotes
 		/// <summary>
 		/// Number of cached values.
 		/// </summary>
-		public int NumCached => _lookup.Count;
+		public int NumCached
+		{
+			get
+			{
+				lock (_lockObject)
+				{
+					return _map.Count;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class.
 		/// </summary>
 		public QuoteCache()
 		{
-			_lookup = new List<T>();
-			_cache = new Dictionary<int, int>();
-			_removed = new HashSet<int>();
-			_random = new Random();
-			_tagCache = new Dictionary<string, List<int>>();
+			_map = new();
+			_tagCache = new();
+			_lookup = new();
+			_removed = new();
+			_comparer = new();
 		}
 
-		/// <inheritdoc/>
-		public void CacheQuote(T quote)
+		/// <summary>
+		/// Adds the specified <paramref name="quote"/> to the cache.
+		/// </summary>
+		/// <param name="quote"><see cref="IQuote"/> to cache.</param>
+		/// <param name="replace">Determines whether to replace an <see cref="IQuote"/> with the same id.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="quote"/> is <see langword="null"/>.</exception>
+		public void CacheQuote(T quote, bool replace = false)
 		{
 			if (quote is null)
 			{
 				throw Error.Null(nameof(quote));
 			}
 
-			ScrapRemovedValues();
-
 			int id = quote.GetId();
-			int index = _lookup.Count;
 
-			if (!_cache.TryAdd(id, index))
+			lock (_lockObject)
 			{
-				return;
-			}
+				ScrapRemoved();
 
-			_lookup.Add(quote);
-			++_recentlyAdded;
+				int index = _lookup.Count;
+
+				if (!_map.TryAdd(id, index))
+				{
+					if (replace)
+					{
+						index = _map[id];
+
+						lock (_lookup)
+						{
+							_lookup[index] = quote;
+						}
+
+						// Replace old tags
+					}
+
+					return;
+				}
+
+				_lookup.Add(quote);
+				CacheTags(quote.Tags, index);
+			}
 		}
 
 		/// <inheritdoc/>
 		public void Clear()
 		{
-			_lookup.Clear();
-			_cache.Clear();
-			_removed.Clear();
-			_tagCache.Clear();
-			_recentlyAdded = 0;
+			lock (_lockObject)
+			{
+				_map.Clear();
+				_lookup.Clear();
+				_removed.Clear();
+				_tagCache.Clear();
+			}
 		}
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetCached()
 		{
-			ScrapRemovedValues();
+			lock (_lockObject)
+			{
+				ScrapRemoved();
 
-			return _lookup.ToArray();
+				return _lookup.ToArray();
+			}
 		}
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetCached(string tag)
 		{
-			if (string.IsNullOrEmpty(tag))
+			if (string.IsNullOrWhiteSpace(tag))
 			{
 				throw Error.NullOrEmpty(nameof(tag));
 			}
 
-			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))
+			lock (_lockObject)
 			{
-				return Array.Empty<T>();
+				if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry) || entry.IsEmpty)
+				{
+					return Array.Empty<T>();
+				}
+
+				ScrapRemoved();
+
+				if (entry.IsEmpty)
+				{
+					return Array.Empty<T>();
+				}
+
+				List<T> quotes = new(entry.Count);
+
+				foreach (int index in entry)
+				{
+					quotes.Add(_lookup[index]);
+				}
+
+				return quotes;
 			}
-
-			T[] quotes = new T[quoteIndices.Count];
-
-			for (int i = 0; i < quoteIndices.Count; i++)
-			{
-				quotes[i] = _lookup[quoteIndices[i]];
-			}
-
-			return quotes;
 		}
 
 		/// <inheritdoc/>
@@ -111,60 +229,73 @@ namespace JollyQuotes
 				return Array.Empty<T>();
 			}
 
-			return Yield();
-
-			IEnumerable<T> Yield()
+			lock (_lockObject)
 			{
-				HashSet<int> quotes = new();
+				if (_tagCache.Count == 0)
+				{
+					return Array.Empty<T>();
+				}
+
+				ScrapRemoved();
+
+				List<T> quotes = new(_lookup.Count);
+
+				HashSet<int> included = new();
 
 				foreach (string tag in tags)
 				{
-					if (string.IsNullOrWhiteSpace(tag) || !InitializeCacheForTag(tag, out List<int>? quoteIndices))
+					if (string.IsNullOrWhiteSpace(tag) || !_tagCache.TryGetValue(tag, out TagCacheEntry? entry) || entry.IsEmpty)
 					{
 						continue;
 					}
 
-					foreach (int index in quoteIndices)
+					foreach (int index in entry)
 					{
-						if (quotes.Add(index))
+						if (included.Add(index))
 						{
-							yield return _lookup[index];
+							quotes.Add(_lookup[index]);
 						}
 					}
 				}
+
+				return quotes;
 			}
 		}
 
-		/// <summary>
-		/// Enumerates through all <see cref="IQuote"/>s contained within the cache.
-		/// </summary>
+		/// <inheritdoc/>
 		public IEnumerator<T> GetEnumerator()
 		{
-			ScrapRemovedValues();
+			lock (_lockObject)
+			{
+				ScrapRemoved();
 
-			return _lookup.GetEnumerator();
+				return _lookup.GetEnumerator();
+			}
 		}
 
 		/// <inheritdoc/>
 		public T GetRandomQuote(bool remove = false)
 		{
-			if (IsEmpty)
+			lock (_lockObject)
 			{
-				throw new InvalidOperationException("Cannot return a quote from empty cache");
+				ScrapRemoved();
+
+				if (IsEmpty)
+				{
+					throw new InvalidOperationException("Cannot return a quote from empty cache");
+				}
+
+				int index = Internals.RandomNumber(0, NumCached);
+
+				T quote = _lookup[index];
+
+				if (remove && _map.Remove(quote.GetId()))
+				{
+					_removed.Add(index);
+				}
+
+				return quote;
 			}
-
-			ScrapRemovedValues();
-
-			int index = _random.Next(0, _lookup.Count);
-			T quote = _lookup[index];
-
-			if (remove)
-			{
-				_cache.Remove(quote.GetId());
-				_removed.Add(index);
-			}
-
-			return quote;
 		}
 
 		/// <inheritdoc/>
@@ -175,7 +306,20 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			return _cache.ContainsKey(quote.GetId());
+			int id = quote.GetId();
+			return IsCached(id);
+		}
+
+		/// <summary>
+		/// Determines whether an <see cref="IQuote"/> with the specified <paramref name="id"/> is to be found in the cache.
+		/// </summary>
+		/// <param name="id">Id of <see cref="IQuote"/> to check for.</param>
+		public bool IsCached(int id)
+		{
+			lock (_lockObject)
+			{
+				return _map.ContainsKey(id);
+			}
 		}
 
 		/// <inheritdoc/>
@@ -186,25 +330,70 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			return RemoveQuoteInternal(quote);
+			int id = quote.GetId();
+			return RemoveQuote(id);
+		}
+
+		/// <summary>
+		/// Removes an <see cref="IQuote"/> with the specified <paramref name="id"/>.
+		/// </summary>
+		/// <param name="id">Id <see cref="IQuote"/> to remove.</param>
+		public bool RemoveQuote(int id)
+		{
+			return RemoveQuote(id, out _);
+		}
+
+		/// <summary>
+		/// Removes an <see cref="IQuote"/> with the specified <paramref name="id"/>.
+		/// </summary>
+		/// <param name="id">Id <see cref="IQuote"/> to remove.</param>
+		/// <param name="quote"><see cref="IQuote"/> that was removed.</param>
+		public bool RemoveQuote(int id, [NotNullWhen(true)] out T? quote)
+		{
+			lock (_lockObject)
+			{
+				if (!_map.Remove(id, out int index))
+				{
+					quote = _lookup[index];
+					_removed.Add(index);
+
+					return true;
+				}
+			}
+
+			quote = default;
+			return false;
 		}
 
 		/// <inheritdoc/>
 		public bool RemoveQuotes(string tag)
 		{
-			if (string.IsNullOrEmpty(tag))
+			if (string.IsNullOrWhiteSpace(tag))
 			{
 				throw Error.NullOrEmpty(nameof(tag));
 			}
 
-			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))
+			lock (_lockObject)
 			{
-				return false;
-			}
+				if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry) || entry.IsEmpty)
+				{
+					return false;
+				}
 
-			foreach (int index in quoteIndices)
-			{
-				RemoveQuoteInternal(_lookup[index]);
+				ScrapRemoved();
+
+				if (entry.IsEmpty)
+				{
+					return false;
+				}
+
+				foreach (int key in entry)
+				{
+					_map.Remove(key, out int index);
+					_removed.Add(index);
+				}
+
+				entry.Clear();
 			}
 
 			return true;
@@ -213,29 +402,45 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		public bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote, bool remove = false)
 		{
-			if (string.IsNullOrEmpty(tag))
+			if (string.IsNullOrWhiteSpace(tag))
 			{
 				throw Error.NullOrEmpty(nameof(tag));
 			}
 
-			if (!InitializeCacheForTag(tag, out List<int>? quoteIndices))
+			lock (_lockObject)
 			{
-				quote = default;
-				return false;
+				if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry) || entry.IsEmpty)
+				{
+					quote = default;
+					return false;
+				}
+
+				ScrapRemoved();
+
+				if (entry.IsEmpty)
+				{
+					quote = default;
+					return false;
+				}
+
+				int randomIndex = Internals.RandomNumber(0, entry.Count);
+				int lookupIndex = entry.GetLookupIndex(randomIndex);
+
+				quote = _lookup[lookupIndex];
+
+				if (remove)
+				{
+					_map.Remove(quote.GetId());
+					_removed.Add(lookupIndex);
+				}
+
+				return true;
 			}
+		}
 
-			int randomIndex = _random.Next(0, quoteIndices.Count);
-			int quoteIndex = quoteIndices[randomIndex];
-
-			quote = _lookup[quoteIndex];
-
-			if (remove)
-			{
-				_cache.Remove(quote.GetId());
-				_removed.Add(quoteIndex);
-			}
-
-			return true;
+		void IQuoteCache<T>.CacheQuote(T quote)
+		{
+			CacheQuote(quote);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -243,156 +448,73 @@ namespace JollyQuotes
 			return GetEnumerator();
 		}
 
-		private void AddIfHasTag(List<int> list, int index, string tag)
+		private void CacheTags(string[] tags, int index)
 		{
-			T quote = _lookup[index];
-
-			if (quote.HasTag(tag))
-			{
-				list.Add(index);
-			}
-		}
-
-		private int GetFirstScrapingIndex()
-		{
-			int index = 0;
-
-			// Indices in _cache don't need to be updated until the first removed index is detected.
-			while (!_removed.Contains(index))
-			{
-				++index;
-			}
-
-			return index;
-		}
-
-		private bool InitializeCacheForTag(string tag, [NotNullWhen(true)] out List<int>? quoteIndices)
-		{
-			int startRemoveRange = ScrapRemovedValues();
-			return InitializeCacheForTag(tag, startRemoveRange, out quoteIndices);
-		}
-
-		private bool InitializeCacheForTag(string tag, int startRemoveRange, [NotNullWhen(true)] out List<int>? quoteIndices)
-		{
-			if (startRemoveRange > -1 && UpdateTagCache(tag, startRemoveRange, out quoteIndices))
-			{
-				InitializeTagsForRecentlyAdded(quoteIndices, tag);
-
-				if (quoteIndices.Count > 0)
-				{
-					return true;
-				}
-			}
-			else if (_lookup.Count > 0)
-			{
-				quoteIndices = InitializeTagList(tag);
-
-				if (quoteIndices.Count > 0)
-				{
-					_tagCache[tag] = quoteIndices;
-					return true;
-				}
-			}
-
-			quoteIndices = null;
-			return false;
-		}
-
-		private List<int> InitializeTagList(string tag)
-		{
-			List<int> list = new(_lookup.Count);
-
-			for (int i = 0; i < _lookup.Count; i++)
-			{
-				AddIfHasTag(list, i, tag);
-			}
-
-			list.TrimExcess();
-			return list;
-		}
-
-		private void InitializeTagsForRecentlyAdded(List<int> quoteIndices, string tag)
-		{
-			if (_recentlyAdded == 0)
+			if (tags is null || tags.Length == 0)
 			{
 				return;
 			}
 
-			for (int i = _lookup.Count - _recentlyAdded; i < _lookup.Count; i++)
+			lock (_lockObject)
 			{
-				AddIfHasTag(quoteIndices, i, tag);
-			}
-
-			_recentlyAdded = 0;
-		}
-
-		private bool RemoveQuoteInternal(T quote)
-		{
-			bool removed = _cache.Remove(quote.GetId(), out int index);
-
-			if (removed)
-			{
-				_removed.Add(index);
-
-				if (index >= _lookup.Count - _recentlyAdded)
+				foreach (string tag in tags)
 				{
-					--_recentlyAdded;
+					if (string.IsNullOrWhiteSpace(tag))
+					{
+						continue;
+					}
+
+					TagCacheEntry entry = GetTagEntry(tag);
+
+					entry.Add(index);
 				}
 			}
-
-			return removed;
 		}
 
-		private int ScrapRemovedValues()
+		private TagCacheEntry GetTagEntry(string tag)
+		{
+			if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry))
+			{
+				entry = new();
+				_tagCache.TryAdd(tag, entry);
+			}
+
+			return entry;
+		}
+
+		private void ScrapRemoved()
 		{
 			if (_removed.Count == 0)
 			{
-				return -1;
+				return;
 			}
 
-			int startIndex = GetFirstScrapingIndex();
-			int startRemoveRange = ScrapRemovedValuesWithoutClearing(startIndex);
+			// from last to first
+			_removed.Sort(_comparer);
+			List<string> tags = new(_removed.Count * 2);
 
-			_lookup.RemoveRange(startRemoveRange, _lookup.Count - startRemoveRange);
+			foreach (int index in _removed)
+			{
+				T quote = _lookup[index];
+				_lookup.RemoveAt(index);
+
+				tags.AddRange(quote.Tags);
+			}
+
+			foreach (string tag in tags)
+			{
+				if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry) || entry.IsEmpty)
+				{
+					continue;
+				}
+
+				foreach (int index in _removed)
+				{
+					entry.Remove(index);
+				}
+			}
+
 			_removed.Clear();
-
-			return startRemoveRange;
-		}
-
-		private int ScrapRemovedValuesWithoutClearing(int startIndex)
-		{
-			int newIndex = startIndex;
-
-			for (int i = startIndex + 1; i < _lookup.Count; i++)
-			{
-				if (!_removed.Contains(i))
-				{
-					T quote = _lookup[i];
-					_lookup[newIndex] = quote;
-					_cache[quote.GetId()] = newIndex;
-
-					++newIndex;
-				}
-			}
-
-			return newIndex;
-		}
-
-		private bool UpdateTagCache(string tag, int startRemoveRange, [NotNullWhen(true)] out List<int>? quoteIndices)
-		{
-			if (_tagCache.TryGetValue(tag, out quoteIndices))
-			{
-				int index = quoteIndices.FindIndex(q => q >= startRemoveRange);
-
-				if (index > -1)
-				{
-					quoteIndices.RemoveRange(index, quoteIndices.Count - index);
-				}
-
-				return true;
-			}
-
-			return false;
 		}
 	}
 }

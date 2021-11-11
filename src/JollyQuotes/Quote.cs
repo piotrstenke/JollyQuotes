@@ -11,7 +11,7 @@ namespace JollyQuotes
 	/// <remarks>This class implements the <see cref="IEquatable{T}"/> interface - two instances are compare by their value, not reference.</remarks>
 	[Serializable]
 	[JsonObject]
-	public sealed record Quote : IQuoteWithTags
+	public sealed record Quote : IQuote
 	{
 		/// <summary>
 		/// Value used when an author of a quote is unknown.

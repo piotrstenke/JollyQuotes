@@ -16,7 +16,8 @@
 				quote.Author,
 				quote.Source,
 				quote.Date,
-				quote is IQuoteWithTags t ? t.Tags : null);
+				quote.Tags
+			);
 		}
 	}
 }

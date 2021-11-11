@@ -186,15 +186,5 @@ namespace JollyQuotes.TronaldDump
 		{
 			return Id.GetHashCode();
 		}
-
-		bool IQuote.HasTag(string tag)
-		{
-			if (string.IsNullOrWhiteSpace(tag))
-			{
-				throw Error.NullOrEmpty(nameof(tag));
-			}
-
-			return Array.IndexOf(Tags, tag) > -1;
-		}
 	}
 }
