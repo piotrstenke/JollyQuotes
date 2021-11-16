@@ -14,7 +14,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link that was used to access the current resource.
 		/// </summary>
 		[JsonProperty("self", Required = Required.Always)]
-		public LinkModel Self { get; }
+		public LinkModel Self { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SelfLinkModel"/> class with a <paramref name="self"/> link model specified.

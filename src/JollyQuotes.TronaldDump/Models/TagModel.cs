@@ -14,25 +14,25 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Date the tag was added to the database at.
 		/// </summary>
 		[JsonProperty("created_at", Order = 1, Required = Required.Always)]
-		public DateTime CreatedAt { get; }
+		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Date the tag was updated at.
 		/// </summary>
 		[JsonProperty("updated_at", Order = 2)]
-		public DateTime UpdatedAt { get; }
+		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// Actual tag.
 		/// </summary>
 		[JsonProperty("value", Order = 0, Required = Required.Always)]
-		public string Value { get; }
+		public string Value { get; init; }
 
 		/// <summary>
 		/// Link that was used to retrieve this tag.
 		/// </summary>
 		[JsonProperty("_links", Order = 3, Required = Required.Always)]
-		public SelfLinkModel Links { get; }
+		public SelfLinkModel Links { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="links"/> and creation date specified.

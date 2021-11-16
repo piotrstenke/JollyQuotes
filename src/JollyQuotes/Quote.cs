@@ -25,26 +25,26 @@ namespace JollyQuotes
 
 		/// <inheritdoc/>
 		[JsonProperty("author", Order = 1, Required = Required.Always)]
-		public string Author { get; }
+		public string Author { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("date", Order = 2)]
 		[JsonConverter(typeof(Settings.DateOnlyConverter))]
-		public DateTime? Date { get; }
+		public DateTime? Date { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("source", Order = 3, Required = Required.Always)]
-		public string Source { get; }
+		public string Source { get; init; }
 
 		/// <summary>
 		/// Tags associated with the quote.
 		/// </summary>
 		[JsonProperty("tags", Order = 4, Required = Required.DisallowNull)]
-		public string[] Tags { get; }
+		public string[] Tags { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("quote", Order = 0, Required = Required.Always)]
-		public string Value { get; }
+		public string Value { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Quote"/> class with a <paramref name="quote"/> and an <paramref name="author"/> specified.

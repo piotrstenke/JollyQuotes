@@ -15,7 +15,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Quotes this list contains.
 		/// </summary>
 		[JsonProperty("quotes", Required = Required.Always)]
-		public QuoteModel[] Quotes { get; }
+		public QuoteModel[] Quotes { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteListModel"/> class with an array of underlaying <paramref name="quotes"/> specified.

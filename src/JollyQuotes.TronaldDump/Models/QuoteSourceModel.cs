@@ -13,43 +13,43 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Date the quote source was added to the database at.
 		/// </summary>
 		[JsonProperty("created_at", Order = 2, Required = Required.Always)]
-		public DateTime CreatedAt { get; }
+		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Name of file associated with the quote.
 		/// </summary>
 		[JsonProperty("filename", Order = 4)]
-		public string? FileName { get; }
+		public string? FileName { get; init; }
 
 		/// <summary>
 		/// Id of the quote source.
 		/// </summary>
 		[JsonProperty("quote_source_id", Order = 0, Required = Required.Always)]
-		public string Id { get; }
+		public string Id { get; init; }
 
 		/// <summary>
 		/// Link to the quote source data.
 		/// </summary>
 		[JsonProperty("_links", Order = 6, Required = Required.Always)]
-		public SelfLinkModel Links { get; }
+		public SelfLinkModel Links { get; init; }
 
 		/// <summary>
 		/// Remarks about the quote source.
 		/// </summary>
 		[JsonProperty("remarks", Order = 5)]
-		public string? Remarks { get; }
+		public string? Remarks { get; init; }
 
 		/// <summary>
 		/// Date the quote source was last updated at.
 		/// </summary>
 		[JsonProperty("updated_at", Order = 3, Required = Required.DisallowNull)]
-		public DateTime UpdatedAt { get; }
+		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// URL of the actual quote source.
 		/// </summary>
 		[JsonProperty("url", Order = 1, Required = Required.Always)]
-		public string Url { get; }
+		public string Url { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteSourceModel"/> class with <paramref name="id"/>, target <paramref name="url"/>, <paramref name="filename"/>, <paramref name="remarks"/> and date of creation specified.

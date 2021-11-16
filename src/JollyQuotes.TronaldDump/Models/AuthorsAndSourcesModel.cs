@@ -15,13 +15,13 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Array of authors of the current resource.
 		/// </summary>
 		[JsonProperty("author", Required = Required.Always)]
-		public AuthorModel[] Authors { get; }
+		public AuthorModel[] Authors { get; init; }
 
 		/// <summary>
 		/// Array of sources of the current resource.
 		/// </summary>
 		[JsonProperty("source", Required = Required.Always)]
-		public QuoteSourceModel[] Sources { get; }
+		public QuoteSourceModel[] Sources { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorsAndSourcesModel"/> class with arrays of target <paramref name="authors"/> and <paramref name="sources"/> specified.

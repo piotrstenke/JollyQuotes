@@ -17,7 +17,7 @@ namespace JollyQuotes.KanyeRest
 		/// Text of the quote.
 		/// </summary>
 		[JsonProperty("quote", Required = Required.Always)]
-		public string Quote { get; }
+		public string Quote { get; init; }
 
 		string IQuote.Author => _author;
 		DateTime? IQuote.Date => default;

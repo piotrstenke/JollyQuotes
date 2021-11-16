@@ -15,7 +15,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// An array of underlaying tags.
 		/// </summary>
 		[JsonProperty("tag", Required = Required.Always)]
-		public TagModel[] Tags { get; }
+		public TagModel[] Tags { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TagListModel"/> class with an array of underlaying <paramref name="tags"/> specified.

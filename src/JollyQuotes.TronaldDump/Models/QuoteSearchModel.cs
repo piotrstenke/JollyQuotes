@@ -14,20 +14,20 @@ namespace JollyQuotes.TronaldDump.Models
 		/// A search query build from phrases separated by a plus '+'.
 		/// </summary>
 		[JsonProperty("query", Order = 0)]
-		public string? Query { get; }
+		public string? Query { get; init; }
 
 		/// <summary>
 		/// Tag to search associated quotes with.
 		/// </summary>
 		[JsonProperty("tag", Order = 1)]
-		public string? Tag { get; }
+		public string? Tag { get; init; }
 
 		/// <summary>
 		/// The current page of the search result.
 		/// </summary>
 		/// <remarks>The lowest possible value is <c>0</c>.</remarks>
 		[JsonProperty("page", Order = 2)]
-		public int Page { get; }
+		public int Page { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with query <paramref name="phrases"/> and associated <paramref name="tag"/> specified.

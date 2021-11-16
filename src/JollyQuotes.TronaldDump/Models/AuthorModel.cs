@@ -14,43 +14,43 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Bio of the author.
 		/// </summary>
 		[JsonProperty("bio", Order = 3)]
-		public string? Bio { get; }
+		public string? Bio { get; init; }
 
 		/// <summary>
 		/// Date the data of the author was created at.
 		/// </summary>
 		[JsonProperty("created_at", Order = 4, Required = Required.Always)]
-		public DateTime CreatedAt { get; }
+		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Id of the author.
 		/// </summary>
 		[JsonProperty("author_id", Order = 0, Required = Required.Always)]
-		public string Id { get; }
+		public string Id { get; init; }
 
 		/// <summary>
 		/// Link to the author data.
 		/// </summary>
 		[JsonProperty("_links", Order = 6, Required = Required.Always)]
-		public SelfLinkModel Links { get; }
+		public SelfLinkModel Links { get; init; }
 
 		/// <summary>
 		/// Name of the author.
 		/// </summary>
 		[JsonProperty("name", Order = 1, Required = Required.Always)]
-		public string Name { get; }
+		public string Name { get; init; }
 
 		/// <summary>
 		/// Slugified version of the <see cref="Name"/>.
 		/// </summary>
 		[JsonProperty("slug", Order = 2, Required = Required.Always)]
-		public string Slug { get; }
+		public string Slug { get; init; }
 
 		/// <summary>
 		/// Date the data of the author was updated at.
 		/// </summary>
 		[JsonProperty("updated_at", Order = 5)]
-		public DateTime UpdatedAt { get; }
+		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="links"/> and date of creation and last update specified.

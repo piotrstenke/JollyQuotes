@@ -11,13 +11,13 @@
 		int Count { get; }
 
 		/// <summary>
-		/// Total number of values contained in the search result.
-		/// </summary>
-		int Total { get; }
-
-		/// <summary>
 		/// Links to all the pages in the search result.
 		/// </summary>
 		PageHierarchyModel? Links { get; }
+
+		/// <summary>
+		/// Total number of values contained in the search result.
+		/// </summary>
+		int Total { get; }
 	}
 }

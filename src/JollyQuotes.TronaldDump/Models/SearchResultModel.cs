@@ -11,21 +11,21 @@ namespace JollyQuotes.TronaldDump.Models
 	{
 		/// <inheritdoc/>
 		[JsonProperty("count", Order = 0, Required = Required.Always)]
-		public int Count { get; }
+		public int Count { get; init; }
 
 		/// <summary>
 		/// Values present in the current page of the search result.
 		/// </summary>
 		[JsonProperty("_embedded", Order = 2, Required = Required.Always)]
-		public T Embedded { get; }
+		public T Embedded { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("_links", Order = 3)]
-		public PageHierarchyModel? Links { get; }
+		public PageHierarchyModel? Links { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("total", Order = 1, Required = Required.Always)]
-		public int Total { get; }
+		public int Total { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SearchResultModel{T}"/> class with <paramref name="embedded"/> data,

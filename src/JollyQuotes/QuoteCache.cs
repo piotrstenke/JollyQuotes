@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -12,6 +13,7 @@ namespace JollyQuotes
 	/// <typeparam name="T">Type of quotes this class can store.</typeparam>
 	public class QuoteCache<T> : IQuoteCache<T> where T : class, IQuote
 	{
+		[DebuggerDisplay("{Lookup}, nq")]
 		private sealed class TagCacheEntry : IEnumerable<int>
 		{
 			private readonly Dictionary<int, int> _map;
@@ -181,9 +183,24 @@ namespace JollyQuotes
 					if (replace)
 					{
 						index = _map[id];
-						_lookup[index] = quote;
 
-						// TODO: Replace old tags
+						if (_tagCache is not null)
+						{
+							T old = _lookup[index]!;
+
+							foreach (string tag in old.Tags)
+							{
+								if (Array.IndexOf(old.Tags, tag) > -1 || !_tagCache.TryGetValue(tag, out TagCacheEntry? oldEntry))
+								{
+									continue;
+								}
+
+								oldEntry.Remove(index);
+								CacheTag(tag, index);
+							}
+						}
+
+						_lookup[index] = quote;
 
 						return true;
 					}

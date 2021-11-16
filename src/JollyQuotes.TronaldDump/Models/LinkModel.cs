@@ -14,7 +14,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Actual link.
 		/// </summary>
 		[JsonProperty("href", Required = Required.Always)]
-		public string Href { get; }
+		public string Href { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LinkModel"/> class with a <paramref name="href"/> specified.

@@ -14,31 +14,31 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link to the first page in the hierarchy.
 		/// </summary>
 		[JsonProperty("first", Order = 1, Required = Required.Always)]
-		public LinkModel First { get; }
+		public LinkModel First { get; init; }
 
 		/// <summary>
 		/// Link to the last page in the hierarchy.
 		/// </summary>
 		[JsonProperty("last", Order = 4, Required = Required.Always)]
-		public LinkModel Last { get; }
+		public LinkModel Last { get; init; }
 
 		/// <summary>
 		/// Link to the next page in the hierarchy.
 		/// </summary>
 		[JsonProperty("next", Order = 3, Required = Required.Always)]
-		public LinkModel Next { get; }
+		public LinkModel Next { get; init; }
 
 		/// <summary>
 		/// Link to the previous page in the hierarchy.
 		/// </summary>
 		[JsonProperty("prev", Order = 2, Required = Required.Always)]
-		public LinkModel Prev { get; }
+		public LinkModel Prev { get; init; }
 
 		/// <summary>
 		/// Link to the current page in the hierarchy.
 		/// </summary>
 		[JsonProperty("self", Order = 0, Required = Required.Always)]
-		public LinkModel Self { get; }
+		public LinkModel Self { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PageHierarchyModel"/> class with a single <see cref="LinkModel"/> specified for all properties.

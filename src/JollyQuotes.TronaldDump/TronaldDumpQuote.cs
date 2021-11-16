@@ -15,39 +15,39 @@ namespace JollyQuotes.TronaldDump
 		/// Date the quote was added to the database at.
 		/// </summary>
 		[JsonProperty("created_at", Order = 3, Required = Required.Always)]
-		public DateTime CreatedAt { get; }
+		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was last updated at.
 		/// </summary>
 		[JsonProperty("updated_at", Order = 4)]
-		public DateTime UpdatedAt { get; }
+		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was said/written at.
 		/// </summary>
 		[JsonProperty("appeared_at", Order = 2, Required = Required.Always)]
-		public DateTime AppearedAt { get; }
+		public DateTime AppearedAt { get; init; }
 
 		/// <summary>
 		/// Id of the quote.
 		/// </summary>
 		[JsonProperty("quote_id", Order = 0, Required = Required.Always)]
-		public string Id { get; }
+		public string Id { get; init; }
 
 		/// <summary>
 		/// Array of tags associated with this quote.
 		/// </summary>
 		[JsonProperty("tags", Order = 5, Required = Required.Always)]
-		public string[] Tags { get; }
+		public string[] Tags { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("quote", Order = 1, Required = Required.Always)]
-		public string Value { get; }
+		public string Value { get; init; }
 
 		/// <inheritdoc/>
 		[JsonProperty("source", Order = 6, Required = Required.Always)]
-		public string Source { get; }
+		public string Source { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpQuote"/> class with an <paramref name="id"/>,

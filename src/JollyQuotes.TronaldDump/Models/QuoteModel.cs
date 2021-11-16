@@ -15,49 +15,49 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Date the quote was said/written at.
 		/// </summary>
 		[JsonProperty("appeared_at", Order = 2, Required = Required.Always)]
-		public DateTime AppearedAt { get; }
+		public DateTime AppearedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was added to the database at.
 		/// </summary>
 		[JsonProperty("created_at", Order = 3, Required = Required.Always)]
-		public DateTime CreatedAt { get; }
+		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was last updated at.
 		/// </summary>
 		[JsonProperty("updated_at", Order = 4)]
-		public DateTime UpdatedAt { get; }
+		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// Id of the quote.
 		/// </summary>
 		[JsonProperty("quote_id", Order = 0, Required = Required.Always)]
-		public string Id { get; }
+		public string Id { get; init; }
 
 		/// <summary>
 		/// Array of tags associated with this quote.
 		/// </summary>
 		[JsonProperty("tags", Order = 5, Required = Required.Always)]
-		public string[] Tags { get; }
+		public string[] Tags { get; init; }
 
 		/// <summary>
 		/// Actual quote.
 		/// </summary>
 		[JsonProperty("value", Order = 1, Required = Required.Always)]
-		public string Value { get; }
+		public string Value { get; init; }
 
 		/// <summary>
 		/// Contains information about the quote's author and source.
 		/// </summary>
 		[JsonProperty("_embedded", Order = 6, Required = Required.Always)]
-		public AuthorsAndSourcesModel Embedded { get; }
+		public AuthorsAndSourcesModel Embedded { get; init; }
 
 		/// <summary>
 		/// Links to data of the quote.
 		/// </summary>
 		[JsonProperty("_links")]
-		public SelfLinkModel Links { get; }
+		public SelfLinkModel Links { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, <paramref name="value"/>, <paramref name="tags"/>, child <paramref name="links"/>, <paramref name="embedded"/> data and dates of first appearance and creation.
