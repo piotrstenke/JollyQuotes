@@ -6,7 +6,7 @@ namespace JollyQuotes
 	/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class EnumerableQuoteResolver<T> : EnumerableQuoteGenerator<T>, IQuoteService where T : IQuote
+	public abstract partial class EnumerableQuoteResolver<T> : EnumerableQuoteGenerator<T>, IQuoteService where T : class, IQuote
 	{
 		/// <inheritdoc/>
 		public IResourceResolver Resolver { get; }

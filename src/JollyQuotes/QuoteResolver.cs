@@ -6,7 +6,7 @@ namespace JollyQuotes
 	/// <see cref="IRandomQuoteGenerator"/> that generates random quotes using an external API accessed by an <see cref="IResourceResolver"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class QuoteResolver<T> : RandomQuoteGenerator<T>, IQuoteService where T : IQuote
+	public abstract partial class QuoteResolver<T> : RandomQuoteGenerator<T>, IQuoteService where T : class, IQuote
 	{
 		/// <inheritdoc/>
 		public IResourceResolver Resolver { get; }

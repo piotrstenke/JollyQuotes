@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace JollyQuotes
 {
-	public abstract partial class EnumerableQuoteGenerator<T> where T : IQuote
+	public abstract partial class EnumerableQuoteGenerator<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// <see cref="IEnumerableQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.

@@ -10,7 +10,7 @@ namespace JollyQuotes
 	/// </summary>
 	/// <remarks>Methods of this class are thread-safe only if the underlaying <see cref="IQuoteCache{T}"/> is also thread-safe.</remarks>
 	/// <typeparam name="T">Type of quotes this class can store.</typeparam>
-	public class BlockableQuoteCache<T> : IQuoteCache<T> where T : IQuote
+	public class BlockableQuoteCache<T> : IQuoteCache<T> where T : class, IQuote
 	{
 		private readonly IQuoteCache<T> _cache;
 		private bool _preserveState = true;
@@ -19,6 +19,9 @@ namespace JollyQuotes
 		/// Determines whether the cache is blocked from modification.
 		/// </summary>
 		public bool IsBlocked { get; private set; }
+
+		/// <inheritdoc/>
+		public bool IsEmpty => _cache.IsEmpty;
 
 		/// <summary>
 		/// Determines whether state of the cache should be preserved when <see cref="IsBlocked"/> is <see langword="false"/> and restored when <see cref="IsBlocked"/> is set back to <see langword="true"/>.
@@ -43,9 +46,6 @@ namespace JollyQuotes
 		/// that modifies the state of the cache is called while <see cref="IsBlocked"/> is <see langword="true"/>.
 		/// </summary>
 		public bool ThrowIfBlocked { get; set; }
-
-		/// <inheritdoc/>
-		public bool IsEmpty => _cache.IsEmpty;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BlockableQuoteCache{T}"/> class with the underlaying <paramref name="cache"/> specified.
@@ -132,15 +132,9 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		/// <exception cref="ArgumentException"><paramref name="remove"/> cannot be <see langword="true"/> when <see cref="IsBlocked"/> is <see langword="true"/>.</exception>
-		public T GetRandomQuote(bool remove = false)
+		public T GetRandomQuote()
 		{
-			if (remove && IsBlocked)
-			{
-				throw Exc_RemoveParameterIsTrueWhenBlocked();
-			}
-
-			return _cache.GetRandomQuote(remove);
+			return _cache.GetRandomQuote();
 		}
 
 		/// <inheritdoc/>
@@ -174,15 +168,9 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		/// <exception cref="ArgumentException"><paramref name="remove"/> cannot be <see langword="true"/> when <see cref="IsBlocked"/> is <see langword="true"/>.</exception>
-		public bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote, bool remove = false)
+		public bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote)
 		{
-			if (remove && IsBlocked)
-			{
-				throw Exc_RemoveParameterIsTrueWhenBlocked();
-			}
-
-			return _cache.TryGetRandomQuote(tag, out quote, remove);
+			return _cache.TryGetRandomQuote(tag, out quote);
 		}
 
 		/// <summary>
@@ -201,11 +189,6 @@ namespace JollyQuotes
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		private static ArgumentException Exc_RemoveParameterIsTrueWhenBlocked()
-		{
-			return new ArgumentException("Parameter 'remove' cannot be true when {IsBlocked} is true", "remove");
 		}
 
 		private bool CanBeModified()

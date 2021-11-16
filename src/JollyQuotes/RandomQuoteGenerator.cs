@@ -4,7 +4,7 @@ namespace JollyQuotes
 {
 	/// <inheritdoc cref="IRandomQuoteGenerator"/>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class RandomQuoteGenerator<T> : IRandomQuoteGenerator where T : IQuote
+	public abstract partial class RandomQuoteGenerator<T> : IRandomQuoteGenerator where T : class, IQuote
 	{
 		/// <summary>
 		/// Source of the quotes, e.g. a link, file name or raw text.

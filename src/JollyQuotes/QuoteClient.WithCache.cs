@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace JollyQuotes
 {
-	public abstract partial class QuoteClient<T> where T : IQuote
+	public abstract partial class QuoteClient<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// <see cref="IRandomQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>

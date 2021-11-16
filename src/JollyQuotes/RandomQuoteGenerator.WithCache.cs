@@ -2,7 +2,7 @@
 
 namespace JollyQuotes
 {
-	public abstract partial class RandomQuoteGenerator<T> where T : IQuote
+	public abstract partial class RandomQuoteGenerator<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// <see cref="IRandomQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.

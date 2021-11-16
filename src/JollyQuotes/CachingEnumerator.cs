@@ -8,7 +8,7 @@ namespace JollyQuotes
 	/// <see cref="IEnumerator{T}"/> that uses a <see cref="BlockableQuoteCache{T}"/> to cache the iterated quotes.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this enumerator can access.</typeparam>
-	public struct CachingEnumerator<T> : IEnumerator<T> where T : IQuote
+	public struct CachingEnumerator<T> : IEnumerator<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// Storage of cached <see cref="IQuote"/>s.
@@ -16,14 +16,14 @@ namespace JollyQuotes
 		public BlockableQuoteCache<T> Cache { get; }
 
 		/// <summary>
-		/// The underlaying <see cref="IEnumerator{T}"/>.
-		/// </summary>
-		public IEnumerator<T> Enumerator { get; }
-
-		/// <summary>
 		/// Current <see cref="IQuote"/>.
 		/// </summary>
 		public T Current => Enumerator.Current;
+
+		/// <summary>
+		/// The underlaying <see cref="IEnumerator{T}"/>.
+		/// </summary>
+		public IEnumerator<T> Enumerator { get; }
 
 		object IEnumerator.Current => Current;
 

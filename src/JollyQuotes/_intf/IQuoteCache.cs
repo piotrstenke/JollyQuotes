@@ -8,7 +8,7 @@ namespace JollyQuotes
 	/// Represents a cache of quotes.
 	/// </summary>
 	/// <typeparam name="T">Type of quotes this class can store.</typeparam>
-	public interface IQuoteCache<T> : IEnumerable<T> where T : IQuote
+	public interface IQuoteCache<T> : IEnumerable<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// Determines whether the cache is empty.
@@ -48,9 +48,8 @@ namespace JollyQuotes
 		/// <summary>
 		/// Returns a random <see cref="IQuote"/> from the cache.
 		/// </summary>
-		/// <param name="remove">Determines whether to remove the returned <see cref="IQuote"/> from the cache.</param>
 		/// <exception cref="InvalidOperationException">Cannot return a quote from empty cache.</exception>
-		T GetRandomQuote(bool remove = false);
+		T GetRandomQuote();
 
 		/// <summary>
 		/// Determines whether the specified <paramref name="quote"/> is cached.
@@ -81,9 +80,8 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="tag">Tag to generate a quote associated with.</param>
 		/// <param name="quote">Returned <see cref="IQuote"/>.</param>
-		/// <param name="remove">Determines whether to remove the returned <see cref="IQuote"/> from the cache.</param>
 		/// <returns><see langword="true"/> if a <see cref="IQuote"/> associated with the specified <paramref name="tag"/> was found, <see langword="false"/> otherwise.</returns>
 		/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-		bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote, bool remove = false);
+		bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote);
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace JollyQuotes
 {
-	public abstract partial class EnumerableQuoteResolver<T> where T : IQuote
+	public abstract partial class EnumerableQuoteResolver<T> where T : class, IQuote
 	{
 		/// <summary>
 		/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/>

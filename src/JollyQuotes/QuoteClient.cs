@@ -8,8 +8,13 @@ namespace JollyQuotes
 	/// <see cref="QuoteResolver{T}"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class QuoteClient<T> : QuoteResolver<T> where T : IQuote
+	public abstract partial class QuoteClient<T> : QuoteResolver<T> where T : class, IQuote
 	{
+		/// <summary>
+		/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
+		/// </summary>
+		public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
+
 		/// <summary>
 		/// Returns the <see cref="QuoteResolver{T}.Resolver"/> as a <see cref="JollyQuotes.HttpResolver"/>.
 		/// </summary>
@@ -20,11 +25,6 @@ namespace JollyQuotes
 		/// </summary>
 		[MemberNotNullWhen(true, nameof(HttpResolver), nameof(BaseClient))]
 		public bool IsHttpBased => Resolver is HttpResolver;
-
-		/// <summary>
-		/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
-		/// </summary>
-		public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteClient{T}"/> class with a <paramref name="source"/> specified.
