@@ -11,7 +11,7 @@ namespace JollyQuotes
 	/// <remarks>This class implements the <see cref="IEquatable{T}"/> interface - two instances are compare by their value, not reference.</remarks>
 	[Serializable]
 	[JsonObject]
-	public sealed record Quote : IQuote
+	public record Quote : IQuote
 	{
 		/// <summary>
 		/// Value used when an author of a quote is unknown.
@@ -21,7 +21,13 @@ namespace JollyQuotes
 		/// <summary>
 		/// Returns a new instance of the <see cref="Quote"/> class representing an unknown quote (can be used e.g. when quote with tag was not found).
 		/// </summary>
-		public static Quote Unknown => new();
+		public static Quote Unknown => new()
+		{
+			Author = "Unknown",
+			Value = "No Content",
+			Source = string.Empty,
+			Tags = Array.Empty<string>(),
+		};
 
 		/// <inheritdoc/>
 		[JsonProperty("author", Order = 1, Required = Required.Always)]
@@ -45,6 +51,15 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		[JsonProperty("quote", Order = 0, Required = Required.Always)]
 		public string Value { get; init; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Quote"/> class.
+		/// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+		protected Quote()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+		{
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Quote"/> class with a <paramref name="quote"/> and an <paramref name="author"/> specified.
@@ -96,16 +111,8 @@ namespace JollyQuotes
 			Tags = tags ?? Array.Empty<string>();
 		}
 
-		private Quote()
-		{
-			Author = "Unknown";
-			Value = string.Empty;
-			Source = string.Empty;
-			Tags = Array.Empty<string>();
-		}
-
 		/// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-		public bool Equals(Quote? other)
+		public virtual bool Equals(Quote? other)
 		{
 			return
 				other is not null &&
@@ -135,24 +142,17 @@ namespace JollyQuotes
 			return hash.ToHashCode();
 		}
 
-		/// <inheritdoc/>
-		public override string ToString()
+		/// <summary>
+		/// Returns an unique id of the quote.
+		/// </summary>
+		protected virtual int GetId()
 		{
-			StringBuilder builder = new();
-
-			builder.Append($"\"{Value}\", {Author}");
-
-			if (Date.HasValue)
-			{
-				builder.Append($", {Date.Value.ToShortDateString()}");
-			}
-
-			return builder.ToString();
+			return GetHashCode();
 		}
 
 		int IQuote.GetId()
 		{
-			return GetHashCode();
+			return GetId();
 		}
 	}
 }

@@ -33,7 +33,7 @@ namespace JollyQuotes
 		string Value { get; }
 
 		/// <summary>
-		/// Returns a unique id of the quote. Best used by calling <see cref="object.GetHashCode()"/>.
+		/// Returns an unique id of the quote. Best used by calling <see cref="object.GetHashCode()"/>.
 		/// </summary>
 		int GetId();
 	}

@@ -88,13 +88,10 @@ namespace JollyQuotes
 		private List<T?> _lookup;
 		private Dictionary<string, TagCacheEntry>? _tagCache;
 
-		/// <inheritdoc/>
-		public bool IsEmpty => NumCached == 0;
-
 		/// <summary>
 		/// Number of cached values.
 		/// </summary>
-		public int NumCached
+		public int Count
 		{
 			get
 			{
@@ -104,6 +101,14 @@ namespace JollyQuotes
 				}
 			}
 		}
+
+		/// <summary>
+		/// <see cref="IEqualityComparer{T}"/> that is used to decide whether two <see cref="IQuote"/>s are equal.
+		/// </summary>
+		public IEqualityComparer<T> EqualityComparer { get; }
+
+		/// <inheritdoc/>
+		public bool IsEmpty => Count == 0;
 
 		/// <summary>
 		/// Determines whether to use a cache of tags. Will speed up tag-related operations, such as <see cref="TryGetRandomQuote(string, out T?, bool)"/>,
@@ -150,12 +155,28 @@ namespace JollyQuotes
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class.
 		/// </summary>
-		public QuoteCache()
+		public QuoteCache() : this(EqualityComparer<T>.Default)
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class with a <paramref name="equalityComparer"/> specified.
+		/// </summary>
+		/// <param name="equalityComparer"><see cref="IEqualityComparer{T}"/> that is used to decide whether two <see cref="IQuote"/>s are equal.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="equalityComparer"/> is <see langword="null"/>.</exception>
+		public QuoteCache(IEqualityComparer<T> equalityComparer)
+		{
+			if (equalityComparer is null)
+			{
+				throw Error.Null(nameof(equalityComparer));
+			}
+
 			_lockObject = new();
 			_map = new();
 			_lookup = new();
 			_removed = new();
+
+			EqualityComparer = equalityComparer;
 		}
 
 		/// <summary>
@@ -172,59 +193,51 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			int id = quote.GetId();
-
-			lock (_lockObject)
+			if (replace)
 			{
-				int index = _lookup.Count;
-
-				if (!_map.TryAdd(id, index))
-				{
-					if (replace)
-					{
-						index = _map[id];
-
-						if (_tagCache is not null)
-						{
-							T old = _lookup[index]!;
-
-							foreach (string tag in old.Tags)
-							{
-								if (Array.IndexOf(old.Tags, tag) > -1 || !_tagCache.TryGetValue(tag, out TagCacheEntry? oldEntry))
-								{
-									continue;
-								}
-
-								oldEntry.Remove(index);
-								CacheTag(tag, index);
-							}
-						}
-
-						_lookup[index] = quote;
-
-						return true;
-					}
-
-					return false;
-				}
-
-				_lookup.Add(quote);
-
-				if (_tagCache is not null)
-				{
-					foreach (string tag in quote.Tags)
-					{
-						if (string.IsNullOrWhiteSpace(tag))
-						{
-							continue;
-						}
-
-						CacheTag(tag, index);
-					}
-				}
+				return TryCacheOrReplace(quote);
 			}
 
-			return true;
+			return TryCache(quote);
+		}
+
+		/// <summary>
+		/// Adds the specified <paramref name="quotes"/> to the cache.
+		/// </summary>
+		/// <param name="quotes">A collection of <see cref="IQuote"/>s to add.</param>
+		/// <param name="replace">Determines whether to replace an <see cref="IQuote"/> with the same id.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="quotes"/> is <see langword="null"/>.</exception>
+		public void CacheQuotes(IEnumerable<T> quotes, bool replace = false)
+		{
+			if (quotes is null)
+			{
+				throw Error.Null(nameof(quotes));
+			}
+
+			if (replace)
+			{
+				foreach (T quote in quotes)
+				{
+					if (quote is null)
+					{
+						continue;
+					}
+
+					TryCacheOrReplace(quote);
+				}
+			}
+			else
+			{
+				foreach (T quote in quotes)
+				{
+					if (quote is null)
+					{
+						continue;
+					}
+
+					TryCache(quote);
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -379,7 +392,7 @@ namespace JollyQuotes
 			}
 
 			int id = quote.GetId();
-			return IsCached(id);
+			return TryGetQuote(id, out T? other) && EqualityComparer.Equals(other, quote);
 		}
 
 		/// <summary>
@@ -394,27 +407,6 @@ namespace JollyQuotes
 			}
 		}
 
-		/// <summary>
-		/// Determines whether an <see cref="IQuote"/> with the specified <paramref name="id"/> is to be found in the cache.
-		/// </summary>
-		/// <param name="id">Id of <see cref="IQuote"/> to check for.</param>
-		/// <param name="quote"><see cref="IQuote"/> associated with the <paramref name="id"/>.</param>
-		public bool IsCached(int id, [NotNullWhen(true)] out T? quote)
-		{
-			lock (_lockObject)
-			{
-				// If an id exists in the _map, a quote is not null
-				if (_map.TryGetValue(id, out int index))
-				{
-					quote = _lookup[index]!;
-					return true;
-				}
-			}
-
-			quote = default;
-			return false;
-		}
-
 		/// <inheritdoc/>
 		public bool RemoveQuote(T quote)
 		{
@@ -424,7 +416,27 @@ namespace JollyQuotes
 			}
 
 			int id = quote.GetId();
-			return RemoveQuote(id);
+
+			lock (_lockObject)
+			{
+				if (_map.TryGetValue(id, out int index))
+				{
+					T other = _lookup[index]!;
+
+					if (!EqualityComparer.Equals(other, quote))
+					{
+						return false;
+					}
+
+					_map.Remove(id);
+					RemoveIndex(index);
+					TryRemoveQuoteFromTagCache(quote, index);
+
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -464,12 +476,17 @@ namespace JollyQuotes
 		{
 			if (string.IsNullOrWhiteSpace(tag))
 			{
-				throw Error.Null(nameof(tag));
+				throw Error.NullOrEmpty(nameof(tag));
 			}
 
 			lock (_lockObject)
 			{
 				int count = _map.Count;
+
+				if (count == 0)
+				{
+					return false;
+				}
 
 				if (_tagCache is null)
 				{
@@ -510,6 +527,83 @@ namespace JollyQuotes
 					}
 				}
 
+				return _map.Count < count;
+			}
+		}
+
+		/// <summary>
+		/// Removes all quotes with the specified <paramref name="tag"/> from the cache.
+		/// </summary>
+		/// <param name="tag">Tag remove all quotes associated with.</param>
+		/// <param name="removed">Array containing <see cref="IQuote"/>s that were removed from the cache.</param>
+		/// <returns><see langword="true"/> if any quote associated with the specified <paramref name="tag"/> was successfully removed, <see langword="false"/> otherwise.</returns>
+		/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
+		public bool RemoveQuotes(string tag, [NotNullWhen(true)] out T[]? removed)
+		{
+			if (string.IsNullOrWhiteSpace(tag))
+			{
+				throw Error.NullOrEmpty(nameof(tag));
+			}
+
+			lock (_lockObject)
+			{
+				int count = _map.Count;
+
+				if (count == 0)
+				{
+					removed = null;
+					return false;
+				}
+
+				List<T> quotes;
+
+				if (_tagCache is null)
+				{
+					DefragmentInternal();
+
+					int length = _lookup.Count;
+
+					quotes = new(length);
+
+					for (int i = 0; i < length; i++)
+					{
+						T? quote = _lookup[i];
+
+						if (quote is null || Array.IndexOf(quote.Tags, tag) == -1)
+						{
+							continue;
+						}
+
+						quotes.Add(quote);
+						RemoveQuoteAtIndex(quote, i);
+					}
+				}
+				else
+				{
+					if (!_tagCache.TryGetValue(tag, out TagCacheEntry? entry))
+					{
+						removed = null;
+						return false;
+					}
+
+					quotes = new(entry.Count);
+
+					foreach (int index in entry)
+					{
+						T? quote = _lookup[index];
+
+						if (quote is null)
+						{
+							continue;
+						}
+
+						quotes.Add(quote);
+						RemoveQuoteAtIndex(quote, index);
+						RemoveQuoteFromTagCache(quote, index);
+					}
+				}
+
+				removed = quotes.Count > 0 ? quotes.ToArray() : null;
 				return _map.Count < count;
 			}
 		}
@@ -901,12 +995,104 @@ namespace JollyQuotes
 			}
 		}
 
+		private bool ReplaceQuote(T quote, int id, out int index)
+		{
+			index = _map[id];
+			T old = _lookup[index]!;
+
+			if (quote is IEquatable<T> eq)
+			{
+				if (eq.Equals(old))
+				{
+					return false;
+				}
+			}
+			else if (ReferenceEquals(old, quote))
+			{
+				return false;
+			}
+
+			if (_tagCache is not null)
+			{
+				foreach (string tag in old.Tags)
+				{
+					if (Array.IndexOf(old.Tags, tag) > -1 || !_tagCache.TryGetValue(tag, out TagCacheEntry? oldEntry))
+					{
+						continue;
+					}
+
+					oldEntry.Remove(index);
+					CacheTag(tag, index);
+				}
+			}
+
+			_lookup[index] = quote;
+
+			return true;
+		}
+
 		private void SortRemoved()
 		{
 			if (!_isSorted)
 			{
 				_removed.Sort();
 				_isSorted = true;
+			}
+		}
+
+		private bool TryCache(T quote)
+		{
+			int id = quote.GetId();
+
+			lock (_lockObject)
+			{
+				int index = _lookup.Count;
+
+				if (_map.TryAdd(id, index))
+				{
+					_lookup.Add(quote);
+					TryCacheTags(quote, index);
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private bool TryCacheOrReplace(T quote)
+		{
+			int id = quote.GetId();
+
+			lock (_lockObject)
+			{
+				int index = _lookup.Count;
+
+				if (!_map.TryAdd(id, index))
+				{
+					return ReplaceQuote(quote, id, out index);
+				}
+
+				_lookup.Add(quote);
+				TryCacheTags(quote, index);
+			}
+
+			return true;
+		}
+
+		private void TryCacheTags(T quote, int index)
+		{
+			if (_tagCache is not null)
+			{
+				foreach (string tag in quote.Tags)
+				{
+					if (string.IsNullOrWhiteSpace(tag))
+					{
+						continue;
+					}
+
+					CacheTag(tag, index);
+				}
 			}
 		}
 
