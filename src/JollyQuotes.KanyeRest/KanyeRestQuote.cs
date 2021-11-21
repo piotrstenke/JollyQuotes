@@ -8,10 +8,10 @@ namespace JollyQuotes.KanyeRest
 	/// </summary>
 	[Serializable]
 	[JsonObject]
-	public sealed record KanyeQuote : IQuote
+	public sealed record KanyeRestQuote : IQuote
 	{
 		private const string _author = "Kanye West";
-		private const string _source = KanyeResources.APIPage;
+		private const string _source = KanyeRestResources.APIPage;
 
 		/// <summary>
 		/// Text of the quote.
@@ -26,11 +26,11 @@ namespace JollyQuotes.KanyeRest
 		string[] IQuote.Tags => Array.Empty<string>();
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="KanyeQuote"/> class with a <paramref name="quote"/> specified.
+		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="quote"/> specified.
 		/// </summary>
 		/// <param name="quote">Text of the quote.</param>
 		/// <exception cref="ArgumentException"><paramref name="quote"/> cannot be <see langword="null"/> or empty.</exception>
-		public KanyeQuote(string quote)
+		public KanyeRestQuote(string quote)
 		{
 			if (string.IsNullOrWhiteSpace(quote))
 			{

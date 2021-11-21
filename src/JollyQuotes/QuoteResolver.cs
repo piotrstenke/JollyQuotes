@@ -6,10 +6,15 @@ namespace JollyQuotes
 	/// <see cref="IRandomQuoteGenerator"/> that generates random quotes using an external API accessed by an <see cref="IResourceResolver"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class QuoteResolver<T> : RandomQuoteGenerator<T>, IQuoteService where T : class, IQuote
+	public abstract partial class QuoteResolver<T> : RandomQuoteGenerator<T>, IQuoteService, IDisposable where T : class, IQuote
 	{
 		/// <inheritdoc/>
 		public IResourceResolver Resolver { get; }
+
+		/// <summary>
+		/// Determines whether the current instance has been already disposed.
+		/// </summary>
+		protected bool Disposed { get; private set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteResolver{T}"/> class with an underlaying <paramref name="resolver"/> and <paramref name="source"/> specified.
@@ -26,6 +31,32 @@ namespace JollyQuotes
 			}
 
 			Resolver = resolver;
+		}
+
+		/// <summary>
+		/// Releases the unmanaged resources used by the <see cref="QuoteResolver{T}"/> and optionally disposes of the managed resources.
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Releases the unmanaged resources used by the <see cref="QuoteResolver{T}"/> and optionally disposes of the managed resources.
+		/// </summary>
+		/// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;<see langword="false"/> to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!Disposed)
+			{
+				if (disposing && Resolver is IDisposable d)
+				{
+					d.Dispose();
+				}
+
+				Disposed = true;
+			}
 		}
 	}
 }

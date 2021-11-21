@@ -6,23 +6,35 @@ namespace JollyQuotes
 {
 	internal static class Internals
 	{
-		private static readonly Random _global = new();
-
-		[ThreadStatic]
-		private static Random? _local;
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static HttpResolver CreateResolver(string source)
+		public static HttpClient CreateDefaultClient()
 		{
+			HttpClient client = new();
+			client.DefaultRequestHeaders.Accept.Add(new("*/*"));
+			return client;
+		}
+
+		public static HttpResolver CreateResolver(string source, bool includeBaseAddress)
+		{
+			if (!includeBaseAddress)
+			{
+				// In this case, 'source' is not used outside of constructor of RandomQuoteGenerator,
+				// so it doesn't have to be checked against null before that constructor runs,
+				// unlike 'uri' in method below, which is converted to string using ToString().
+
+				return HttpResolver.CreateDefault();
+			}
+
 			if (string.IsNullOrWhiteSpace(source))
 			{
 				throw Error.NullOrEmpty(nameof(source));
 			}
 
-			return new HttpResolver(new HttpClient() { BaseAddress = new Uri(source) });
+			HttpClient client = CreateDefaultClient();
+			client.BaseAddress = new Uri(source);
+
+			return new HttpResolver(client);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static HttpResolver CreateResolver(Uri uri)
 		{
 			if (uri is null)
@@ -30,29 +42,18 @@ namespace JollyQuotes
 				throw Error.Null(nameof(uri));
 			}
 
-			return new HttpResolver(new HttpClient() { BaseAddress = uri });
+			HttpClient client = CreateDefaultClient();
+			client.BaseAddress = uri;
+
+			return new HttpResolver(client);
 		}
 
-		public static HttpClient EnsureNullAddress(HttpClient client)
+		public static void EnsureNullAddress(HttpClient client)
 		{
-			if (client is null)
-			{
-				throw Error.Null(nameof(client));
-			}
-
 			if (client.BaseAddress is not null)
 			{
 				throw new ArgumentException("Base address of a HtppClient must be null", nameof(client));
 			}
-
-			return client;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IResourceResolver GetResolverFromClient(HttpClient client, out IStreamResolver resolver)
-		{
-			resolver = new HttpResolver(client);
-			return resolver;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -64,23 +65,6 @@ namespace JollyQuotes
 			}
 
 			return service.Resolver;
-		}
-
-		public static int RandomNumber(int min, int max)
-		{
-			if (_local is null)
-			{
-				int seed;
-
-				lock (_global)
-				{
-					seed = _global.Next();
-				}
-
-				_local = new Random(seed);
-			}
-
-			return _local.Next(min, max);
 		}
 
 		public static string RetrieveSourceFromClient(HttpClient client)

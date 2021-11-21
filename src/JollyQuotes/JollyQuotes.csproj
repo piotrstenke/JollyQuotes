@@ -21,10 +21,13 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>JollyQuotes.KanyeRest</_Parameter1>
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>JollyQuotes.TronaldDump</_Parameter1>
+      <_Parameter1>$(AssemblyName).KanyeRest</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(AssemblyName).TronaldDump</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

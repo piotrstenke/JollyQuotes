@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// A random number generator that is used to determine a <see cref="bool"/> value that should be returned by the <see cref="Determine()"/> method.
 		/// </summary>
-		public Random Random { get; }
+		public IRandomNumberGenerator Random { get; }
 
 		/// <summary>
 		/// If a generated number is greater than or equal to this value, <see langword="true"/> is returned, otherwise <see langword="false"/>.
@@ -33,57 +33,8 @@ namespace JollyQuotes
 		/// </summary>
 		public Possibility()
 		{
-			Random = new();
+			Random = new ThreadRandom();
 			Reset();
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Possibility"/> class with a <paramref name="seed"/> for number generation specified.
-		/// </summary>
-		/// <param name="seed">
-		/// A number used to calculate a starting value for the pseudo-random number sequence.
-		/// If a negative number is specified, the absolute value of the number is used.
-		/// </param>
-		public Possibility(int seed)
-		{
-			Random = new(seed);
-			Reset();
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Possibility"/> class with a <paramref name="seed"/> for number generation and <paramref name="upperLimit"/> specified.
-		/// <see cref="Step"/> is set to half of the <paramref name="upperLimit"/>.
-		/// </summary>
-		/// <param name="seed">
-		/// A number used to calculate a starting value for the pseudo-random number sequence.
-		/// If a negative number is specified, the absolute value of the number is used.
-		/// </param>
-		/// <param name="upperLimit">Greatest number that can be generated. Must greater than <c>0</c>.</param>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="upperLimit"/> must be greater than <c>0</c>.</exception>
-		public Possibility(int seed, int upperLimit)
-		{
-			Random = new Random(seed);
-			Bound(upperLimit);
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Possibility"/> class with a <paramref name="seed"/> for number generation,
-		/// <paramref name="step"/> and <paramref name="upperLimit"/> specified.
-		/// </summary>
-		/// <param name="seed">
-		/// A number used to calculate a starting value for the pseudo-random number sequence.
-		/// If a negative number is specified, the absolute value of the number is used.
-		/// </param>
-		/// <param name="upperLimit">Greatest number that can be generated. Must greater than <c>0</c> and greater than or equal to <paramref name="step"/>.</param>
-		/// <param name="step">If a generated number is greater than or equal to this value, <see langword="true"/> is returned, otherwise <see langword="false"/>. Must be greater than <c>0</c>.</param>
-		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="step"/> must be greater than <c>0</c>. -or-
-		/// <paramref name="upperLimit"/> must be greater than <c>0</c>. -or-
-		/// <paramref name="upperLimit"/> must be greater than or equal to <paramref name="step"/>.</exception>
-		public Possibility(int seed, int upperLimit, int step)
-		{
-			Bound(upperLimit, step);
-			Random = new(seed);
 		}
 
 		/// <summary>
@@ -91,7 +42,7 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="random">A random number generator that is used to determine a <see cref="bool"/> value that should be returned by the <see cref="Determine()"/> method.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="random"/> is <see langword="null"/>.</exception>
-		public Possibility(Random random)
+		public Possibility(IRandomNumberGenerator random)
 		{
 			if (random is null)
 			{
@@ -109,7 +60,7 @@ namespace JollyQuotes
 		/// <param name="upperLimit">Greatest number that can be generated. Must greater than <c>0</c>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="random"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="upperLimit"/> must be greater than <c>0</c>.</exception>
-		public Possibility(Random random, int upperLimit)
+		public Possibility(IRandomNumberGenerator random, int upperLimit)
 		{
 			if (random is null)
 			{
@@ -132,7 +83,7 @@ namespace JollyQuotes
 		/// <paramref name="step"/> must be greater than <c>0</c>. -or-
 		/// <paramref name="upperLimit"/> must be greater than <c>0</c>. -or-
 		/// <paramref name="upperLimit"/> must be greater than or equal to <paramref name="step"/>.</exception>
-		public Possibility(Random random, int upperLimit, int step)
+		public Possibility(IRandomNumberGenerator random, int upperLimit, int step)
 		{
 			if (random is null)
 			{
@@ -192,7 +143,7 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		public bool Determine()
 		{
-			return Random.Next(1, UpperLimit + 1) > Step;
+			return Random.RandomNumber(1, UpperLimit + 1) > Step;
 		}
 
 		/// <summary>

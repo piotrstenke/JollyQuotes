@@ -14,8 +14,11 @@ namespace JollyQuotes.TronaldDump
 			/// <inheritdoc cref="TronaldDumpQuoteGenerator.ModelConverter"/>
 			public ITronaldDumpModelConverter ModelConverter => _generator.ModelConverter;
 
-			/// <inheritdoc cref="TronaldDumpQuoteGenerator.Random"/>
-			public Random Random => _generator.Random;
+			/// <inheritdoc cref="TronaldDumpQuoteGenerator.RandomNumberGenerator"/>
+			public IRandomNumberGenerator RandomNumberGenerator => _generator.RandomNumberGenerator;
+
+			/// <inheritdoc cref="TronaldDumpQuoteGenerator.Resolver"/>
+			public new IStreamResolver Resolver => _generator.Resolver;
 
 			/// <inheritdoc cref="TronaldDumpQuoteGenerator.Service"/>
 			public ITronaldDumpService Service => _generator.Service;
@@ -28,6 +31,12 @@ namespace JollyQuotes.TronaldDump
 				: base(baseGenerator.Resolver, baseGenerator.Source, baseGenerator.Cache, baseGenerator.Possibility)
 			{
 				_generator = baseGenerator;
+			}
+
+			/// <inheritdoc/>
+			protected override void Dispose(bool disposing)
+			{
+				// Do nothing.
 			}
 
 			/// <inheritdoc/>

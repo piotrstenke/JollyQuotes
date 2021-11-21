@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <see cref="IRandomQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
 		/// and a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : QuoteResolver<T>.WithCache
+		public abstract new class WithCache : QuoteResolver<T>.WithCache
 		{
 			/// <summary>
 			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
@@ -32,6 +32,7 @@ namespace JollyQuotes
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
 			/// </summary>
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
+			/// <param name="includeBaseAddress">Determines whether the specified <paramref name="source"/> should be applied to <see cref="HttpClient.BaseAddress"/>.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
 			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
@@ -41,9 +42,10 @@ namespace JollyQuotes
 			/// <exception cref="UriFormatException">Invalid format of the <paramref name="source"/>.</exception>
 			protected WithCache(
 				string source,
+				bool includeBaseAddress = true,
 				IQuoteCache<T>? cache = null,
 				IPossibility? possibility = null
-			) : base(Internals.CreateResolver(source), source, cache, possibility)
+			) : base(Internals.CreateResolver(source, includeBaseAddress), source, cache, possibility)
 			{
 			}
 

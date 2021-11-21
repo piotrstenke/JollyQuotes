@@ -52,15 +52,16 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Finalizes the current instance.
+		/// Returns a new instance of <see cref="HttpResolver"/> with default options applied.
 		/// </summary>
-		~HttpResolver()
+		public static HttpResolver CreateDefault()
 		{
-			Dispose(false);
+			HttpClient client = Internals.CreateDefaultClient();
+			return new HttpResolver(client);
 		}
 
 		/// <summary>
-		/// Releases unmanaged resources held by the current instance.
+		/// Releases the unmanaged resources used by the <see cref="HttpResolver"/> and optionally disposes of the managed resources.
 		/// </summary>
 		public void Dispose()
 		{
@@ -199,9 +200,9 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Releases unmanaged resources held by the current instance.
+		/// Releases the unmanaged resources used by the <see cref="HttpResolver"/> and optionally disposes of the managed resources.
 		/// </summary>
-		/// <param name="disposing">Determines whether this method was called from the <see cref="Dispose()"/> or by a finalizer.</param>
+		/// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;<see langword="false"/> to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!_disposed)

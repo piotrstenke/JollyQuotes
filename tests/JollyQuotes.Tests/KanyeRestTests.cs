@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JollyQuotes.KanyeRest;
 using Xunit;
-using static JollyQuotes.Tests.Internals;
+using static JollyQuotes.Tests.TestHelpers;
 
 namespace JollyQuotes.Tests
 {
@@ -13,17 +13,17 @@ namespace JollyQuotes.Tests
 
 		public KanyeRestTests()
 		{
-			_service = new KanyeRestService(GlobalClient);
+			_service = new KanyeRestService(HttpResolver.CreateDefault());
 		}
 
 		[Fact]
 		public async Task Returns_All_Quotes()
 		{
-			List<KanyeQuote> quotes = await _service.GetAllQuotes();
+			List<KanyeRestQuote> quotes = await _service.GetAllQuotes();
 
-			List<KanyeQuote> all = (await GlobalResolver
-				.ResolveAsync<List<string>>(KanyeResources.Database))
-				.ConvertAll(q => new KanyeQuote(q))
+			List<KanyeRestQuote> all = (await GlobalResolver
+				.ResolveAsync<List<string>>(KanyeRestResources.Database))
+				.ConvertAll(q => new KanyeRestQuote(q))
 				.ToList();
 
 			Assert.Equal(quotes, all);
@@ -32,7 +32,7 @@ namespace JollyQuotes.Tests
 		[Fact]
 		public async Task Returns_Random_Quote()
 		{
-			KanyeQuote quote = await _service.GetRandomQuote();
+			KanyeRestQuote quote = await _service.GetRandomQuote();
 
 			Assert.NotNull(quote);
 			Assert.False(string.IsNullOrWhiteSpace(quote.Quote));

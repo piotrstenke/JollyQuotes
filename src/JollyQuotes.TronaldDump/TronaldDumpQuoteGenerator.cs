@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using JollyQuotes.TronaldDump.Models;
 
+using static JollyQuotes.Internals;
+using static JollyQuotes.TronaldDump.TronaldDumpResources;
+
 namespace JollyQuotes.TronaldDump
 {
 	/// <summary>
@@ -18,9 +21,12 @@ namespace JollyQuotes.TronaldDump
 		public ITronaldDumpModelConverter ModelConverter { get; }
 
 		/// <summary>
-		/// <see cref="System.Random"/> used to pick random quotes.
+		/// Service that generates a value used to determine which random quote to return.
 		/// </summary>
-		public Random Random { get; }
+		public IRandomNumberGenerator RandomNumberGenerator { get; }
+
+		/// <inheritdoc cref="ITronaldDumpService.Resolver"/>
+		public new IStreamResolver Resolver => (base.Resolver as IStreamResolver)!;
 
 		/// <summary>
 		/// <see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API.
@@ -28,57 +34,44 @@ namespace JollyQuotes.TronaldDump
 		public ITronaldDumpService Service { get; }
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class.
+		/// </summary>
+		public TronaldDumpQuoteGenerator() : this(CreateDefaultResolver())
+		{
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/> specified.
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="TronaldDumpResources.APIPage"/>.</exception>
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
 		public TronaldDumpQuoteGenerator(HttpClient client)
-			: base(Internals.GetResolverFromClient(TronaldDumpService.SetAddress(client), out IStreamResolver resolver), TronaldDumpResources.BaseAddress)
-		{
-			ModelConverter = new TronaldDumpModelConverter();
-			Service = new TronaldDumpService(resolver);
-			Random = new();
-			_internalGenerator = new(this);
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/> and target <paramref name="service"/> specified.
-		/// </summary>
-		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
-		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>. -or- <paramref name="service"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="TronaldDumpResources.APIPage"/>.</exception>
-		public TronaldDumpQuoteGenerator(HttpClient client, ITronaldDumpService service)
-			: this(client, service, new TronaldDumpModelConverter(), new Random())
+			: this(client, new TronaldDumpModelConverter(), new ThreadRandom())
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/>, target <paramref name="service"/> and model <paramref name="converter"/> specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/> and <paramref name="modelConverter"/> specified.
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
-		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <param name="converter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="client"/> is <see langword="null"/>. -or-
-		/// <paramref name="service"/> is <see langword="null"/>. -or-
-		/// <paramref name="converter"/> is <see langword="null"/>.
+		/// <paramref name="modelConverter"/> is <see langword="null"/>.
 		/// </exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="TronaldDumpResources.APIPage"/>.</exception>
-		public TronaldDumpQuoteGenerator(HttpClient client, ITronaldDumpService service, ITronaldDumpModelConverter converter)
-			: this(client, service, converter, new Random())
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
+		public TronaldDumpQuoteGenerator(HttpClient client, ITronaldDumpModelConverter modelConverter)
+			: this(client, modelConverter, new ThreadRandom())
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/>,
-		/// target <paramref name="service"/>, model <paramref name="converter"/> and <paramref name="random"/> number generator specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="client"/>, <paramref name="modelConverter"/> and <paramref name="random"/> number generator specified.
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
-		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <param name="converter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
-		/// <param name="random"><see cref="System.Random"/> used to pick random quotes.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <param name="random">Service that generates a value used to determine which random quote to return.</param>
 		/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 		/// <param name="possibility">
 		/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
@@ -86,98 +79,73 @@ namespace JollyQuotes.TronaldDump
 		/// </param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="client"/> is <see langword="null"/>. -or-
-		/// <paramref name="service"/> is <see langword="null"/>. -or-
-		/// <paramref name="converter"/> is <see langword="null"/>. -or-
+		/// <paramref name="modelConverter"/> is <see langword="null"/>. -or-
 		/// <paramref name="random"/> is <see langword="null"/>.
 		/// </exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="TronaldDumpResources.APIPage"/>.</exception>
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
 		public TronaldDumpQuoteGenerator(
 			HttpClient client,
-			ITronaldDumpService service,
-			ITronaldDumpModelConverter converter,
-			Random random,
+			ITronaldDumpModelConverter modelConverter,
+			IRandomNumberGenerator random,
 			IQuoteCache<TronaldDumpQuote>? cache = null,
 			IPossibility? possibility = null
-		) : this(new HttpResolver(TronaldDumpService.SetAddress(client)), service, converter, random, cache, possibility)
+		) : this(new HttpResolver(SetAddress(client)), modelConverter, random, cache, possibility)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/> specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with a target <paramref name="service"/> specified.
 		/// </summary>
-		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
-		public TronaldDumpQuoteGenerator(IStreamResolver resolver) : base(resolver, TronaldDumpResources.BaseAddress)
+		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
+		/// <exception cref="ArgumentNullException"><paramref name="service"/> is <see langword="null"/>.</exception>
+		public TronaldDumpQuoteGenerator(ITronaldDumpService service) : base(GetResolverFromService(service), BaseAddress)
 		{
-			Service = new TronaldDumpService(resolver);
+			Service = service;
 			ModelConverter = new TronaldDumpModelConverter();
-			Random = new();
+			RandomNumberGenerator = new ThreadRandom();
 			_internalGenerator = new(this);
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/> and target <paramref name="service"/> specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with a target <paramref name="service"/> and <paramref name="modelConverter"/> specified.
 		/// </summary>
-		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
 		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>. -or- <paramref name="service"/> is <see langword="null"/>.</exception>
-		public TronaldDumpQuoteGenerator(IResourceResolver resolver, ITronaldDumpService service)
-			: this(resolver, service, new TronaldDumpModelConverter(), new Random())
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/>, target <paramref name="service"/> and model <paramref name="converter"/> specified.
-		/// </summary>
-		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
-		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <param name="converter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="resolver"/> is <see langword="null"/>. -or-
 		/// <paramref name="service"/> is <see langword="null"/>. -or-
-		/// <paramref name="converter"/> is <see langword="null"/>.
+		/// <paramref name="modelConverter"/> is <see langword="null"/>.
 		/// </exception>
-		public TronaldDumpQuoteGenerator(IResourceResolver resolver, ITronaldDumpService service, ITronaldDumpModelConverter converter)
-			: this(resolver, service, converter, new Random())
+		public TronaldDumpQuoteGenerator(ITronaldDumpService service, ITronaldDumpModelConverter modelConverter) : this(service, modelConverter, new ThreadRandom())
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/>,
-		/// target <paramref name="service"/>, model <paramref name="converter"/> and <paramref name="random"/> number generator specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with a target <paramref name="service"/>, <paramref name="modelConverter"/> and <paramref name="random"/> number generator specified.
 		/// </summary>
-		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
 		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
-		/// <param name="converter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
-		/// <param name="random"><see cref="System.Random"/> used to pick random quotes.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <param name="random">Service that generates a value used to determine which random quote to return.</param>
 		/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 		/// <param name="possibility">
 		/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
 		/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="resolver"/> is <see langword="null"/>. -or-
 		/// <paramref name="service"/> is <see langword="null"/>. -or-
-		/// <paramref name="converter"/> is <see langword="null"/>. -or-
+		/// <paramref name="modelConverter"/> is <see langword="null"/>. -or-
 		/// <paramref name="random"/> is <see langword="null"/>.
 		/// </exception>
 		public TronaldDumpQuoteGenerator(
-			IResourceResolver resolver,
 			ITronaldDumpService service,
-			ITronaldDumpModelConverter converter,
-			Random random,
+			ITronaldDumpModelConverter modelConverter,
+			IRandomNumberGenerator random,
 			IQuoteCache<TronaldDumpQuote>? cache = null,
 			IPossibility? possibility = null
-		) : base(resolver, TronaldDumpResources.BaseAddress, cache, possibility)
+		) : base(GetResolverFromService(service), BaseAddress, cache, possibility)
 		{
-			if (service is null)
+			if (modelConverter is null)
 			{
-				throw Error.Null(nameof(service));
-			}
-
-			if (converter is null)
-			{
-				throw Error.Null(nameof(converter));
+				throw Error.Null(nameof(modelConverter));
 			}
 
 			if (random is null)
@@ -186,9 +154,62 @@ namespace JollyQuotes.TronaldDump
 			}
 
 			Service = service;
-			ModelConverter = converter;
-			Random = random;
+			ModelConverter = modelConverter;
+			RandomNumberGenerator = random;
 			_internalGenerator = new(this);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/> specified.
+		/// </summary>
+		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		public TronaldDumpQuoteGenerator(IStreamResolver resolver) : base(resolver, BaseAddress)
+		{
+			Service = new TronaldDumpService(resolver);
+			ModelConverter = new TronaldDumpModelConverter();
+			RandomNumberGenerator = new ThreadRandom();
+			_internalGenerator = new(this);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/> and <paramref name="modelConverter"/> specified.
+		/// </summary>
+		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="resolver"/> is <see langword="null"/>. -or-
+		/// <paramref name="modelConverter"/> is <see langword="null"/>.
+		/// </exception>
+		public TronaldDumpQuoteGenerator(IStreamResolver resolver, ITronaldDumpModelConverter modelConverter)
+			: this(resolver, modelConverter, new ThreadRandom())
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/>, <paramref name="modelConverter"/> and <paramref name="random"/> number generator specified.
+		/// </summary>
+		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.</param>
+		/// <param name="random">Service that generates a value used to determine which random quote to return.</param>
+		/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
+		/// <param name="possibility">
+		/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
+		/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="resolver"/> is <see langword="null"/>. -or-
+		/// <paramref name="modelConverter"/> is <see langword="null"/>. -or-
+		/// <paramref name="random"/> is <see langword="null"/>.
+		/// </exception>
+		public TronaldDumpQuoteGenerator(
+			IStreamResolver resolver,
+			ITronaldDumpModelConverter modelConverter,
+			IRandomNumberGenerator random,
+			IQuoteCache<TronaldDumpQuote>? cache = null,
+			IPossibility? possibility = null
+		) : this(new TronaldDumpService(resolver), modelConverter, random, cache, possibility)
+		{
 		}
 
 		/// <inheritdoc cref="EnumerableQuoteGenerator{T}.WithCache.GetAllQuotes(string, QuoteInclude)"/>
@@ -201,6 +222,30 @@ namespace JollyQuotes.TronaldDump
 		public IEnumerable<TronaldDumpQuote> GetAllQuotes(string[]? tags, QuoteInclude which = QuoteInclude.All)
 		{
 			return _internalGenerator.GetAllQuotes(tags, which);
+		}
+
+		/// <inheritdoc/>
+		protected override void Dispose(bool disposing)
+		{
+			if (!Disposed)
+			{
+				if (Service is IDisposable d)
+				{
+					d.Dispose();
+				}
+
+				if (RandomNumberGenerator is IDisposable r)
+				{
+					r.Dispose();
+				}
+
+				if (ModelConverter is IDisposable m)
+				{
+					m.Dispose();
+				}
+
+				base.Dispose(disposing);
+			}
 		}
 
 		/// <inheritdoc cref="EnumerableQuoteGenerator{T}.WithCache.DownloadAllQuotes(string)"/>
@@ -262,7 +307,7 @@ namespace JollyQuotes.TronaldDump
 
 			if (numPages > 1)
 			{
-				int targetPage = Random.Next(0, numPages);
+				int targetPage = RandomNumberGenerator.RandomNumber(0, numPages);
 
 				if (targetPage > 0)
 				{
@@ -271,7 +316,7 @@ namespace JollyQuotes.TronaldDump
 				}
 			}
 
-			int targetQuote = Random.Next(0, TronaldDumpResources.MaxItemsPerPage);
+			int targetQuote = RandomNumberGenerator.RandomNumber(0, MaxItemsPerPage);
 
 			QuoteModel model = result.Embedded.Quotes[targetQuote];
 

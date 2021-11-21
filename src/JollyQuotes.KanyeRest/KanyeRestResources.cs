@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Contains links to important <c>kanye.rest</c> resources.
 	/// </summary>
-	public static class KanyeResources
+	public static class KanyeRestResources
 	{
 		/// <summary>
 		/// Entry point for API calls.

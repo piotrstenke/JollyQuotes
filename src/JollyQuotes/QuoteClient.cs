@@ -30,9 +30,10 @@ namespace JollyQuotes
 		/// Initializes a new instance of the <see cref="QuoteClient{T}"/> class with a <paramref name="source"/> specified.
 		/// </summary>
 		/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
+		/// <param name="includeBaseAddress">Determines whether the specified <paramref name="source"/> should be applied to <see cref="HttpClient.BaseAddress"/>.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		/// <exception cref="UriFormatException">Invalid format of the <paramref name="source"/>.</exception>
-		protected QuoteClient(string source) : base(Internals.CreateResolver(source), source)
+		protected QuoteClient(string source, bool includeBaseAddress = true) : base(Internals.CreateResolver(source, includeBaseAddress), source)
 		{
 		}
 

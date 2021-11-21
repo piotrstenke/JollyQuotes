@@ -7,7 +7,7 @@ using JollyQuotes.TronaldDump.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using Xunit;
-using static JollyQuotes.Tests.Internals;
+using static JollyQuotes.Tests.TestHelpers;
 
 namespace JollyQuotes.Tests
 {
@@ -178,7 +178,7 @@ namespace JollyQuotes.Tests
 		{
 			SearchResultModel<TagListModel> searchResult = await _resolver.ResolveAsync<SearchResultModel<TagListModel>>("tag");
 			TagModel[] allTags = searchResult.Embedded.Tags;
-			int randomIndex = RandomNumber.Next(0, allTags.Length);
+			int randomIndex = ThreadRandom.Random.Next(0, allTags.Length);
 
 			return allTags[randomIndex];
 		}

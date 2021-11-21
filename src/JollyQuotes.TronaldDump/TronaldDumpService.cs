@@ -5,29 +5,31 @@ using System.Text;
 using System.Threading.Tasks;
 using JollyQuotes.TronaldDump.Models;
 
+using static JollyQuotes.TronaldDump.TronaldDumpResources;
+
 namespace JollyQuotes.TronaldDump
 {
 	/// <inheritdoc cref="ITronaldDumpService"/>
-	public class TronaldDumpService : ITronaldDumpService, IQuoteService
+	public class TronaldDumpService : QuoteService, ITronaldDumpService
 	{
-		/// <summary>
-		/// <see cref="IStreamResolver"/> that is used to access requested <c>Tronald Dump</c> resources.
-		/// </summary>
-		public IStreamResolver Resolver { get; }
+		/// <inheritdoc/>
+		public new IStreamResolver Resolver => (base.Resolver as IStreamResolver)!;
 
-		IResourceResolver IQuoteService.Resolver => Resolver;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class.
+		/// </summary>
+		public TronaldDumpService() : this(CreateDefaultResolver())
+		{
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with a <paramref name="client"/> as the target <see cref="IResourceResolver"/> specified.
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="TronaldDumpResources.APIPage"/>.</exception>
-		public TronaldDumpService(HttpClient client)
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
+		public TronaldDumpService(HttpClient client) : base(SetAddress(client))
 		{
-			SetAddress(client);
-
-			Resolver = new HttpResolver(client);
 		}
 
 		/// <summary>
@@ -35,14 +37,8 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access requested <c>Tronald Dump</c> resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
-		public TronaldDumpService(IStreamResolver resolver)
+		public TronaldDumpService(IStreamResolver resolver) : base(resolver)
 		{
-			if (resolver is null)
-			{
-				throw Error.Null(nameof(resolver));
-			}
-
-			Resolver = resolver;
 		}
 
 		/// <inheritdoc/>
@@ -166,11 +162,6 @@ namespace JollyQuotes.TronaldDump
 					hasParam = true;
 				}
 			}
-		}
-
-		internal static HttpClient SetAddress(HttpClient client)
-		{
-			return Internals.SetAddress(client, TronaldDumpResources.BaseAddress, TronaldDumpResources.BaseAddressSource);
 		}
 	}
 }

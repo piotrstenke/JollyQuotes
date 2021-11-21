@@ -111,6 +111,11 @@ namespace JollyQuotes
 		public bool IsEmpty => Count == 0;
 
 		/// <summary>
+		/// Service that generates a value used to determine which random quote to return.
+		/// </summary>
+		public IRandomNumberGenerator RandomNumberGenerator { get; }
+
+		/// <summary>
 		/// Determines whether to use a cache of tags. Will speed up tag-related operations, such as <see cref="TryGetRandomQuote(string, out T?, bool)"/>,
 		/// but will have negative impact on performance of enumerator-based methods (e.g. <see cref="Defragment()"/>, <see cref="GetCached()"/> or <see cref="GetEnumerator()"/>).
 		/// </summary>
@@ -155,17 +160,41 @@ namespace JollyQuotes
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class.
 		/// </summary>
-		public QuoteCache() : this(EqualityComparer<T>.Default)
+		public QuoteCache() : this(new ThreadRandom(), EqualityComparer<T>.Default)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class with a <paramref name="equalityComparer"/> specified.
+		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class with an <paramref name="equalityComparer"/> specified.
 		/// </summary>
 		/// <param name="equalityComparer"><see cref="IEqualityComparer{T}"/> that is used to decide whether two <see cref="IQuote"/>s are equal.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="equalityComparer"/> is <see langword="null"/>.</exception>
-		public QuoteCache(IEqualityComparer<T> equalityComparer)
+		public QuoteCache(IEqualityComparer<T> equalityComparer) : this(new ThreadRandom(), equalityComparer)
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class with a <paramref name="randomNumberGenerator"/> specified.
+		/// </summary>
+		/// <param name="randomNumberGenerator">Service that generates a value used to determine which random quote to return.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="randomNumberGenerator"/> is <see langword="null"/>.</exception>
+		public QuoteCache(IRandomNumberGenerator randomNumberGenerator) : this(randomNumberGenerator, EqualityComparer<T>.Default)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QuoteCache{T}"/> class with a <paramref name="randomNumberGenerator"/> and <paramref name="equalityComparer"/> specified.
+		/// </summary>
+		/// <param name="randomNumberGenerator">Service that generates a value used to determine which random quote to return.</param>
+		/// <param name="equalityComparer"><see cref="IEqualityComparer{T}"/> that is used to decide whether two <see cref="IQuote"/>s are equal.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="randomNumberGenerator"/> is <see langword="null"/>. -or- <paramref name="equalityComparer"/> is <see langword="null"/>.</exception>
+		public QuoteCache(IRandomNumberGenerator randomNumberGenerator, IEqualityComparer<T> equalityComparer)
+		{
+			if (randomNumberGenerator is null)
+			{
+				throw Error.Null(nameof(randomNumberGenerator));
+			}
+
 			if (equalityComparer is null)
 			{
 				throw Error.Null(nameof(equalityComparer));
@@ -176,6 +205,7 @@ namespace JollyQuotes
 			_lookup = new();
 			_removed = new();
 
+			RandomNumberGenerator = randomNumberGenerator;
 			EqualityComparer = equalityComparer;
 		}
 
@@ -698,11 +728,6 @@ namespace JollyQuotes
 			return TryGetRandomQuote(tag, out quote);
 		}
 
-		private static int GetRandomIndex(int max)
-		{
-			return Internals.RandomNumber(0, max);
-		}
-
 		private void CacheTag(string tag, int index)
 		{
 			if (_tagCache!.TryGetValue(tag, out TagCacheEntry? entry))
@@ -884,6 +909,11 @@ namespace JollyQuotes
 			}
 
 			return quotes;
+		}
+
+		private int GetRandomIndex(int max)
+		{
+			return RandomNumberGenerator.RandomNumber(0, max);
 		}
 
 		private T GetRandomQuoteFromIndexList(List<int> indices, out int index)

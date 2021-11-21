@@ -6,16 +6,16 @@ namespace JollyQuotes.KanyeRest
 	/// <summary>
 	/// Defines all actions available in the <c>kanye.rest</c> web API.
 	/// </summary>
-	public interface IKanyeRestService
+	public interface IKanyeRestService : IQuoteService
 	{
 		/// <summary>
-		/// Returns all available <see cref="KanyeQuote"/>s.
+		/// Returns all available <see cref="KanyeRestQuote"/>s.
 		/// </summary>
-		Task<List<KanyeQuote>> GetAllQuotes();
+		Task<List<KanyeRestQuote>> GetAllQuotes();
 
 		/// <summary>
-		/// Returns a random <see cref="KanyeQuote"/>.
+		/// Returns a random <see cref="KanyeRestQuote"/>.
 		/// </summary>
-		Task<KanyeQuote> GetRandomQuote();
+		Task<KanyeRestQuote> GetRandomQuote();
 	}
 }

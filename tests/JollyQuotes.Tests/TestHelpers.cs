@@ -4,24 +4,12 @@ using System.Net.Http;
 
 namespace JollyQuotes.Tests
 {
-	internal static class Internals
+	internal static class TestHelpers
 	{
 		private static readonly ConcurrentDictionary<string, HttpClient> _perAddressClients = new();
+		private static HttpResolver? _globalResolver;
 
-		public static HttpClient GlobalClient
-		{
-			get
-			{
-				HttpClient client = new();
-				client.DefaultRequestHeaders.Accept.Add(new("*/*"));
-
-				return client;
-			}
-		}
-
-		public static HttpResolver GlobalResolver { get; } = new(GlobalClient);
-
-		public static Random RandomNumber { get; } = new();
+		public static HttpResolver GlobalResolver => _globalResolver ??= HttpResolver.CreateDefault();
 
 		public static HttpClient GetClient(string address)
 		{

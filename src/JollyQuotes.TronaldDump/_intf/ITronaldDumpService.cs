@@ -8,8 +8,13 @@ namespace JollyQuotes.TronaldDump
 	/// <summary>
 	/// Defines all actions available in the <c>Tronald Dump</c> web API.
 	/// </summary>
-	public interface ITronaldDumpService
+	public interface ITronaldDumpService : IQuoteService
 	{
+		/// <summary>
+		/// <see cref="IStreamResolver"/> that is used to access requested resources.
+		/// </summary>
+		new IStreamResolver Resolver { get; }
+
 		/// <summary>
 		/// Returns information about a quote author with the specified <paramref name="id"/>.
 		/// </summary>
