@@ -15,6 +15,9 @@ namespace JollyQuotes
 		private readonly IQuoteCache<T> _cache;
 		private bool _preserveState = true;
 
+		/// <inheritdoc/>
+		public int Count => _cache.Count;
+
 		/// <summary>
 		/// Determines whether the cache is blocked from modification.
 		/// </summary>

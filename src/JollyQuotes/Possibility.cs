@@ -3,9 +3,9 @@
 namespace JollyQuotes
 {
 	/// <summary>
-	/// Generates a random <see cref="bool"/> value paying attention to requested weight and accuracy.
+	/// Generates a random <see cref="bool"/> value.
 	/// </summary>
-	public sealed class Possibility : IPossibility
+	public class Possibility : IPossibility
 	{
 		/// <summary>
 		/// A random number generator that is used to determine a <see cref="bool"/> value that should be returned by the <see cref="Determine()"/> method.
@@ -23,7 +23,7 @@ namespace JollyQuotes
 		public int Step { get; private set; }
 
 		/// <summary>
-		/// Greatest number that can be generated. Must greater than or equal to <see cref="Step"/>.
+		/// Greatest number that can be generated. Must be greater than or equal to <see cref="Step"/>.
 		/// </summary>
 		/// <remarks>The default value is <c>100</c>.</remarks>
 		public int UpperLimit { get; private set; }
@@ -50,6 +50,7 @@ namespace JollyQuotes
 			}
 
 			Random = random;
+			Reset();
 		}
 
 		/// <summary>
@@ -82,7 +83,8 @@ namespace JollyQuotes
 		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="step"/> must be greater than <c>0</c>. -or-
 		/// <paramref name="upperLimit"/> must be greater than <c>0</c>. -or-
-		/// <paramref name="upperLimit"/> must be greater than or equal to <paramref name="step"/>.</exception>
+		/// <paramref name="upperLimit"/> must be greater than or equal to <paramref name="step"/>.
+		/// </exception>
 		public Possibility(IRandomNumberGenerator random, int upperLimit, int step)
 		{
 			if (random is null)
@@ -92,6 +94,34 @@ namespace JollyQuotes
 
 			Bound(upperLimit, step);
 			Random = random;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Possibility"/> class with an <paramref name="upperLimit"/> specified.
+		/// <see cref="Step"/> is set to half of the <paramref name="upperLimit"/>.
+		/// </summary>
+		/// <param name="upperLimit">Greatest number that can be generated. Must greater than <c>0</c>.</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="upperLimit"/> must be greater than <c>0</c>.</exception>
+		public Possibility(int upperLimit)
+		{
+			Bound(upperLimit);
+			Random = new ThreadRandom();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Possibility"/> class with a <paramref name="step"/> and <paramref name="upperLimit"/> specified.
+		/// </summary>
+		/// <param name="upperLimit">Greatest number that can be generated. Must greater than <c>0</c> and greater than or equal to <paramref name="step"/>.</param>
+		/// <param name="step">If a generated number is greater than or equal to this value, <see langword="true"/> is returned, otherwise <see langword="false"/>. Must be greater than <c>0</c>.</param>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="step"/> must be greater than <c>0</c>. -or-
+		/// <paramref name="upperLimit"/> must be greater than <c>0</c>. -or-
+		/// <paramref name="upperLimit"/> must be greater than or equal to <paramref name="step"/>.
+		/// </exception>
+		public Possibility(int upperLimit, int step)
+		{
+			Bound(upperLimit, step);
+			Random = new ThreadRandom();
 		}
 
 		/// <summary>
@@ -141,7 +171,7 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		public bool Determine()
+		public virtual bool Determine()
 		{
 			return Random.RandomNumber(1, UpperLimit + 1) > Step;
 		}
@@ -149,7 +179,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Resets the <see cref="Step"/> and <see cref="UpperLimit"/> to their default values.
 		/// </summary>
-		public void Reset()
+		public virtual void Reset()
 		{
 			UpperLimit = 100;
 			Step = 50;

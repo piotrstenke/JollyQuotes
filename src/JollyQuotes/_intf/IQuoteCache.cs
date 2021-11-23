@@ -11,6 +11,11 @@ namespace JollyQuotes
 	public interface IQuoteCache<T> : IEnumerable<T> where T : class, IQuote
 	{
 		/// <summary>
+		/// Number of cached values.
+		/// </summary>
+		public int Count { get; }
+
+		/// <summary>
 		/// Determines whether the cache is empty.
 		/// </summary>
 		bool IsEmpty { get; }

@@ -88,9 +88,7 @@ namespace JollyQuotes
 		private List<T?> _lookup;
 		private Dictionary<string, TagCacheEntry>? _tagCache;
 
-		/// <summary>
-		/// Number of cached values.
-		/// </summary>
+		/// <inheritdoc/>
 		public int Count
 		{
 			get

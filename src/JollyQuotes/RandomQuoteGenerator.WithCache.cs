@@ -9,6 +9,9 @@ namespace JollyQuotes
 		/// </summary>
 		public abstract class WithCache : IRandomQuoteGenerator
 		{
+			// If the Count of the Cache is less than this value, Cache will not be randomly picked when QuoteInclude.All is specified.
+			private const int _minCacheCountToRandom = 10;
+
 			/// <summary>
 			/// Container of all the cached <see cref="IQuote"/>s.
 			/// </summary>
@@ -46,9 +49,6 @@ namespace JollyQuotes
 					throw Error.NullOrEmpty(nameof(source));
 				}
 
-				Source = source;
-				Possibility = possibility ?? new Possibility();
-
 				if (cache is null)
 				{
 					Cache = new BlockableQuoteCache<T>(new QuoteCache<T>());
@@ -61,6 +61,12 @@ namespace JollyQuotes
 				{
 					Cache = new BlockableQuoteCache<T>(cache);
 				}
+
+				Source = source;
+				Possibility = possibility ?? new AssertPossiblity(() => Cache.Count >= _minCacheCountToRandom)
+				{
+					BoolValue = false
+				};
 			}
 
 			/// <summary>
