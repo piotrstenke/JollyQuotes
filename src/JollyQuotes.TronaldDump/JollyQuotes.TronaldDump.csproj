@@ -4,7 +4,7 @@
     <TargetFramework>net5</TargetFramework>
     <OutputType>Library</OutputType>
     <Description>Provides easy access to a huge database of the dumbest things Donald has ever said accessed through the Tronald Dump web API.</Description>
-    <PackageTags></PackageTags>
+    <PackageTags>Jolly;Quote;Quotes;Generation;Generator;Interface;Tronald;Dump;Donald;Trump;President;API;Web</PackageTags>
     <PackageVersion>1.0.0</PackageVersion>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <Version>1.0.0</Version>

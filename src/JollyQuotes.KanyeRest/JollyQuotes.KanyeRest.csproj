@@ -4,7 +4,7 @@
     <TargetFramework>net5</TargetFramework>
     <OutputType>Library</OutputType>
     <Description>Provides easy access to a huge database of quotes of everybody's favorite rapper, Kanye West, through the kanye.rest API.</Description>
-    <PackageTags></PackageTags>
+    <PackageTags>Jolly;Quote;Quotes;Generation;Generator;Interface;Kanye;Rest;West;API;Web</PackageTags>
     <PackageVersion>1.0.0</PackageVersion>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <Version>1.0.0</Version>
@@ -13,10 +13,6 @@
 
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <PackageReference Include="Roslynator.Analyzers" Version="3.2.2" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="KanyeQuoteGenerator.cs~RF13b132ff.TMP" />
   </ItemGroup>
 
   <ItemGroup>
