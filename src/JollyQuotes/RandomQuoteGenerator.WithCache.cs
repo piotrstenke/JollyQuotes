@@ -10,7 +10,7 @@ namespace JollyQuotes
 		public abstract class WithCache : IRandomQuoteGenerator
 		{
 			// If the Count of the Cache is less than this value, Cache will not be randomly picked when QuoteInclude.All is specified.
-			private const int _minCacheCountToRandom = 10;
+			private const int _minCacheCountToRandom = 25;
 
 			/// <summary>
 			/// Container of all the cached <see cref="IQuote"/>s.

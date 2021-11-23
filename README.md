@@ -32,7 +32,7 @@ Currently, **JollyQuotes** provides access to the following APIs:
  - [[nuget]](https://www.nuget.org/packages/JollyQuotes.KanyeRest) [kanye.rest](https://kanye.rest/)
  - [[nuget]](https://www.nuget.org/packages/JollyQuotes.TronaldDump) [Tronald Dump](https://www.tronalddump.io/)
 
-The following APIs are not yet supported, but will be in the future:
+The following APIs are not supported, but will be in not-yet-specified future:
 
  - [quotable](https://github.com/lukePeavey/quotable)
 
@@ -192,3 +192,5 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 		}
 	}
 	```
+
+	Congratulations, you just wired up a new API with **JollyQuotes**! If you think your code is ready to be shared and you want it to be published under **JollyQuote**'s branding, feel free to make a push request.

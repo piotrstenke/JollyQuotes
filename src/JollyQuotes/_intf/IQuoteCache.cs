@@ -13,7 +13,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Number of cached values.
 		/// </summary>
-		public int Count { get; }
+		int Count { get; }
 
 		/// <summary>
 		/// Determines whether the cache is empty.
