@@ -86,7 +86,7 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 	public static class TestResources
 	{
 		public const string ApiPage = "http://api.test.com";
-		public const string GitHub = "https://github.com//abc/Test"
+		public const string GitHub = "https://github.com//abc/Test";
 	}
 	```
 

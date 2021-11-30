@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IEnumerableQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : RandomQuoteGenerator<T>.WithCache, IEnumerableQuoteGenerator
+		public new abstract class WithCache : RandomQuoteGenerator<T>.WithCache, IEnumerableQuoteGenerator
 		{
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
