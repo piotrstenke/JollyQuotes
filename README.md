@@ -21,9 +21,14 @@
 
 ## Table of Contents
 
-1. [Supported APIs](#supported-apis)
-2. [Structure](#structure)
-3. [Custom APIs](#custom-apis)
+1. [Target Framework](#target-framework)
+2. [Supported APIs](#supported-apis)
+3. [Structure](#structure)
+4. [Custom APIs](#custom-apis)
+
+### Target Framework
+
+This package supports .NET 5 or greater.
 
 ### Supported APIs
 
