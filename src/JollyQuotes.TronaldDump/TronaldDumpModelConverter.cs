@@ -33,7 +33,14 @@ namespace JollyQuotes.TronaldDump
 				throw Error.Null(nameof(model));
 			}
 
-			return (model.Total / TronaldDumpResources.MaxItemsPerPage) + 1;
+			int pages = model.Total / TronaldDumpResources.MaxItemsPerPage;
+
+			if (model.Total % TronaldDumpResources.MaxItemsPerPage > 0)
+			{
+				pages++;
+			}
+
+			return pages;
 		}
 
 		/// <inheritdoc/>

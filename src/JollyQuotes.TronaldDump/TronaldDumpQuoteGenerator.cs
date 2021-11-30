@@ -276,6 +276,11 @@ namespace JollyQuotes.TronaldDump
 			{
 				foreach (string tag in tags)
 				{
+					if (string.IsNullOrWhiteSpace(tag))
+					{
+						continue;
+					}
+
 					foreach (TronaldDumpQuote quote in DownloadAllQuotes(tag))
 					{
 						yield return quote;
@@ -309,14 +314,15 @@ namespace JollyQuotes.TronaldDump
 			{
 				int targetPage = RandomNumberGenerator.RandomNumber(0, numPages);
 
-				if (targetPage > 0)
+				// Page 0 was already returned at the beginning of the method, so there's no need to request it again.
+				if (targetPage != 0)
 				{
-					search = new(null as string, tag, targetPage);
+					search = search with { Page = targetPage };
 					result = Service.SearchQuotes(search).Result;
 				}
 			}
 
-			int targetQuote = RandomNumberGenerator.RandomNumber(0, MaxItemsPerPage);
+			int targetQuote = RandomNumberGenerator.RandomNumber(0, result.Count);
 
 			QuoteModel model = result.Embedded.Quotes[targetQuote];
 

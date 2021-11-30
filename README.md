@@ -70,11 +70,6 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 		public string Source { get; init; }
 		public DateTime? Date { get; init; }
 		public string[] Tags { get; init; }
-
-		int IQuote.GetId()
-		{
-			return Id;
-		}
 	}
 	```
 

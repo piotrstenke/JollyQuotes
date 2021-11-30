@@ -38,6 +38,11 @@ namespace JollyQuotes
 			{
 				foreach (string tag in tags)
 				{
+					if (string.IsNullOrWhiteSpace(tag))
+					{
+						continue;
+					}
+
 					foreach (T quote in GetAllQuotes(tag))
 					{
 						yield return quote;
