@@ -5,9 +5,9 @@
     <OutputType>Library</OutputType>
     <Description>Provides easy access to a huge database of quotes of everybody's favorite rapper, Kanye West, through the kanye.rest API.</Description>
     <PackageTags>Jolly;Quote;Quotes;Generation;Generator;Interface;Kanye;Rest;West;API;Web</PackageTags>
-    <PackageVersion>1.0.0</PackageVersion>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <Version>1.0.0</Version>
+    <PackageVersion>1.1.0</PackageVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <Version>1.1.0</Version>
     <RootNamespace>JollyQuotes.KanyeRest</RootNamespace>
   </PropertyGroup>
 
