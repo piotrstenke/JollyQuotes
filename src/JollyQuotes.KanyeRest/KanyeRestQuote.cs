@@ -19,6 +19,7 @@ namespace JollyQuotes.KanyeRest
 		[JsonProperty("quote", Required = Required.Always)]
 		public string Quote { get; init; }
 
+		int IQuote.Id => GetHashCode();
 		string IQuote.Author => _author;
 		DateTime? IQuote.Date => default;
 		string IQuote.Source => _source;
@@ -44,11 +45,6 @@ namespace JollyQuotes.KanyeRest
 		public override string ToString()
 		{
 			return Quote;
-		}
-
-		int IQuote.GetId()
-		{
-			return GetHashCode();
 		}
 	}
 }

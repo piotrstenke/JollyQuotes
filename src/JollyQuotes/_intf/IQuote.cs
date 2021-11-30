@@ -18,6 +18,11 @@ namespace JollyQuotes
 		DateTime? Date { get; }
 
 		/// <summary>
+		/// Unique id of the quote.
+		/// </summary>
+		int Id { get; }
+
+		/// <summary>
 		/// Source of the quote, e.g. a link, file name or raw text.
 		/// </summary>
 		string Source { get; }
@@ -31,10 +36,5 @@ namespace JollyQuotes
 		/// Actual quote.
 		/// </summary>
 		string Value { get; }
-
-		/// <summary>
-		/// Returns an unique id of the quote. Best used by calling <see cref="object.GetHashCode()"/>.
-		/// </summary>
-		int GetId();
 	}
 }

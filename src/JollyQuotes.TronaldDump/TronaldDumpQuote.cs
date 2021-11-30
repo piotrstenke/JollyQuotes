@@ -49,6 +49,8 @@ namespace JollyQuotes.TronaldDump
 		[JsonProperty("source", Order = 6, Required = Required.Always)]
 		public string Source { get; init; }
 
+		int IQuote.Id => Id.GetHashCode();
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpQuote"/> class with an <paramref name="id"/>,
 		/// actual <paramref name="value"/>, <paramref name="source"/>, <paramref name="tags"/>
@@ -180,11 +182,6 @@ namespace JollyQuotes.TronaldDump
 			}
 
 			return hash.ToHashCode();
-		}
-
-		int IQuote.GetId()
-		{
-			return Id.GetHashCode();
 		}
 	}
 }

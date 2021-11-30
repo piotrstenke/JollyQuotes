@@ -419,7 +419,7 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			int id = quote.GetId();
+			int id = quote.Id;
 			return TryGetQuote(id, out T? other) && EqualityComparer.Equals(other, quote);
 		}
 
@@ -443,7 +443,7 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			int id = quote.GetId();
+			int id = quote.Id;
 
 			lock (_lockObject)
 			{
@@ -785,7 +785,7 @@ namespace JollyQuotes
 			void MoveQuote(int quoteIndex, int numRemoved)
 			{
 				T quote = _lookup[quoteIndex]!;
-				int id = quote.GetId();
+				int id = quote.Id;
 				quotes.Add(quote);
 
 				_map[id] -= numRemoved;
@@ -1008,7 +1008,7 @@ namespace JollyQuotes
 
 		private void RemoveQuoteAtIndex(T quote, int index)
 		{
-			_map.Remove(quote.GetId());
+			_map.Remove(quote.Id);
 			RemoveIndex(index);
 		}
 
@@ -1070,7 +1070,7 @@ namespace JollyQuotes
 
 		private bool TryCache(T quote)
 		{
-			int id = quote.GetId();
+			int id = quote.Id;
 
 			lock (_lockObject)
 			{
@@ -1090,7 +1090,7 @@ namespace JollyQuotes
 
 		private bool TryCacheOrReplace(T quote)
 		{
-			int id = quote.GetId();
+			int id = quote.Id;
 
 			lock (_lockObject)
 			{

@@ -28,6 +28,8 @@ namespace JollyQuotes
 			Tags = Array.Empty<string>(),
 		};
 
+		int IQuote.Id => GetId();
+
 		/// <inheritdoc/>
 		[JsonProperty("author", Order = 1, Required = Required.Always)]
 		public string Author { get; init; }
@@ -147,11 +149,6 @@ namespace JollyQuotes
 		protected virtual int GetId()
 		{
 			return GetHashCode();
-		}
-
-		int IQuote.GetId()
-		{
-			return GetId();
 		}
 	}
 }
