@@ -5,10 +5,10 @@
     <OutputType>Library</OutputType>
     <Description>JollyQuotes provides a simple, class-oriented interface for quick and painless access to multiple quote generation APIs scattered all across the Internet.</Description>
     <PackageTags>Jolly;Quote;Quotes;Generation;Generator;Interface;API;Web</PackageTags>
-    <PackageVersion>1.1.0</PackageVersion>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <Version>1.1.0</Version>
-    <RootNamespace>JollyQoutes</RootNamespace>
+    <PackageVersion>2.0.0</PackageVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <Version>2.0.0</Version>
+    <RootNamespace>JollyQuotes</RootNamespace>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -18,17 +18,9 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>$(AssemblyName).KanyeRest</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>$(AssemblyName).TronaldDump</_Parameter1>
-    </AssemblyAttribute>
+    <ProjectReference Include="..\JollyQuotes.Core\JollyQuotes.Core.csproj" />
   </ItemGroup>
 
 </Project>

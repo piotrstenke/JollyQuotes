@@ -98,7 +98,7 @@ namespace JollyQuotes
 			response.EnsureSuccessStatusCode();
 
 			string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-			T? t = JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
+			T? t = JsonConvert.DeserializeObject<T>(json, Quote.JsonSettings);
 
 			if (t is null)
 			{
@@ -166,7 +166,7 @@ namespace JollyQuotes
 			}
 
 			string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-			return JsonConvert.DeserializeObject<T>(json, Settings.JsonSettings);
+			return JsonConvert.DeserializeObject<T>(json, Quote.JsonSettings);
 		}
 
 		/// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace JollyQuotes
 {
@@ -12,6 +13,33 @@ namespace JollyQuotes
 	[JsonObject]
 	public record Quote : IQuote
 	{
+		/// <summary>
+		/// <see cref="JsonConverter"/> that formats <see cref="DateTime"/> and <see cref="DateTimeOffset"/> values to use only the <c>date</c> part.
+		/// </summary>
+		public sealed class DateOnlyConverter : IsoDateTimeConverter
+		{
+			/// <summary>
+			/// Initializes a new instance of the <see cref="DateOnlyConverter"/> class.
+			/// </summary>
+			public DateOnlyConverter()
+			{
+				DateTimeFormat = Quote.DateTimeFormat;
+			}
+		}
+
+		/// <summary>
+		/// Format of date time values used by <c>JollyQuotes</c> libraries.
+		/// </summary>
+		public const string DateTimeFormat = "yyyy-MM-dd";
+
+		/// <summary>
+		/// <see cref="JsonSerializerSettings"/> used to internally deserialize json objects.
+		/// </summary>
+		public static JsonSerializerSettings JsonSettings { get; } = new()
+		{
+			DateFormatString = DateTimeFormat
+		};
+
 		/// <summary>
 		/// Value used when an author of a quote is unknown.
 		/// </summary>
@@ -28,7 +56,7 @@ namespace JollyQuotes
 			Tags = Array.Empty<string>(),
 		};
 
-		int IQuote.Id => GetId();
+		Id IQuote.Id => GetId();
 
 		/// <inheritdoc/>
 		[JsonProperty("author", Order = 1, Required = Required.Always)]
@@ -36,7 +64,7 @@ namespace JollyQuotes
 
 		/// <inheritdoc/>
 		[JsonProperty("date", Order = 2)]
-		[JsonConverter(typeof(Settings.DateOnlyConverter))]
+		[JsonConverter(typeof(DateOnlyConverter))]
 		public DateTime? Date { get; init; }
 
 		/// <inheritdoc/>
@@ -146,9 +174,9 @@ namespace JollyQuotes
 		/// <summary>
 		/// Returns an unique id of the quote.
 		/// </summary>
-		protected virtual int GetId()
+		protected virtual Id GetId()
 		{
-			return GetHashCode();
+			return new Id(Value);
 		}
 	}
 }

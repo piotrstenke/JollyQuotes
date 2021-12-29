@@ -2,13 +2,12 @@
 
 namespace JollyQuotes
 {
-	public abstract partial class EnumerableQuoteResolver<T> where T : class, IQuote
+	public abstract partial class QuoteResolver<T> where T : class, IQuote
 	{
 		/// <summary>
-		/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/>
-		/// and a for caching <see cref="IQuote"/>s.
+		/// <see cref="IRandomQuoteGenerator"/> that generates random quotes using an external API accessed by an <see cref="IResourceResolver"/> and provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : EnumerableQuoteGenerator<T>.WithCache, IDisposable
+		public abstract new class WithCache : RandomQuoteGenerator<T>.WithCache, IDisposable
 		{
 			/// <inheritdoc/>
 			public IResourceResolver Resolver { get; }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC9E460D-13B4-4EFC-9593-9E616B66EF66}"
 EndProject
@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{AC16590A-A42
 		img\logo-64.png = img\logo-64.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JollyQuotes.Core", "src\JollyQuotes.Core\JollyQuotes.Core.csproj", "{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2A17834F-C976-44A8-BE4A-9DA7FC60E4BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A17834F-C976-44A8-BE4A-9DA7FC60E4BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A17834F-C976-44A8-BE4A-9DA7FC60E4BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{232B9FD6-5EA7-41BD-8065-6A1326E3AD85} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
 		{016D208B-7A48-42F7-BA54-3A3D7A6E127B} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
 		{2A17834F-C976-44A8-BE4A-9DA7FC60E4BC} = {4D2ACD3E-91E8-46B7-A537-3CD9FAC7568D}
+		{8482FEC5-8128-4AEF-AFD1-650FAD2EADE7} = {BC9E460D-13B4-4EFC-9593-9E616B66EF66}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2BD0A2A5-6304-4FB2-92B9-486FC7EBC170}

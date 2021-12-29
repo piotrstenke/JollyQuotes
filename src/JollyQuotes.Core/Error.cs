@@ -8,6 +8,20 @@ namespace JollyQuotes
 	{
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ArgumentException Arg(string? message)
+		{
+			return new ArgumentException(message);
+		}
+
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ArgumentException Arg(string? message, string paramName)
+		{
+			return new ArgumentException(message, paramName);
+		}
+
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ArgumentException Empty(string paramName)
 		{
 			return new ArgumentException($"{paramName} cannot be empty", paramName);
@@ -15,14 +29,14 @@ namespace JollyQuotes
 
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ArgumentOutOfRangeException MustBeGreaterThan(string paramName, object value)
+		public static ArgumentOutOfRangeException MustBeGreaterThan(string paramName, object? value)
 		{
 			return new ArgumentOutOfRangeException(paramName, $"value must be greater than '{value}'");
 		}
 
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ArgumentOutOfRangeException MustBeGreaterThanOrEqualTo(string paramName, object value)
+		public static ArgumentOutOfRangeException MustBeGreaterThanOrEqualTo(string paramName, object? value)
 		{
 			return new ArgumentOutOfRangeException(paramName, $"value must be greater than or equal to '{value}'");
 		}

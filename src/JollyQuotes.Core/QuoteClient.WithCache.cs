@@ -4,13 +4,13 @@ using System.Net.Http;
 
 namespace JollyQuotes
 {
-	public abstract partial class EnumerableQuoteClient<T> where T : class, IQuote
+	public abstract partial class QuoteClient<T> where T : class, IQuote
 	{
 		/// <summary>
-		/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/> with an additional handling of <see cref="JollyQuotes.HttpResolver"/>,
-		/// as well as a mechanism for caching <see cref="IQuote"/>s.
+		/// <see cref="IRandomQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
+		/// and a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public new abstract class WithCache : EnumerableQuoteResolver<T>.WithCache
+		public abstract new class WithCache : QuoteResolver<T>.WithCache
 		{
 			/// <summary>
 			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
@@ -18,12 +18,12 @@ namespace JollyQuotes
 			public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
 
 			/// <summary>
-			/// Returns the <see cref="EnumerableQuoteResolver{T}.WithCache.Resolver"/> as a <see cref="JollyQuotes.HttpResolver"/>.
+			/// Returns the <see cref="QuoteResolver{T}.WithCache.Resolver"/> as a <see cref="JollyQuotes.HttpResolver"/>.
 			/// </summary>
 			public HttpResolver? HttpResolver => Resolver as HttpResolver;
 
 			/// <summary>
-			/// Determines whether the <see cref="EnumerableQuoteResolver{T}.WithCache.Resolver"/> is a <see cref="JollyQuotes.HttpResolver"/>.
+			/// Determines whether the <see cref="QuoteResolver{T}.WithCache.Resolver"/> is a <see cref="JollyQuotes.HttpResolver"/>.
 			/// </summary>
 			[MemberNotNullWhen(true, nameof(HttpResolver), nameof(BaseClient))]
 			public bool IsHttpBased => Resolver is HttpResolver;

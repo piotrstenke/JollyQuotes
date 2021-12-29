@@ -11,6 +11,8 @@ namespace JollyQuotes.TronaldDump
 	[JsonObject]
 	public sealed record TronaldDumpQuote : IQuote
 	{
+		private const string _author = "Donald Trump";
+
 		/// <summary>
 		/// Date the quote was added to the database at.
 		/// </summary>
@@ -29,11 +31,9 @@ namespace JollyQuotes.TronaldDump
 		[JsonProperty("appeared_at", Order = 2, Required = Required.Always)]
 		public DateTime AppearedAt { get; init; }
 
-		/// <summary>
-		/// Id of the quote.
-		/// </summary>
+		/// <inheritdoc/>
 		[JsonProperty("quote_id", Order = 0, Required = Required.Always)]
-		public string Id { get; init; }
+		public Id Id { get; init; }
 
 		/// <summary>
 		/// Array of tags associated with this quote.
@@ -49,7 +49,8 @@ namespace JollyQuotes.TronaldDump
 		[JsonProperty("source", Order = 6, Required = Required.Always)]
 		public string Source { get; init; }
 
-		int IQuote.Id => Id.GetHashCode();
+		string IQuote.Author => _author;
+		DateTime? IQuote.Date => AppearedAt;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpQuote"/> class with an <paramref name="id"/>,
@@ -64,12 +65,11 @@ namespace JollyQuotes.TronaldDump
 		/// <param name="createdAt">Date the quote was added to the database at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="tags"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="value"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="source"/> is <see langword="null"/> or empty.
 		/// </exception>
 		public TronaldDumpQuote(
-			string id,
+			Id id,
 			string value,
 			string source,
 			string[] tags,
@@ -93,13 +93,12 @@ namespace JollyQuotes.TronaldDump
 		/// <param name="updatedAt">Date the quote was last updated at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="tags"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="value"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="source"/> is <see langword="null"/> or empty.
 		/// </exception>
 		[JsonConstructor]
 		public TronaldDumpQuote(
-			string id,
+			Id id,
 			string value,
 			string source,
 			string[] tags,
@@ -136,9 +135,6 @@ namespace JollyQuotes.TronaldDump
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 		}
-
-		string IQuote.Author => "Donald Trump";
-		DateTime? IQuote.Date => AppearedAt;
 
 		/// <inheritdoc/>
 		public bool Equals(TronaldDumpQuote? other)

@@ -70,7 +70,7 @@ namespace JollyQuotes.TronaldDump
 		private static TronaldDumpQuote ConvertQuoteModelInternal(QuoteModel model)
 		{
 			return new TronaldDumpQuote(
-				model.Id,
+				new Id(model.Id),
 				model.Value,
 				model.Embedded.Sources[0].Url,
 				model.Tags,

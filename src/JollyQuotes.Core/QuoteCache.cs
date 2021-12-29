@@ -82,7 +82,7 @@ namespace JollyQuotes
 		private const int _minRemovedForMismatch = 3;
 
 		private readonly object _lockObject;
-		private readonly Dictionary<int, int> _map;
+		private readonly Dictionary<Id, int> _map;
 		private readonly List<int> _removed;
 		private bool _isSorted;
 		private List<T?> _lookup;
@@ -373,7 +373,7 @@ namespace JollyQuotes
 		/// <param name="id">Id of <see cref="IQuote"/> to return.</param>
 		/// <exception cref="ArgumentException">Quote with <paramref name="id"/> not found.</exception>
 		/// <exception cref="InvalidOperationException">Cannot return a quote from empty cache.</exception>
-		public T GetQuote(int id)
+		public T GetQuote(Id id)
 		{
 			lock (_lockObject)
 			{
@@ -419,7 +419,7 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			int id = quote.Id;
+			Id id = quote.Id;
 			return TryGetQuote(id, out T? other) && EqualityComparer.Equals(other, quote);
 		}
 
@@ -427,7 +427,7 @@ namespace JollyQuotes
 		/// Determines whether an <see cref="IQuote"/> with the specified <paramref name="id"/> is to be found in the cache.
 		/// </summary>
 		/// <param name="id">Id of <see cref="IQuote"/> to check for.</param>
-		public bool IsCached(int id)
+		public bool IsCached(Id id)
 		{
 			lock (_lockObject)
 			{
@@ -443,7 +443,7 @@ namespace JollyQuotes
 				throw Error.Null(nameof(quote));
 			}
 
-			int id = quote.Id;
+			Id id = quote.Id;
 
 			lock (_lockObject)
 			{
@@ -471,7 +471,7 @@ namespace JollyQuotes
 		/// Removes an <see cref="IQuote"/> with the specified <paramref name="id"/>.
 		/// </summary>
 		/// <param name="id">Id <see cref="IQuote"/> to remove.</param>
-		public bool RemoveQuote(int id)
+		public bool RemoveQuote(Id id)
 		{
 			return RemoveQuote(id, out _);
 		}
@@ -481,7 +481,7 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="id">Id <see cref="IQuote"/> to remove.</param>
 		/// <param name="quote"><see cref="IQuote"/> that was removed.</param>
-		public bool RemoveQuote(int id, [NotNullWhen(true)] out T? quote)
+		public bool RemoveQuote(Id id, [NotNullWhen(true)] out T? quote)
 		{
 			lock (_lockObject)
 			{
@@ -641,7 +641,7 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="id">Id of <see cref="IQuote"/> to return.</param>
 		/// <param name="quote">Returned <see cref="IQuote"/>.</param>
-		public bool TryGetQuote(int id, [NotNullWhen(true)] out T? quote)
+		public bool TryGetQuote(Id id, [NotNullWhen(true)] out T? quote)
 		{
 			lock (_lockObject)
 			{
@@ -785,7 +785,7 @@ namespace JollyQuotes
 			void MoveQuote(int quoteIndex, int numRemoved)
 			{
 				T quote = _lookup[quoteIndex]!;
-				int id = quote.Id;
+				Id id = quote.Id;
 				quotes.Add(quote);
 
 				_map[id] -= numRemoved;
@@ -1023,7 +1023,7 @@ namespace JollyQuotes
 			}
 		}
 
-		private bool ReplaceQuote(T quote, int id, out int index)
+		private bool ReplaceQuote(T quote, Id id, out int index)
 		{
 			index = _map[id];
 			T old = _lookup[index]!;
@@ -1070,7 +1070,7 @@ namespace JollyQuotes
 
 		private bool TryCache(T quote)
 		{
-			int id = quote.Id;
+			Id id = quote.Id;
 
 			lock (_lockObject)
 			{
@@ -1090,7 +1090,7 @@ namespace JollyQuotes
 
 		private bool TryCacheOrReplace(T quote)
 		{
-			int id = quote.Id;
+			Id id = quote.Id;
 
 			lock (_lockObject)
 			{

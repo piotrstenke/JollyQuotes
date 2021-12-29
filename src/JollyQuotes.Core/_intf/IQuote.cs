@@ -20,7 +20,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Unique id of the quote.
 		/// </summary>
-		int Id { get; }
+		Id Id { get; }
 
 		/// <summary>
 		/// Source of the quote, e.g. a link, file name or raw text.

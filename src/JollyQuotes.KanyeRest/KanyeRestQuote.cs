@@ -13,13 +13,19 @@ namespace JollyQuotes.KanyeRest
 		private const string _author = "Kanye West";
 		private const string _source = KanyeRestResources.APIPage;
 
+		private readonly Id _id;
+
 		/// <summary>
 		/// Text of the quote.
 		/// </summary>
 		[JsonProperty("quote", Required = Required.Always)]
-		public string Quote { get; init; }
+		public string Quote
+		{
+			get => _id.Value;
+			init => _id = new(value);
+		}
 
-		int IQuote.Id => GetHashCode();
+		Id IQuote.Id => _id;
 		string IQuote.Author => _author;
 		DateTime? IQuote.Date => default;
 		string IQuote.Source => _source;

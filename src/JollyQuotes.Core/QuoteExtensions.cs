@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JollyQuotes
+﻿namespace JollyQuotes
 {
 	/// <summary>
 	/// Contains various utility extension methods widely used through the <c>JollyQuotes</c> libraries.
@@ -27,8 +25,7 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="quote"><see cref="IQuote"/> to convert.</param>
 		/// <param name="id">Id to assign to the <paramref name="quote"/>.</param>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="id"/> must be greater than or equal to <c>0</c>.</exception>
-		public static QuoteWithId WithId(this IQuote quote, int id)
+		public static QuoteWithId WithId(this IQuote quote, Id id)
 		{
 			if (quote is QuoteWithId q && q.Id == id)
 			{
