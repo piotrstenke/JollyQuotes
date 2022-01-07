@@ -7,7 +7,7 @@ namespace JollyQuotes
 {
 	/// <inheritdoc cref="IEnumerableQuoteGenerator"/>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
-	public abstract partial class EnumerableQuoteGenerator<T> : RandomQuoteGenerator<T>, IEnumerableQuoteGenerator where T : class, IQuote
+	public abstract partial class EnumerableQuoteGenerator<T> : QuoteGenerator<T>, IEnumerableQuoteGenerator where T : class, IQuote
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EnumerableQuoteGenerator{T}"/> class with a <paramref name="source"/> specified.

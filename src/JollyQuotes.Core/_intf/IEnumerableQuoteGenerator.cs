@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace JollyQuotes
 {
 	/// <summary>
-	/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s.
+	/// <see cref="IQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s.
 	/// </summary>
-	public interface IEnumerableQuoteGenerator : IRandomQuoteGenerator, IEnumerable<IQuote>
+	public interface IEnumerableQuoteGenerator : IQuoteGenerator, IEnumerable<IQuote>
 	{
 		/// <summary>
 		/// Returns a collection of all possible quotes.

@@ -27,8 +27,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
-		public TronaldDumpService(HttpClient client) : base(SetAddress(client))
+		public TronaldDumpService(HttpClient client) : base(client)
 		{
 		}
 

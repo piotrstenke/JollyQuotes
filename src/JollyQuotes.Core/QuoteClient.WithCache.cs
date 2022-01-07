@@ -7,7 +7,7 @@ namespace JollyQuotes
 	public abstract partial class QuoteClient<T> where T : class, IQuote
 	{
 		/// <summary>
-		/// <see cref="IRandomQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
+		/// <see cref="IQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
 		/// and a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
 		public abstract new class WithCache : QuoteResolver<T>.WithCache
@@ -35,39 +35,39 @@ namespace JollyQuotes
 			/// <param name="includeBaseAddress">Determines whether the specified <paramref name="source"/> should be applied to <see cref="HttpClient.BaseAddress"/>.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			/// <exception cref="UriFormatException">Invalid format of the <paramref name="source"/>.</exception>
 			protected WithCache(
 				string source,
 				bool includeBaseAddress = true,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(Internals.CreateResolver(source, includeBaseAddress), source, cache, possibility)
 			{
 			}
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a specified <paramref name="uri"/>
-			/// that is used as a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+			/// that is used as a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 			/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 			/// </summary>
 			/// <param name="uri">
-			/// <see cref="Uri"/> that is used a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+			/// <see cref="Uri"/> that is used a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 			/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 			/// </param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>.</exception>
 			protected WithCache(
 				Uri uri,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(Internals.CreateResolver(uri), uri.ToString(), cache, possibility)
 			{
 			}
@@ -78,15 +78,15 @@ namespace JollyQuotes
 			/// <param name="client">Underlaying client that is used to access required resources.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> cannot be <see langword="null"/> or empty when no source specified.</exception>
 			protected WithCache(
 				HttpClient client,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(new HttpResolver(client), Internals.RetrieveSourceFromClient(client), cache, possibility)
 			{
 			}
@@ -97,15 +97,15 @@ namespace JollyQuotes
 			/// <param name="resolver"><see cref="JollyQuotes.HttpResolver"/> that is used to access the requested resources.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="resolver"/> cannot be <see langword="null"/> or empty when no source specified.</exception>
 			protected WithCache(
 				HttpResolver resolver,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(resolver, Internals.RetrieveSourceFromClient(resolver.BaseClient), cache, possibility)
 			{
 			}
@@ -117,16 +117,16 @@ namespace JollyQuotes
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(
 				IResourceResolver resolver,
 				string source,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(resolver, source, cache, possibility)
 			{
 			}
@@ -138,16 +138,16 @@ namespace JollyQuotes
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(
 				HttpClient client,
 				string source,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(new HttpResolver(client), source, cache, possibility)
 			{
 			}

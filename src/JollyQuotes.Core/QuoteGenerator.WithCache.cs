@@ -2,12 +2,12 @@
 
 namespace JollyQuotes
 {
-	public abstract partial class RandomQuoteGenerator<T> where T : class, IQuote
+	public abstract partial class QuoteGenerator<T> where T : class, IQuote
 	{
 		/// <summary>
-		/// <see cref="IRandomQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
+		/// <see cref="IQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract class WithCache : IRandomQuoteGenerator
+		public abstract class WithCache : IQuoteGenerator
 		{
 			// If the Count of the Cache is less than this value, Cache will not be randomly picked when QuoteInclude.All is specified.
 			private const int _minCacheCountToRandom = 25;
@@ -40,8 +40,8 @@ namespace JollyQuotes
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(
 				string source,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			)
 			{
 				if (string.IsNullOrWhiteSpace(source))
@@ -214,17 +214,17 @@ namespace JollyQuotes
 				}
 			}
 
-			IQuote IRandomQuoteGenerator.GetRandomQuote()
+			IQuote IQuoteGenerator.GetRandomQuote()
 			{
 				return GetRandomQuote()!;
 			}
 
-			IQuote? IRandomQuoteGenerator.GetRandomQuote(string tag)
+			IQuote? IQuoteGenerator.GetRandomQuote(string tag)
 			{
 				return GetRandomQuote(tag);
 			}
 
-			IQuote? IRandomQuoteGenerator.GetRandomQuote(params string[]? tags)
+			IQuote? IQuoteGenerator.GetRandomQuote(params string[]? tags)
 			{
 				return GetRandomQuote(tags);
 			}

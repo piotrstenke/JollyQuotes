@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+
+using JollyQuotes.KanyeRest;
+using JollyQuotes.TronaldDump;
 
 namespace JollyQuotes
 {
@@ -11,40 +17,99 @@ namespace JollyQuotes
 	{
 		private const int NUM_QUOTE_APIS = 3;
 
+		internal static int EnumToIndex(this JollyQuotesApi api)
+		{
+			int index = (int)api / 2;
+
+			if(index >= NUM_QUOTE_APIS)
+			{
+				return -1;
+			}
+
+			return index;
+		}
+
+		[DebuggerStepThrough]
+		internal static Exception Exc_InvalidEnum(string paramName)
+		{
+			return Error.Arg($"'{paramName}' must represent a single valid JollyQuotes API", paramName);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[DebuggerStepThrough]
+		internal static JollyQuotesApi IndexToEnum(int index)
+		{
+			return (JollyQuotesApi)(index ^ 2);
+		}
+
+		internal static JollyQuotesApi[] GetFlags(this JollyQuotesApi api)
+		{
+			List<JollyQuotesApi> list = new(3);
+
+			TryAdd(JollyQuotesApi.KanyeRest);
+			TryAdd(JollyQuotesApi.TronaldDump);
+			TryAdd(JollyQuotesApi.Quotable);
+
+			return list.ToArray();
+
+			void TryAdd(JollyQuotesApi value)
+			{
+				if (api.HasFlag(value))
+				{
+					list.Add(value);
+				}
+			}
+		}
+
+		internal static ArgumentException Exc_UnknownApiNameOrNull(string apiName)
+		{
+			if (string.IsNullOrWhiteSpace(apiName))
+			{
+				return Error.NullOrEmpty(nameof(apiName));
+			}
+
+			return Exc_UnknownApiName(apiName);
+		}
+
+		internal static ArgumentException Exc_UnknownApiName(string apiName)
+		{
+			return new ArgumentException($"Api with the specified name '{apiName}' not found", nameof(apiName));
+		}
+
 		/// <summary>
-		/// Returns a value of <see cref="JollyQuotesAPI"/> representing all <c>JollyQuotes</c> APIs supported by the specified <paramref name="assembly"/>.
+		/// Returns a value of <see cref="JollyQuotesApi"/> representing all <c>JollyQuotes</c> APIs supported by the specified <paramref name="assembly"/>.
 		/// </summary>
 		/// <param name="assembly"><see cref="Assembly"/> to get all <c>JollyQuotes</c> APIs supported by.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="assembly"/> is <see langword="null"/>.</exception>
-		public static JollyQuotesAPI GetSupportedAPIs(this Assembly assembly)
+		public static JollyQuotesApi GetSupportedApis(Assembly assembly)
 		{
 			if (assembly is null)
 			{
 				throw Error.Null(nameof(assembly));
 			}
 
-			return GetSupportedAPIs(assembly.GetReferencedAssemblies());
+			return GetSupportedApis(assembly.GetReferencedAssemblies());
 		}
 
 		/// <summary>
-		/// Returns a value of <see cref="JollyQuotesAPI"/> representing all <c>JollyQuotes</c> APIs supported by the specified collection of assembly <paramref name="references"/>.
+		/// Returns a value of <see cref="JollyQuotesApi"/> representing all <c>JollyQuotes</c> APIs supported by the specified collection of assembly <paramref name="references"/>.
 		/// </summary>
 		/// <param name="references">A collection of <see cref="AssemblyName"/>s representing target assembly references.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="references"/> is <see langword="null"/>.</exception>
-		public static JollyQuotesAPI GetSupportedAPIs(IEnumerable<AssemblyName> references)
+		public static JollyQuotesApi GetSupportedApis(IEnumerable<AssemblyName> references)
 		{
 			if (references is null)
 			{
 				throw Error.Null(nameof(references));
 			}
 
-			JollyQuotesAPI all = JollyQuotesAPI.None;
+			JollyQuotesApi all = JollyQuotesApi.None;
 
 			int count = 0;
 
 			foreach (AssemblyName assembly in references)
 			{
-				if (TryParse(assembly.Name, out JollyQuotesAPI api) && !all.HasFlag(api))
+				if (TryParseApi(assembly.Name, out JollyQuotesApi api) && !all.HasFlag(api))
 				{
 					all |= api;
 					count++;
@@ -60,23 +125,23 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Converts a specified <see cref="string"/> into a value of <see cref="JollyQuotesAPI"/>.
+		/// Converts a specified <see cref="string"/> into a value of <see cref="JollyQuotesApi"/>.
 		/// </summary>
 		/// <param name="source"><see cref="string"/> to convert.</param>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="source"/> is <see langword="null"/> or empty. -or-
-		/// <paramref name="source"/> could not be converted to a value of type <see cref="JollyQuotesAPI"/>.
+		/// <paramref name="source"/> could not be converted to a value of type <see cref="JollyQuotesApi"/>.
 		/// </exception>
-		public static JollyQuotesAPI Parse(string source)
+		public static JollyQuotesApi ParseApi(string source)
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
 				throw Error.NullOrEmpty(nameof(source));
 			}
 
-			if (!TryParse_Internal(source, out JollyQuotesAPI api))
+			if (!TryParseApi_Internal(source, out JollyQuotesApi api))
 			{
-				throw Error.Arg($"Value '{source}' could not be converted to a value of type {nameof(JollyQuotesAPI)}", nameof(source));
+				throw Error.Arg($"Value '{source}' could not be converted to a value of type {nameof(JollyQuotesApi)}", nameof(source));
 			}
 
 			return api;
@@ -86,32 +151,32 @@ namespace JollyQuotes
 		/// Determines whether the specified <c>JollyQuotes</c> <paramref name="apis"/> are supported by the specified <paramref name="assembly"/>.
 		/// </summary>
 		/// <param name="assembly"><see cref="Assembly"/> to check if supports the specified <paramref name="apis"/>.</param>
-		/// <param name="apis"><see cref="JollyQuotesAPI"/>s to check if are supported by the provided <paramref name="assembly"/>.</param>
+		/// <param name="apis"><see cref="JollyQuotesApi"/>s to check if are supported by the provided <paramref name="assembly"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="assembly"/> is <see langword="null"/>.</exception>
-		public static bool SupportsAPIs(this Assembly assembly, JollyQuotesAPI apis)
+		public static bool SupportsApis(Assembly assembly, JollyQuotesApi apis)
 		{
 			if (assembly is null)
 			{
 				throw Error.Null(nameof(assembly));
 			}
 
-			return SupportsAPIs(assembly.GetReferencedAssemblies(), apis);
+			return SupportsApis(assembly.GetReferencedAssemblies(), apis);
 		}
 
 		/// <summary>
 		/// Determines whether the specified <c>JollyQuotes</c> <paramref name="apis"/> are supported by the provided collection of <paramref name="references"/>.
 		/// </summary>
 		/// <param name="references">A collection of <see cref="AssemblyName"/>s representing target assembly references.</param>
-		/// <param name="apis"><see cref="JollyQuotesAPI"/>s to check if are supported by the provided <paramref name="references"/>.</param>
+		/// <param name="apis"><see cref="JollyQuotesApi"/>s to check if are supported by the provided <paramref name="references"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="references"/> is <see langword="null"/>.</exception>
-		public static bool SupportsAPIs(IEnumerable<AssemblyName> references, JollyQuotesAPI apis)
+		public static bool SupportsApis(IEnumerable<AssemblyName> references, JollyQuotesApi apis)
 		{
 			if (references is null)
 			{
 				throw Error.Null(nameof(references));
 			}
 
-			JollyQuotesAPI current = apis;
+			JollyQuotesApi current = apis;
 
 			foreach (AssemblyName assembly in references)
 			{
@@ -120,7 +185,7 @@ namespace JollyQuotes
 					continue;
 				}
 
-				if (TryParse(assembly.Name, out JollyQuotesAPI result) && current.HasFlag(result))
+				if (TryParseApi(assembly.Name, out JollyQuotesApi result) && current.HasFlag(result))
 				{
 					current &= ~result;
 
@@ -135,12 +200,151 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Attempts to convert a <see cref="string"/> into a value of <see cref="JollyQuotesAPI"/>.
+		/// Returns full name of web API behind the specified <c>JollyQuotes</c> API.
+		/// </summary>
+		/// <param name="api"><c>JollyQuotes</c> API to get the full name of.</param>
+		public static string GetActualApiName(JollyQuotesApi api)
+		{
+			return api switch
+			{
+				JollyQuotesApi.KanyeRest => ApiNames.KanyeRest,
+				JollyQuotesApi.TronaldDump => ApiNames.TronaldDump,
+				JollyQuotesApi.Quotable => ApiNames.Quotable,
+				_ => throw Exc_InvalidEnum(nameof(api))
+			};
+		}
+
+		/// <summary>
+		/// Attempts to create a new <see cref="QuoteApiDescription"/> for a specified built-in <c>JollyQuotes</c> API.
+		/// </summary>
+		/// <param name="api">Represents the <c>JollyQuotes</c> API to create the <see cref="QuoteApiDescription"/> for.</param>
+		/// <param name="description">Returned <see cref="QuoteApiDescription"/>.</param>
+		public static bool TryCreateDescription(JollyQuotesApi api, [NotNullWhen(true)]out QuoteApiDescription? description)
+		{
+			string apiName = GetActualApiName(api);
+
+			description = api switch
+			{
+				JollyQuotesApi.KanyeRest => new QuoteApiDescription(
+					apiName,
+					typeof(KanyeRestQuoteGenerator),
+					typeof(KanyeRestService),
+					typeof(KanyeRestQuote),
+					typeof(KanyeRestResources),
+					api
+				),
+
+				JollyQuotesApi.TronaldDump => new QuoteApiDescription(
+					apiName,
+					typeof(TronaldDumpQuoteGenerator),
+					typeof(TronaldDumpService),
+					typeof(TronaldDumpQuote),
+					typeof(TronaldDumpResources),
+					api
+				),
+
+				// TODO: Add support for quotable.io instance of QuoteApiDescription.
+				//JollyQuotesApi.Quotable => 
+
+				_ => null
+			};
+
+			return description is not null;
+		}
+
+		/// <inheritdoc cref="IQuoteApiHandler.CreateDescription(JollyQuotesApi)"/>
+		public static QuoteApiDescription CreateDescription(JollyQuotesApi api)
+		{
+			if(!TryCreateDescription(api, out QuoteApiDescription? description))
+			{
+				throw Exc_InvalidEnum(nameof(api));
+			}
+
+			return description;
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="IQuoteGenerator"/> for a specified built-in <c>JollyQuotes</c> API.
+		/// </summary>
+		/// <param name="api">Represents the <c>JollyQuotes</c> API to create the <see cref="IQuoteGenerator"/> for.</param>
+		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
+		/// <param name="possibility">
+		/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+		/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+		/// </param>
+		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="api"/> must represent a single valid <c>JollyQuotes</c> API. -or-
+		/// The <c>Tronald Dump</c> API requires the <paramref name="resolver"/> to implement the <see cref="IStreamResolver"/> interface.
+		/// </exception>
+		public static IQuoteGenerator CreateGenerator(JollyQuotesApi api, IResourceResolver resolver, IPossibility? possibility = default)
+		{
+			if(!TryCreateGenerator(api, resolver, out IQuoteGenerator? generator, possibility))
+			{
+				throw Exc_InvalidEnum(nameof(api));
+			}
+
+			return generator;
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="IQuoteGenerator"/> for a specified built-in <c>JollyQuotes</c> API.
+		/// </summary>
+		/// <param name="api">Represents the <c>JollyQuotes</c> API to create the <see cref="IQuoteGenerator"/> for.</param>
+		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
+		/// <param name="generator">Returned <see cref="IQuoteGenerator"/>.</param>
+		/// <param name="possibility">
+		/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+		/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+		/// </param>
+		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="api"/> must represent a single valid <c>JollyQuotes</c> API.</exception>
+		public static bool TryCreateGenerator(
+			JollyQuotesApi api,
+			IResourceResolver resolver,
+			[NotNullWhen(true)]out IQuoteGenerator? generator,
+			IPossibility? possibility = default
+		)
+		{
+			if(resolver is null)
+			{
+				throw Error.Null(nameof(resolver));
+			}
+
+			if(api == JollyQuotesApi.KanyeRest)
+			{
+				generator = new KanyeRestQuoteGenerator(resolver, possibility: possibility);
+			}
+			else if(api == JollyQuotesApi.TronaldDump)
+			{
+				if(resolver is not IStreamResolver s)
+				{
+					throw new ArgumentException($"The Tronald Dump API requires the '{nameof(resolver)}' to implement the {nameof(IStreamResolver)} interface");
+				}
+
+				generator = new TronaldDumpQuoteGenerator(s, possibility: possibility);
+			}
+			// TODO: Add support for quotable.io IRandomQuoteGenerator
+			//else if(api == JollyQuotesApi.Quotable)
+			//{
+
+			//}
+			else
+			{
+				generator = default;
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Attempts to convert a <see cref="string"/> into a value of <see cref="JollyQuotesApi"/>.
 		/// </summary>
 		/// <param name="source"><see cref="string"/> to convert.</param>
 		/// <param name="api">Result of the conversion.</param>
 		/// <returns><see langword="true"/> if the conversion was a success, <see langword="false"/> otherwise.</returns>
-		public static bool TryParse(string? source, out JollyQuotesAPI api)
+		public static bool TryParseApi(string? source, out JollyQuotesApi api)
 		{
 			if (string.IsNullOrWhiteSpace(source))
 			{
@@ -148,10 +352,10 @@ namespace JollyQuotes
 				return false;
 			}
 
-			return TryParse_Internal(source, out api);
+			return TryParseApi_Internal(source, out api);
 		}
 
-		private static bool TryParse_Internal(string source, out JollyQuotesAPI api)
+		private static bool TryParseApi_Internal(string source, out JollyQuotesApi api)
 		{
 			const StringComparison com = StringComparison.OrdinalIgnoreCase;
 
@@ -175,7 +379,7 @@ namespace JollyQuotes
 			{
 				if (IsApi(trimmed, kanye.Length, '.', "rest", true))
 				{
-					api = JollyQuotesAPI.KanyeRest;
+					api = JollyQuotesApi.KanyeRest;
 					return true;
 				}
 			}
@@ -183,7 +387,7 @@ namespace JollyQuotes
 			{
 				if (IsApi(trimmed, tronald.Length, ' ', "dump", true))
 				{
-					api = JollyQuotesAPI.TronaldDump;
+					api = JollyQuotesApi.TronaldDump;
 					return true;
 				}
 			}
@@ -191,12 +395,12 @@ namespace JollyQuotes
 			{
 				if (IsApi(trimmed, quotable.Length, '.', "io", false))
 				{
-					api = JollyQuotesAPI.Quotable;
+					api = JollyQuotesApi.Quotable;
 					return true;
 				}
 			}
 
-			api = JollyQuotesAPI.None;
+			api = JollyQuotesApi.None;
 			return false;
 
 			static bool IsApi(ReadOnlySpan<char> original, int length, char splitChar, string postfix, bool requirePostfix)

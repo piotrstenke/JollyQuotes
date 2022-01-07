@@ -49,18 +49,13 @@ namespace JollyQuotes.TronaldDump
 			nameof(JollyQuotes) + "." +
 			nameof(TronaldDump) + "." +
 			nameof(TronaldDumpResources) + "." +
-			nameof(TronaldDumpResources.APIPage);
+			nameof(APIPage);
 
 		internal static HttpResolver CreateDefaultResolver()
 		{
 			HttpClient client = Internals.CreateDefaultClient();
 			client.BaseAddress = new Uri(BaseAddress);
 			return new HttpResolver(client);
-		}
-
-		internal static HttpClient SetAddress(HttpClient client)
-		{
-			return Internals.SetAddress(client, BaseAddress, BaseAddressSource);
 		}
 	}
 }

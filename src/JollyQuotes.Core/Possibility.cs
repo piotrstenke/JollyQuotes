@@ -170,7 +170,9 @@ namespace JollyQuotes
 			UpperLimit = upperLimit;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Returns <see langword="true"/> if a randomly generated number between <c>0</c> and <see cref="UpperLimit"/> is larger than <see cref="Step"/>, <see langword="false"/> otherwise.
+		/// </summary>
 		public virtual bool Determine()
 		{
 			return Random.RandomNumber(1, UpperLimit + 1) > Step;

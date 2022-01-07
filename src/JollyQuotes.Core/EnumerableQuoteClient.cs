@@ -5,7 +5,7 @@ using System.Net.Http;
 namespace JollyQuotes
 {
 	/// <summary>
-	/// <see cref="IRandomQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/> with an additional handling of <see cref="JollyQuotes.HttpResolver"/>.
+	/// <see cref="IQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/> with an additional handling of <see cref="JollyQuotes.HttpResolver"/>.
 	/// </summary>
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
 	public abstract partial class EnumerableQuoteClient<T> : EnumerableQuoteResolver<T> where T : class, IQuote
@@ -39,11 +39,11 @@ namespace JollyQuotes
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EnumerableQuoteClient{T}"/> class with a specified <paramref name="uri"/>
-		/// that is used as a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+		/// that is used as a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 		/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 		/// </summary>
 		/// <param name="uri">
-		/// <see cref="Uri"/> that is used a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+		/// <see cref="Uri"/> that is used a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 		/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>.</exception>

@@ -39,11 +39,11 @@ namespace JollyQuotes
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteClient{T}"/> class with a specified <paramref name="uri"/>
-		/// that is used as a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+		/// that is used as a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 		/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 		/// </summary>
 		/// <param name="uri">
-		/// <see cref="Uri"/> that is used a <see cref="RandomQuoteGenerator{T}.Source"/> of the quote resources
+		/// <see cref="Uri"/> that is used a <see cref="QuoteGenerator{T}.Source"/> of the quote resources
 		/// and <see cref="HttpClient.BaseAddress"/> of the underlaying <see cref="BaseClient"/>.
 		/// </param>
 		/// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null"/>.</exception>

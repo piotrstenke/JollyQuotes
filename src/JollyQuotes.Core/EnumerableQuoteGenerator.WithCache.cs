@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IEnumerableQuoteGenerator"/> that provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : RandomQuoteGenerator<T>.WithCache, IEnumerableQuoteGenerator
+		public abstract new class WithCache : QuoteGenerator<T>.WithCache, IEnumerableQuoteGenerator
 		{
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with a <paramref name="source"/> specified.
@@ -18,14 +18,14 @@ namespace JollyQuotes
 			/// <param name="source">Source of the quotes, e.g. a link, file name or raw text.</param>
 			/// <param name="cache">Container of all the cached <see cref="IQuote"/>s.</param>
 			/// <param name="possibility">
-			/// Random number generator used to determine whether to pick quotes from the <see cref="RandomQuoteGenerator{T}.WithCache.Cache"/>
-			/// or <see cref="RandomQuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
+			/// Random number generator used to determine whether to pick quotes from the <see cref="QuoteGenerator{T}.WithCache.Cache"/>
+			/// or <see cref="QuoteGenerator{T}.WithCache.Source"/> when <see cref="QuoteInclude.All"/> is passed as argument.
 			/// </param>
 			/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 			protected WithCache(
 				string source,
-				IQuoteCache<T>? cache = null,
-				IPossibility? possibility = null
+				IQuoteCache<T>? cache = default,
+				IPossibility? possibility = default
 			) : base(source, cache, possibility)
 			{
 			}
@@ -191,18 +191,18 @@ namespace JollyQuotes
 			}
 
 			/// <summary>
-			/// Downloads all quotes available from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>
+			/// Downloads all quotes available from the <see cref="QuoteGenerator{T}.WithCache.Source"/>
 			/// </summary>
 			protected abstract IEnumerable<T> DownloadAllQuotes();
 
 			/// <summary>
-			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
+			/// Downloads all quotes associated with the specified <paramref name="tag"/> from the <see cref="QuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tag">Tag to download all quotes associated with.</param>
 			protected abstract IEnumerable<T> DownloadAllQuotes(string tag);
 
 			/// <summary>
-			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="RandomQuoteGenerator{T}.WithCache.Source"/>.
+			/// Downloads all quotes associated with any of the specified <paramref name="tags"/> from the <see cref="QuoteGenerator{T}.WithCache.Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download all quotes associated with.</param>
 			protected virtual IEnumerable<T> DownloadAllQuotes(params string[]? tags)

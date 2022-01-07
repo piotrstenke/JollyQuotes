@@ -60,9 +60,9 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
  1. Download [this](https://www.nuget.org/packages/JollyQuotes) NuGet package.
 
- 2. Create a quote model (preferably a record) named *[api-name]Quote* and implement the [*JollyQuotes.IQuote*](src/JollyQuotes/_intf/IQuote.cs) interface. 
+ 2. Create a quote model (preferably a record) named *[api-name]Quote* and implement the [*JollyQuotes.IQuote*](src/JollyQuotes.Core/_intf/IQuote.cs) interface. 
 
-	**Note**: There are two built-in implementations of this interface: [*JollyQuotes.Quote*](src/JollyQuotes/Quote.cs) and [*JollyQuotes.QuoteWithId*](src/JollyQuotes/QuoteWithId.cs), so you can feel free to either inherit from them or use them directly instead of creating a new model.
+	**Note**: There are two built-in implementations of this interface: [*JollyQuotes.Quote*](src/JollyQuotes.Core/Quote.cs) and [*JollyQuotes.QuoteWithId*](src/JollyQuotes.Core/QuoteWithId.cs), so you can feel free to either inherit from them or use them directly instead of creating a new model.
 
 	Example:
 
@@ -92,7 +92,7 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
  4. Create a class named *[api-name]Service* that defines all actions that can be performed using the API being implemented.
 
-	**Note**: It is recommended to implement the [*JollyQuotes.IQuoteService*](src/JollyQuotes/_intf/IQuoteService.cs) interface or inherit the [*JollyQuotes.QuoteService*](src/JollyQuotes/QuoteService.cs) class for better clarity and testability.
+	**Note**: It is recommended to implement the [*JollyQuotes.IQuoteService*](src/JollyQuotes.Core/_intf/IQuoteService.cs) interface or inherit the [*JollyQuotes.QuoteService*](src/JollyQuotes.Core/QuoteService.cs) class for better clarity and testability.
 
 	**Note**: It is recommended for all publicly-visible methods of the service to return [*System.Threading.Tasks.Task*](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0) or [*System.Threading.Tasks.Task\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1?view=net-6.0) instead of direct types.
 
@@ -131,17 +131,17 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
  5. Create a class named *[api-name]QuoteGenerator* that generates quotes on demand, preferably by using a *[api-name]Service*. There are multiple ways to achieve that, but by far the easiest and the least painful is to inherit one of the following pre-built abstract classes:
 
-	- [*JollyQuotes.RandomQuoteGenerator*](src/JollyQuotes/RandomQuoteGenerator.cs) - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes/_intf/IRandomQuoteGenerator.cs) interface; does not provide any additional features.
+	- [*JollyQuotes.RandomQuoteGenerator*](src/JollyQuotes.Core/RandomQuoteGenerator.cs) - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IRandomQuoteGenerator.cs) interface; does not provide any additional features.
 
-	- [*JollyQuotes.QuoteResolver*](src/JollyQuotes/QuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes/_intf/IResourceResolver.cs) and implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
+	- [*JollyQuotes.QuoteResolver*](src/JollyQuotes.Core/QuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes.Core/_intf/IResourceResolver.cs) and implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
 
-	- [*JollyQuotes.QuoteClient*](src/JollyQuotes/QuoteClient.cs) - good choice for web-based APIs; provides a [*System.Net.Http.HttpClient*](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0) and a [*JollyQuotes.HttpResolver*](src/JollyQuotes/HttpResolver.cs); implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
+	- [*JollyQuotes.QuoteClient*](src/JollyQuotes.Core/QuoteClient.cs) - good choice for web-based APIs; provides a [*System.Net.Http.HttpClient*](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0) and a [*JollyQuotes.HttpResolver*](src/JollyQuotes.Core/HttpResolver.cs); implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
 
-	- [*JollyQuotes.EnumerableQuoteGenerator*](src/JollyQuotes/EnumerableQuoteGenerator.cs)  - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes/_intf/IRandomQuoteGenerator.cs) interface; implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) interface.
+	- [*JollyQuotes.EnumerableQuoteGenerator*](src/JollyQuotes.Core/EnumerableQuoteGenerator.cs)  - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IRandomQuoteGenerator.cs) interface; implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) interface.
 
-	- [*JollyQuotes.EnumerableQuoteResolver*](src/JollyQuotes/EnumerableQuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes/_intf/IResourceResolver.cs) and implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) and [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interfaces.
+	- [*JollyQuotes.EnumerableQuoteResolver*](src/JollyQuotes.Core/EnumerableQuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes.Core/_intf/IResourceResolver.cs) and implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) and [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interfaces.
 
-	- [*JollyQuotes.EnumerableQuoteClient*](src/JollyQuotes/EnumerableQuoteClient.cs) - good choice for web-based APIs; provides a [*System.Net.Http.HttpClient*](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0) and a [*JollyQuotes.HttpResolver*](src/JollyQuotes/HttpResolver.cs); implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) and [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interfaces. 
+	- [*JollyQuotes.EnumerableQuoteClient*](src/JollyQuotes.Core/EnumerableQuoteClient.cs) - good choice for web-based APIs; provides a [*System.Net.Http.HttpClient*](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0) and a [*JollyQuotes.HttpResolver*](src/JollyQuotes.Core/HttpResolver.cs); implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) and [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interfaces. 
 
 	Example:
 

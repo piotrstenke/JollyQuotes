@@ -21,6 +21,8 @@
   
   <ItemGroup>
     <ProjectReference Include="..\JollyQuotes.Core\JollyQuotes.Core.csproj" />
+    <ProjectReference Include="..\JollyQuotes.KanyeRest\JollyQuotes.KanyeRest.csproj" />
+    <ProjectReference Include="..\JollyQuotes.TronaldDump\JollyQuotes.TronaldDump.csproj" />
   </ItemGroup>
 
 </Project>
