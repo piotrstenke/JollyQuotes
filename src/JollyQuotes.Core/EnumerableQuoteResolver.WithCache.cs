@@ -8,7 +8,7 @@ namespace JollyQuotes
 		/// <see cref="IQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/>
 		/// and a for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : EnumerableQuoteGenerator<T>.WithCache, IDisposable
+		public new abstract class WithCache : EnumerableQuoteGenerator<T>.WithCache, IDisposable
 		{
 			/// <inheritdoc/>
 			public IResourceResolver Resolver { get; }

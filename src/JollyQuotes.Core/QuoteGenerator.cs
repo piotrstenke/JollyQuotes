@@ -6,6 +6,9 @@ namespace JollyQuotes
 	/// <typeparam name="T">Type of <see cref="IQuote"/> this class can generate.</typeparam>
 	public abstract partial class QuoteGenerator<T> : IQuoteGenerator where T : class, IQuote
 	{
+		/// <inheritdoc/>
+		public abstract string ApiName { get; }
+
 		/// <summary>
 		/// Source of the quotes, e.g. a link, file name or raw text.
 		/// </summary>

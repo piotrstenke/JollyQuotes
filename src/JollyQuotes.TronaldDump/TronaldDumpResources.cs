@@ -9,9 +9,14 @@ namespace JollyQuotes.TronaldDump
 	public static class TronaldDumpResources
 	{
 		/// <summary>
+		/// Name of the API.
+		/// </summary>
+		public const string ApiName = "Tronald Dump";
+
+		/// <summary>
 		/// Entry point for API calls.
 		/// </summary>
-		public const string APIPage = "https://www.tronalddump.io/";
+		public const string ApiPage = "https://www.tronalddump.io/";
 
 		/// <summary>
 		/// Link to page with documentation of the <c>Tronald Dump</c> API.
@@ -43,13 +48,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		public const int MemeWidth = 1024;
 
-		internal const string BaseAddress = APIPage;
-
-		internal const string BaseAddressSource =
-			nameof(JollyQuotes) + "." +
-			nameof(TronaldDump) + "." +
-			nameof(TronaldDumpResources) + "." +
-			nameof(APIPage);
+		internal const string BaseAddress = ApiPage;
 
 		internal static HttpResolver CreateDefaultResolver()
 		{

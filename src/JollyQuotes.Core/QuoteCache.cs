@@ -381,7 +381,7 @@ namespace JollyQuotes
 
 				if (!_map.TryGetValue(id, out int index))
 				{
-					throw new ArgumentException($"Quote with id '{id}' not found");
+					throw Error.Arg($"Quote with id '{id}' not found");
 				}
 
 				return _lookup[index]!;
@@ -796,7 +796,7 @@ namespace JollyQuotes
 		{
 			if (_map.Count == 0)
 			{
-				throw new InvalidOperationException("Cannot return a quote from empty cache");
+				throw Error.InvOp("Cannot return a quote from empty cache");
 			}
 		}
 

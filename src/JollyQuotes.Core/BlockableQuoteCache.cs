@@ -12,11 +12,15 @@ namespace JollyQuotes
 	/// <typeparam name="T">Type of quotes this class can store.</typeparam>
 	public class BlockableQuoteCache<T> : IQuoteCache<T> where T : class, IQuote
 	{
-		private readonly IQuoteCache<T> _cache;
 		private bool _preserveState = true;
 
+		/// <summary>
+		/// Underlaying <see cref="IQuoteCache{T}"/>.
+		/// </summary>
+		public IQuoteCache<T> Cache { get; }
+
 		/// <inheritdoc/>
-		public int Count => _cache.Count;
+		public int Count => Cache.Count;
 
 		/// <summary>
 		/// Determines whether the cache is blocked from modification.
@@ -24,7 +28,7 @@ namespace JollyQuotes
 		public bool IsBlocked { get; private set; }
 
 		/// <inheritdoc/>
-		public bool IsEmpty => _cache.IsEmpty;
+		public bool IsEmpty => Cache.IsEmpty;
 
 		/// <summary>
 		/// Determines whether state of the cache should be preserved when <see cref="IsBlocked"/> is <see langword="false"/> and restored when <see cref="IsBlocked"/> is set back to <see langword="true"/>.
@@ -62,7 +66,7 @@ namespace JollyQuotes
 				throw Error.Null(nameof(cache));
 			}
 
-			_cache = cache;
+			Cache = cache;
 		}
 
 		/// <summary>
@@ -84,7 +88,7 @@ namespace JollyQuotes
 		{
 			if (CanBeModified())
 			{
-				_cache.CacheQuote(quote);
+				Cache.CacheQuote(quote);
 			}
 		}
 
@@ -105,25 +109,25 @@ namespace JollyQuotes
 		/// </summary>
 		public void ForceClear()
 		{
-			_cache.Clear();
+			Cache.Clear();
 		}
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetCached()
 		{
-			return _cache.GetCached();
+			return Cache.GetCached();
 		}
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetCached(string tag)
 		{
-			return _cache.GetCached(tag);
+			return Cache.GetCached(tag);
 		}
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetCached(params string[]? tags)
 		{
-			return _cache.GetCached(tags);
+			return Cache.GetCached(tags);
 		}
 
 		/// <summary>
@@ -131,19 +135,19 @@ namespace JollyQuotes
 		/// </summary>
 		public IEnumerator<T> GetEnumerator()
 		{
-			return _cache.GetEnumerator();
+			return Cache.GetEnumerator();
 		}
 
 		/// <inheritdoc/>
 		public T GetRandomQuote()
 		{
-			return _cache.GetRandomQuote();
+			return Cache.GetRandomQuote();
 		}
 
 		/// <inheritdoc/>
 		public bool IsCached(T quote)
 		{
-			return _cache.IsCached(quote);
+			return Cache.IsCached(quote);
 		}
 
 		/// <inheritdoc/>
@@ -152,7 +156,7 @@ namespace JollyQuotes
 		{
 			if (CanBeModified())
 			{
-				return _cache.RemoveQuote(quote);
+				return Cache.RemoveQuote(quote);
 			}
 
 			return false;
@@ -164,7 +168,7 @@ namespace JollyQuotes
 		{
 			if (CanBeModified())
 			{
-				return _cache.RemoveQuotes(tag);
+				return Cache.RemoveQuotes(tag);
 			}
 
 			return false;
@@ -173,7 +177,7 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		public bool TryGetRandomQuote(string tag, [NotNullWhen(true)] out T? quote)
 		{
-			return _cache.TryGetRandomQuote(tag, out quote);
+			return Cache.TryGetRandomQuote(tag, out quote);
 		}
 
 		/// <summary>
@@ -203,7 +207,7 @@ namespace JollyQuotes
 
 			if (ThrowIfBlocked)
 			{
-				throw new InvalidOperationException("Blocked cache cannot be modified");
+				throw Error.InvOp("Blocked cache cannot be modified");
 			}
 
 			return false;

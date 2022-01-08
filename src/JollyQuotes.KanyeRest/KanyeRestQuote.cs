@@ -11,7 +11,7 @@ namespace JollyQuotes.KanyeRest
 	public sealed record KanyeRestQuote : IQuote
 	{
 		private const string _author = "Kanye West";
-		private const string _source = KanyeRestResources.APIPage;
+		private const string _source = KanyeRestResources.ApiPage;
 
 		private readonly Id _id;
 

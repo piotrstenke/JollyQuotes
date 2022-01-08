@@ -12,6 +12,9 @@ namespace JollyQuotes
 			// If the Count of the Cache is less than this value, Cache will not be randomly picked when QuoteInclude.All is specified.
 			private const int _minCacheCountToRandom = 25;
 
+			/// <inheritdoc/>
+			public abstract string ApiName { get; }
+
 			/// <summary>
 			/// Container of all the cached <see cref="IQuote"/>s.
 			/// </summary>

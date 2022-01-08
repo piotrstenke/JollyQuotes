@@ -70,10 +70,21 @@ namespace JollyQuotes
 
 			if (string.IsNullOrWhiteSpace(str))
 			{
-				throw new ArgumentException("Base address of client cannot be null or empty when no source specified", nameof(client));
+				throw Error.Arg("Base address of client cannot be null or empty when no source specified", nameof(client));
 			}
 
 			return str;
+		}
+
+		public static bool TryDispose(object? obj)
+		{
+			if (obj is IDisposable disposable)
+			{
+				disposable.Dispose();
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

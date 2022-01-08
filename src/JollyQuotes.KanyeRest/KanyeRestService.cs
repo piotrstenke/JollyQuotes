@@ -42,7 +42,7 @@ namespace JollyQuotes.KanyeRest
 		/// <inheritdoc/>
 		public Task<KanyeRestQuote> GetRandomQuote()
 		{
-			return Resolver.ResolveAsync<KanyeRestQuote>(KanyeRestResources.APIPage);
+			return Resolver.ResolveAsync<KanyeRestQuote>(KanyeRestResources.ApiPage);
 		}
 	}
 }

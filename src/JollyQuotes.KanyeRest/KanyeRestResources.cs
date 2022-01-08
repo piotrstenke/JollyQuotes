@@ -6,9 +6,14 @@
 	public static class KanyeRestResources
 	{
 		/// <summary>
+		/// Name of the API.
+		/// </summary>
+		public const string ApiName = "kanye.rest";
+
+		/// <summary>
 		/// Entry point for API calls.
 		/// </summary>
-		public const string APIPage = "https://api.kanye.rest";
+		public const string ApiPage = "https://api.kanye.rest";
 
 		/// <summary>
 		/// Link to the database of all available quotes.

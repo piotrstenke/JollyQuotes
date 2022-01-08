@@ -18,7 +18,7 @@ namespace JollyQuotes.Tests
 
 		public TronaldDumpTests()
 		{
-			_resolver = GetResolver(TronaldDumpResources.APIPage);
+			_resolver = GetResolver(TronaldDumpResources.ApiPage);
 			_service = new TronaldDumpService(_resolver);
 		}
 

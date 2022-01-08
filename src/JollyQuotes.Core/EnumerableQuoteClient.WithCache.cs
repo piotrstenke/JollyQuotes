@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <see cref="IQuoteGenerator"/> that provides mechanism for enumerating through a set of available <see cref="IQuote"/>s using a <see cref="IResourceResolver"/> with an additional handling of <see cref="JollyQuotes.HttpResolver"/>,
 		/// as well as a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : EnumerableQuoteResolver<T>.WithCache
+		public new abstract class WithCache : EnumerableQuoteResolver<T>.WithCache
 		{
 			/// <summary>
 			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.

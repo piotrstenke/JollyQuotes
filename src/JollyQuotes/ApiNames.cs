@@ -1,10 +1,41 @@
-﻿namespace JollyQuotes
+﻿using JollyQuotes.KanyeRest;
+using JollyQuotes.TronaldDump;
+
+namespace JollyQuotes
 {
-	internal static class ApiNames
+	/// <summary>
+	/// Contains names of all <c>JollyQuotes</c> APIs.
+	/// </summary>
+	public static class ApiNames
 	{
+		/// <summary>
+		/// Name of the <c>JollyQuotes</c> API.
+		/// </summary>
 		public const string JollyQuotes = "JollyQuotes";
-		public const string KanyeRest = "kanye.rest";
-		public const string TronaldDump = "Tronald Dump";
+
+		/// <summary>
+		/// Name of  the <c>kanye.rest</c> API.
+		/// </summary>
+		public const string KanyeRest = KanyeRestResources.ApiName;
+
+		/// <summary>
+		/// Name of the <c>quotable</c> API.
+		/// </summary>
 		public const string Quotable = "quotable";
+
+		/// <summary>
+		/// Name of the <c>Tronald Dump</c> API.
+		/// </summary>
+		public const string TronaldDump = TronaldDumpResources.ApiName;
+
+		internal static string[] GetAll()
+		{
+			return new[]
+			{
+				KanyeRest,
+				TronaldDump,
+				Quotable
+			};
+		}
 	}
 }

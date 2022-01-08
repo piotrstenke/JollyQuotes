@@ -36,9 +36,9 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="embedded">Values present in the current page of the search result.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="embedded"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="total"/> cannot be less than <c>0</c>. -or-
-		/// <paramref name="count"/> cannot be less than <c>0</c>. -or-
-		/// <paramref name="count"/> cannot be greater than <paramref name="total"/>.
+		/// <paramref name="total"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="count"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="count"/> must be less than or equal <paramref name="total"/>.
 		/// </exception>
 		public SearchResultModel(int count, int total, T embedded) : this(count, total, embedded, null)
 		{
@@ -54,9 +54,9 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="links">Links to all the pages in the search result.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="embedded"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="total"/> cannot be less than <c>0</c>. -or-
-		/// <paramref name="count"/> cannot be less than <c>0</c>. -or-
-		/// <paramref name="count"/> cannot be greater than <paramref name="total"/>.
+		/// <paramref name="total"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="count"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="count"/> must be less than or equal <paramref name="total"/>.
 		/// </exception>
 		[JsonConstructor]
 		public SearchResultModel(int count, int total, T embedded, PageHierarchyModel? links)
@@ -68,17 +68,17 @@ namespace JollyQuotes.TronaldDump.Models
 
 			if (total < 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(total), $"{total} cannot be less than 0");
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(total), 0);
 			}
 
 			if (count < 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(count), $"{count} cannot be less than 0");
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(count), 0);
 			}
 
 			if (count > total)
 			{
-				throw new ArgumentOutOfRangeException(nameof(count), $"{nameof(count)} cannot be greater than '{total}'");
+				throw Error.MustBeLessThanOrEqualTo(nameof(count), nameof(total));
 			}
 
 			Count = count;

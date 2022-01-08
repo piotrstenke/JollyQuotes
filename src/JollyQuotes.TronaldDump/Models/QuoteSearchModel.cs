@@ -90,7 +90,7 @@ namespace JollyQuotes.TronaldDump.Models
 		{
 			if (query is null && tag is null)
 			{
-				throw new ArgumentException($"Either {nameof(query)} or {nameof(tag)} must be not null");
+				throw Error.Arg($"Either {nameof(query)} or {nameof(tag)} must be not null");
 			}
 
 			if (query is not null && string.IsNullOrWhiteSpace(query))

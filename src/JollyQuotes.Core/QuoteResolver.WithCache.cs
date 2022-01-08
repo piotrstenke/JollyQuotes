@@ -7,7 +7,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="IQuoteGenerator"/> that generates random quotes using an external API accessed by an <see cref="IResourceResolver"/> and provides a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : QuoteGenerator<T>.WithCache, IDisposable
+		public new abstract class WithCache : QuoteGenerator<T>.WithCache, IDisposable
 		{
 			/// <inheritdoc/>
 			public IResourceResolver Resolver { get; }
@@ -59,15 +59,17 @@ namespace JollyQuotes
 			/// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;<see langword="false"/> to release only unmanaged resources.</param>
 			protected virtual void Dispose(bool disposing)
 			{
-				if (!Disposed)
+				if (Disposed)
 				{
-					if (disposing && Resolver is IDisposable d)
-					{
-						d.Dispose();
-					}
-
-					Disposed = true;
+					return;
 				}
+
+				if (disposing)
+				{
+					Internals.TryDispose(Resolver);
+				}
+
+				Disposed = true;
 			}
 		}
 	}

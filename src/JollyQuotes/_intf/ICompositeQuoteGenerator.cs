@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace JollyQuotes
 {
@@ -15,14 +14,14 @@ namespace JollyQuotes
 		IQuoteApiHandler ApiHandler { get; }
 
 		/// <summary>
-		/// Enables an API with the specified <paramref name="apiName"/>.
+		/// Forces the generator to update its internal container of <see cref="IQuoteGenerator"/>s.
 		/// </summary>
-		/// <param name="apiName">Name of API to enable.</param>
-		/// <exception cref="ArgumentException">
-		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
-		/// API with the specified <paramref name="apiName"/> not found.
-		/// </exception>
-		void EnableApi(string apiName);
+		void ForceUpdate();
+
+		/// <summary>
+		/// Disables all APIs.
+		/// </summary>
+		void DisableAll();
 
 		/// <summary>
 		/// Disables an API with the specified <paramref name="apiName"/>.
@@ -40,29 +39,19 @@ namespace JollyQuotes
 		void EnableAll();
 
 		/// <summary>
-		/// Enables an API with the specified <paramref name="apiName"/> and disables all others.
+		/// Enables an API with the specified <paramref name="apiName"/>.
 		/// </summary>
 		/// <param name="apiName">Name of API to enable.</param>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
 		/// API with the specified <paramref name="apiName"/> not found.
 		/// </exception>
-		void Switch(string apiName);
+		void EnableApi(string apiName);
 
 		/// <summary>
-		/// Disables all APIs.
+		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all APIs known by the generator.
 		/// </summary>
-		void DisableAll();
-
-		/// <summary>
-		/// Determines whether API with the specified <paramref name="apiName"/> is enabled.
-		/// </summary>
-		/// <param name="apiName">Name of API to check whether is enabled.</param>
-		/// <exception cref="ArgumentException">
-		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
-		/// API with the specified <paramref name="apiName"/> not found.
-		/// </exception>
-		bool IsEnabled(string apiName);
+		IEnumerable<QuoteApiDescription> GetApis();
 
 		/// <summary>
 		/// Returns a <see cref="QuoteApiDescription"/> associated with API with the specified <paramref name="apiName"/>.
@@ -75,6 +64,27 @@ namespace JollyQuotes
 		QuoteApiDescription GetDescription(string apiName);
 
 		/// <summary>
+		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all currently disabled APIs.
+		/// </summary>
+		IEnumerable<QuoteApiDescription> GetDisabledApis();
+
+		/// <summary>
+		/// Returns a collection of <see cref="IQuoteGenerator"/>s associated with all currently disabled APIs.
+		/// </summary>
+		/// <returns></returns>
+		IEnumerable<IQuoteGenerator> GetDisabledGenerators();
+
+		/// <summary>
+		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all currently enabled APIs.
+		/// </summary>
+		IEnumerable<QuoteApiDescription> GetEnabledApis();
+
+		/// <summary>
+		/// Returns a collection of <see cref="IQuoteGenerator"/>s associated with all currently enabled APIs.
+		/// </summary>
+		IEnumerable<IQuoteGenerator> GetEnabledGenerators();
+
+		/// <summary>
 		/// Returns a <see cref="IQuoteGenerator"/> associated with API with the specified <paramref name="apiName"/>.
 		/// </summary>
 		/// <param name="apiName">Name of API to get the <see cref="IQuoteGenerator"/> associated with.</param>
@@ -85,34 +95,35 @@ namespace JollyQuotes
 		IQuoteGenerator GetGenerator(string apiName);
 
 		/// <summary>
-		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all APIs known by the generator.
-		/// </summary>
-		IEnumerable<QuoteApiDescription> GetApis();
-
-		/// <summary>
-		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all currently enabled APIs.
-		/// </summary>
-		IEnumerable<QuoteApiDescription> GetEnabledApis();
-
-		/// <summary>
-		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all currently disabled APIs.
-		/// </summary>
-		IEnumerable<QuoteApiDescription> GetDisabledApis();
-
-		/// <summary>
 		/// Returns a collection of <see cref="IQuoteGenerator"/>s associated with all APIs known by the generator.
 		/// </summary>
 		IEnumerable<IQuoteGenerator> GetGenerators();
 
 		/// <summary>
-		/// Returns a collection of <see cref="IQuoteGenerator"/>s associated with all currently enabled APIs.
+		/// Determines whether API with the specified <paramref name="apiName"/> is enabled.
 		/// </summary>
-		IEnumerable<IQuoteGenerator> GetEnabledGenerators();
+		/// <param name="apiName">Name of API to check whether is enabled.</param>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
+		/// API with the specified <paramref name="apiName"/> not found.
+		/// </exception>
+		bool IsEnabled(string apiName);
 
 		/// <summary>
-		/// Returns a collection of <see cref="IQuoteGenerator"/>s associated with all currently disabled APIs.
+		/// Determines whether API with the specified <paramref name="apiName"/> is registered in the current generator.
 		/// </summary>
-		/// <returns></returns>
-		IEnumerable<IQuoteGenerator> GetDisabledGenerators();
+		/// <param name="apiName">Name of API to check whether is registered.</param>
+		/// <exception cref="ArgumentException"><paramref name="apiName"/> is <see langword="null"/> or empty.</exception>
+		bool IsRegistered(string apiName);
+
+		/// <summary>
+		/// Enables an API with the specified <paramref name="apiName"/> and disables all others.
+		/// </summary>
+		/// <param name="apiName">Name of API to enable.</param>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
+		/// API with the specified <paramref name="apiName"/> not found.
+		/// </exception>
+		void SwitchTo(string apiName);
 	}
 }

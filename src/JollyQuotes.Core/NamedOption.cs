@@ -35,57 +35,22 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Deconstructs the struct into its underlaying values.
+		/// Subtracts an <see cref="int"/> value from an instance of <see cref="NamedOption"/>.
 		/// </summary>
-		public void Deconstruct(out string name, out int possibility)
+		/// <param name="left">Instance of <see cref="NamedOption"/> to subtract the <see cref="int"/> value from.</param>
+		/// <param name="right"><see cref="int"/> value to subtract.</param>
+		public static NamedOption operator -(in NamedOption left, int right)
 		{
-			name = Name;
-			possibility = Possibility;
-		}
-
-		/// <inheritdoc/>
-		public override bool Equals(object? obj)
-		{
-			if (obj is NamedOption other)
-			{
-				return other == this;
-			}
-
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override string ToString()
-		{
-			return $"{Name}, {Possibility}";
-		}
-
-		/// <inheritdoc/>
-		public override int GetHashCode()
-		{
-			return HashCode.Combine(Name, Possibility);
-		}
-
-		/// <inheritdoc/>
-		public bool Equals(NamedOption other)
-		{
-			return other == this;
-		}
-
-		/// <inheritdoc/>
-		public int CompareTo(NamedOption other)
-		{
-			return other.Possibility.CompareTo(Possibility);
+			return new NamedOption(left.Name, left.Possibility - right);
 		}
 
 		/// <summary>
-		/// Checks if two instances of <see cref="NamedOption"/> are considered equal.
+		/// Decrements the possibility of an <see cref="NamedOption"/>.
 		/// </summary>
-		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
-		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
-		public static bool operator ==(in NamedOption left, in NamedOption right)
+		/// <param name="left">Instance of <see cref="NamedOption"/> to decrement the possibility of.</param>
+		public static NamedOption operator --(in NamedOption left)
 		{
-			return left.Name == right.Name && left.Possibility == right.Possibility;
+			return new NamedOption(left.Name, left.Possibility - 1);
 		}
 
 		/// <summary>
@@ -99,33 +64,42 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Checks if one instance of <see cref="NamedOption"/> is considered being greater than the second.
+		/// Multiplies an instance of <see cref="NamedOption"/> by an <see cref="int"/> value.
 		/// </summary>
-		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
-		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
-		public static bool operator >(in NamedOption left, in NamedOption right)
+		/// <param name="left">Instance of <see cref="NamedOption"/> to multiply.</param>
+		/// <param name="right"><see cref="int"/> value to multiply by.</param>
+		public static NamedOption operator *(in NamedOption left, int right)
 		{
-			return left.Possibility > right.Possibility;
+			return new NamedOption(left.Name, left.Possibility * right);
 		}
 
 		/// <summary>
-		/// Checks if instance of <see cref="NamedOption"/> is considered being greater than an <see cref="int"/> value.
+		/// Divides an instance of <see cref="NamedOption"/> by an <see cref="int"/> value.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/>.</param>
-		/// <param name="right"><see cref="int"/> to compare to.</param>
-		public static bool operator >(in NamedOption left, int right)
+		/// <param name="left">Instance of <see cref="NamedOption"/> to divide.</param>
+		/// <param name="right"><see cref="int"/> value to divide by.</param>
+		public static NamedOption operator /(in NamedOption left, int right)
 		{
-			return left.Possibility > right;
+			return new NamedOption(left.Name, left.Possibility / right);
 		}
 
 		/// <summary>
-		/// Checks if an <see cref="int"/> value is considered being greater than an instance of <see cref="NamedOption"/>.
+		/// Adds an <see cref="int"/> value to an instance of <see cref="NamedOption"/>.
 		/// </summary>
-		/// <param name="left"><see cref="int"/> to compare to.</param>
-		/// <param name="right">Instance of <see cref="NamedOption"/>.</param>
-		public static bool operator >(int left, in NamedOption right)
+		/// <param name="left">Instance of <see cref="NamedOption"/> to add the <see cref="int"/> value to.</param>
+		/// <param name="right"><see cref="int"/> value to add.</param>
+		public static NamedOption operator +(in NamedOption left, int right)
 		{
-			return left > right.Possibility;
+			return new NamedOption(left.Name, left.Possibility + right);
+		}
+
+		/// <summary>
+		/// Increments the possibility of an <see cref="NamedOption"/>.
+		/// </summary>
+		/// <param name="left">Instance of <see cref="NamedOption"/> to increment the possibility of.</param>
+		public static NamedOption operator ++(in NamedOption left)
+		{
+			return new NamedOption(left.Name, left.Possibility + 1);
 		}
 
 		/// <summary>
@@ -159,36 +133,6 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Checks if one instance of <see cref="NamedOption"/> is considered being greater than or equal the second.
-		/// </summary>
-		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
-		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
-		public static bool operator >=(in NamedOption left, in NamedOption right)
-		{
-			return left.Possibility >= right.Possibility;
-		}
-
-		/// <summary>
-		/// Checks if instance of <see cref="NamedOption"/> is considered being greater than or equal to an <see cref="int"/> value.
-		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/>.</param>
-		/// <param name="right"><see cref="int"/> to compare to.</param>
-		public static bool operator >=(in NamedOption left, int right)
-		{
-			return left.Possibility >= right;
-		}
-
-		/// <summary>
-		/// Checks if an <see cref="int"/> value is considered being greater than or equal to an instance of <see cref="NamedOption"/>.
-		/// </summary>
-		/// <param name="left"><see cref="int"/> to compare to.</param>
-		/// <param name="right">Instance of <see cref="NamedOption"/>.</param>
-		public static bool operator >=(int left, in NamedOption right)
-		{
-			return left >= right.Possibility;
-		}
-
-		/// <summary>
 		/// Checks if one instance of <see cref="NamedOption"/> is considered being less than or equal to the second.
 		/// </summary>
 		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
@@ -219,62 +163,117 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Adds an <see cref="int"/> value to an instance of <see cref="NamedOption"/>.
+		/// Checks if two instances of <see cref="NamedOption"/> are considered equal.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to add the <see cref="int"/> value to.</param>
-		/// <param name="right"><see cref="int"/> value to add.</param>
-		public static NamedOption operator +(in NamedOption left, int right)
+		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
+		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
+		public static bool operator ==(in NamedOption left, in NamedOption right)
 		{
-			return new NamedOption(left.Name, left.Possibility + right);
+			return left.Name == right.Name && left.Possibility == right.Possibility;
 		}
 
 		/// <summary>
-		/// Subtracts an <see cref="int"/> value from an instance of <see cref="NamedOption"/>.
+		/// Checks if one instance of <see cref="NamedOption"/> is considered being greater than the second.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to subtract the <see cref="int"/> value from.</param>
-		/// <param name="right"><see cref="int"/> value to subtract.</param>
-		public static NamedOption operator -(in NamedOption left, int right)
+		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
+		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
+		public static bool operator >(in NamedOption left, in NamedOption right)
 		{
-			return new NamedOption(left.Name, left.Possibility - right);
+			return left.Possibility > right.Possibility;
 		}
 
 		/// <summary>
-		/// Multiplies an instance of <see cref="NamedOption"/> by an <see cref="int"/> value.
+		/// Checks if instance of <see cref="NamedOption"/> is considered being greater than an <see cref="int"/> value.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to multiply.</param>
-		/// <param name="right"><see cref="int"/> value to multiply by.</param>
-		public static NamedOption operator *(in NamedOption left, int right)
+		/// <param name="left">Instance of <see cref="NamedOption"/>.</param>
+		/// <param name="right"><see cref="int"/> to compare to.</param>
+		public static bool operator >(in NamedOption left, int right)
 		{
-			return new NamedOption(left.Name, left.Possibility * right);
+			return left.Possibility > right;
 		}
 
 		/// <summary>
-		/// Divides an instance of <see cref="NamedOption"/> by an <see cref="int"/> value.
+		/// Checks if an <see cref="int"/> value is considered being greater than an instance of <see cref="NamedOption"/>.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to divide.</param>
-		/// <param name="right"><see cref="int"/> value to divide by.</param>
-		public static NamedOption operator /(in NamedOption left, int right)
+		/// <param name="left"><see cref="int"/> to compare to.</param>
+		/// <param name="right">Instance of <see cref="NamedOption"/>.</param>
+		public static bool operator >(int left, in NamedOption right)
 		{
-			return new NamedOption(left.Name, left.Possibility / right);
+			return left > right.Possibility;
 		}
 
 		/// <summary>
-		/// Increments the possibility of an <see cref="NamedOption"/>.
+		/// Checks if one instance of <see cref="NamedOption"/> is considered being greater than or equal the second.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to increment the possibility of.</param>
-		public static NamedOption operator ++(in NamedOption left)
+		/// <param name="left">First instance of <see cref="NamedOption"/>.</param>
+		/// <param name="right">Second instance of <see cref="NamedOption"/>.</param>
+		public static bool operator >=(in NamedOption left, in NamedOption right)
 		{
-			return new NamedOption(left.Name, left.Possibility + 1);
+			return left.Possibility >= right.Possibility;
 		}
 
 		/// <summary>
-		/// Decrements the possibility of an <see cref="NamedOption"/>.
+		/// Checks if instance of <see cref="NamedOption"/> is considered being greater than or equal to an <see cref="int"/> value.
 		/// </summary>
-		/// <param name="left">Instance of <see cref="NamedOption"/> to decrement the possibility of.</param>
-		public static NamedOption operator --(in NamedOption left)
+		/// <param name="left">Instance of <see cref="NamedOption"/>.</param>
+		/// <param name="right"><see cref="int"/> to compare to.</param>
+		public static bool operator >=(in NamedOption left, int right)
 		{
-			return new NamedOption(left.Name, left.Possibility - 1);
+			return left.Possibility >= right;
 		}
 
+		/// <summary>
+		/// Checks if an <see cref="int"/> value is considered being greater than or equal to an instance of <see cref="NamedOption"/>.
+		/// </summary>
+		/// <param name="left"><see cref="int"/> to compare to.</param>
+		/// <param name="right">Instance of <see cref="NamedOption"/>.</param>
+		public static bool operator >=(int left, in NamedOption right)
+		{
+			return left >= right.Possibility;
+		}
+
+		/// <inheritdoc/>
+		public int CompareTo(NamedOption other)
+		{
+			return other.Possibility.CompareTo(Possibility);
+		}
+
+		/// <summary>
+		/// Deconstructs the struct into its underlaying values.
+		/// </summary>
+		public void Deconstruct(out string name, out int possibility)
+		{
+			name = Name;
+			possibility = Possibility;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object? obj)
+		{
+			if (obj is NamedOption other)
+			{
+				return other == this;
+			}
+
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(NamedOption other)
+		{
+			return other == this;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(Name, Possibility);
+		}
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return $"{Name}, {Possibility}";
+		}
 	}
 }

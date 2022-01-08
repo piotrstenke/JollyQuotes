@@ -14,6 +14,9 @@ namespace JollyQuotes.KanyeRest
 		private const string BASE_ADDRESS = KanyeRestResources.MainPage;
 		private const string ERROR_TAGS_NOT_SUPPORTED = "kanye.rest does not support tags";
 
+		/// <inheritdoc/>
+		public override string ApiName => KanyeRestResources.ApiName;
+
 		/// <summary>
 		/// <see cref="IKanyeRestService"/> used to perform actions using the <c>kanye.rest</c> API.
 		/// </summary>
@@ -117,15 +120,17 @@ namespace JollyQuotes.KanyeRest
 		/// <inheritdoc/>
 		protected override void Dispose(bool disposing)
 		{
-			if (!Disposed)
+			if (Disposed)
 			{
-				if (disposing && Service is IDisposable d)
-				{
-					d.Dispose();
-				}
-
-				base.Dispose(disposing);
+				return;
 			}
+
+			if (disposing)
+			{
+				TryDispose(Service);
+			}
+
+			base.Dispose(disposing);
 		}
 
 		/// <inheritdoc/>

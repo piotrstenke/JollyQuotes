@@ -8,14 +8,14 @@ namespace JollyQuotes
 	public interface IQuoteGenerator
 	{
 		/// <summary>
-		/// Source of the quotes, e.g. a link, file name or raw text.
-		/// </summary>
-		string Source { get; }
-
-		/// <summary>
 		/// Name of API this generator is part of.
 		/// </summary>
 		string ApiName { get; }
+
+		/// <summary>
+		/// Source of the quotes, e.g. a link, file name or raw text.
+		/// </summary>
+		string Source { get; }
 
 		/// <summary>
 		/// Generates a random quote.

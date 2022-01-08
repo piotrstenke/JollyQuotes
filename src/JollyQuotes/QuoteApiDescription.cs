@@ -48,12 +48,12 @@ namespace JollyQuotes
 			JollyQuotesApi api
 		)
 		{
-			if(string.IsNullOrWhiteSpace(name))
+			if (string.IsNullOrWhiteSpace(name))
 			{
 				throw Error.NullOrEmpty(nameof(name));
 			}
 
-			if(generatorType is null)
+			if (generatorType is null)
 			{
 				throw Error.Null(nameof(generatorType));
 			}
@@ -114,7 +114,7 @@ namespace JollyQuotes
 		/// <returns><see langword="true"/> if the API is a <c>JollyQuotes</c> API, false otherwise.</returns>
 		public bool TryGetEnumValue(out JollyQuotesApi api)
 		{
-			if(!IsCustom)
+			if (!IsCustom)
 			{
 				api = default;
 				return false;

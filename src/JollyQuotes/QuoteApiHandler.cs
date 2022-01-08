@@ -1,115 +1,308 @@
 ﻿using System;
-using System.Xml.Linq;
-using JollyQuotes.KanyeRest;
-using JollyQuotes.TronaldDump;
+using System.Collections.Generic;
+using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace JollyQuotes
 {
 	/// <summary>
-	/// Provides methods for creation of quote-related objects for all built-in <c>JollyQuotes</c> APIs.
+	/// Provides methods for creation of quote-related objects for custom quote APIs.
 	/// </summary>
-	public class QuoteApiHandler : IQuoteApiHandler
+	public class QuoteApiHandler : IBuiltInQuoteApiHandler, IEnumerable<string>
 	{
-		/// <summary>
-		/// <see cref="IPossibility"/> that will be passed to the constructor of each <see cref="IQuoteGenerator"/> created using the <c>CreateGenerator</c> method.
-		/// </summary>
-		public IPossibility? Possibility { get; }
+		private sealed class QuoteEntry
+		{
+			private readonly Func<QuoteApiDescription> _descriptionFactory;
+			private readonly Func<IResourceResolver, IQuoteGenerator> _generatorFactory;
+
+			public string ApiName { get; }
+
+			public QuoteEntry(
+				string apiName,
+				Func<QuoteApiDescription> descriptionFactory,
+				Func<IResourceResolver, IQuoteGenerator> generatorFactory
+			)
+			{
+				ApiName = apiName;
+				_descriptionFactory = descriptionFactory;
+				_generatorFactory = generatorFactory;
+			}
+
+			public QuoteApiDescription CreateDescription()
+			{
+				return _descriptionFactory();
+			}
+
+			public IQuoteGenerator CreateGenerator(IResourceResolver resolver)
+			{
+				return _generatorFactory(resolver);
+			}
+		}
+
+		private readonly Dictionary<string, QuoteEntry> _entries;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteApiHandler"/> class.
 		/// </summary>
 		public QuoteApiHandler()
 		{
+			_entries = new();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteApiHandler"/> class with a target <see cref="IPossibility"/> specified.
+		/// Adds an API with the specified <paramref name="apiName"/> to the handler.
 		/// </summary>
-		/// <param name="possibility">Implementation of <see cref="IPossibility"/> that will be passed to the constructor of every <see cref="IQuoteGenerator"/> created using the <c>CreateGenerator</c> method.</param>
-		public QuoteApiHandler(IPossibility? possibility)
-		{
-			Possibility = possibility;
-		}
-
-		/// <inheritdoc/>
-		public virtual QuoteApiDescription CreateDescription(string apiName)
-		{
-			if(QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
-			{
-				return CreateDescription(api);
-			}
-
-			throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
-		}
-
-		/// <inheritdoc/>
-		public virtual QuoteApiDescription CreateDescription(JollyQuotesApi api)
-		{
-			return QuoteUtility.CreateDescription(api);
-		}
-
-		/// <summary>
-		/// Creates a new <see cref="IQuoteGenerator"/> for API with the specified <paramref name="apiName"/>.
-		/// </summary>
-		/// <param name="apiName">Name of API to create the <see cref="IQuoteGenerator"/> for.</param>
-		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		/// <param name="apiName">Name of the API to add.</param>
+		/// <param name="descriptionFactory">Factory method that creates a new <see cref="QuoteApiDescription"/> for the target API.</param>
+		/// <param name="generatorFactory">Factory method that creates a new <see cref="IQuoteGenerator"/> for the target API.</param>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="descriptionFactory"/> is <see langword="null"/>. -or-
+		/// <paramref name="generatorFactory"/> is <see langword="null"/>.
+		/// </exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
-		/// API with the specified <paramref name="apiName"/> not found. -or-
-		/// The <c>Tronald Dump</c> API requires the <paramref name="resolver"/> to implement the <see cref="IStreamResolver"/> interface.
+		/// API with the specified <paramref name="apiName"/> already exists.
 		/// </exception>
-		public virtual IQuoteGenerator CreateGenerator(string apiName, IResourceResolver resolver)
+		public void AddApi(
+			string apiName,
+			Func<QuoteApiDescription> descriptionFactory,
+			Func<IResourceResolver, IQuoteGenerator> generatorFactory
+		)
 		{
-			if (QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
+			if (!TryAddApi(apiName, descriptionFactory, generatorFactory))
 			{
-				return CreateGenerator(api, resolver);
+				throw Error.Arg($"API with name '{apiName}' already exists", nameof(apiName));
 			}
-
-			throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
 		}
 
-		/// <summary>
-		/// Creates a new <see cref="IQuoteGenerator"/> based on the specified API <paramref name="description"/>.
-		/// </summary>
-		/// <param name="description">Provides information about the API the <see cref="IQuoteGenerator"/> is to be created for.</param>
-		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="description"/> is <see langword="null"/>. -or- <paramref name="resolver"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException">The <c>Tronald Dump</c> API requires the <paramref name="resolver"/> to implement the <see cref="IStreamResolver"/> interface.</exception>
-		public virtual IQuoteGenerator CreateGenerator(QuoteApiDescription description, IResourceResolver resolver)
+		/// <inheritdoc/>
+		public IEnumerable<string> GetApis()
 		{
-			if(description is null)
-			{
-				throw Error.Null(nameof(description));
-			}
+			return _entries.Keys;
+		}
 
-			if(resolver is null)
+		IEnumerator<string> IEnumerable<string>.GetEnumerator()
+		{
+			return GetApis().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return ((IEnumerable<string>)this).GetEnumerator();
+		}
+
+		QuoteApiDescription IBuiltInQuoteApiHandler.CreateDescription(JollyQuotesApi api)
+		{
+			string name = QuoteUtility.GetActualApiName(api);
+			return CreateDescription_Internal(name);
+		}
+
+		IQuoteGenerator IBuiltInQuoteApiHandler.CreateGenerator(JollyQuotesApi api, IResourceResolver resolver)
+		{
+			if (resolver is null)
 			{
 				throw Error.Null(nameof(resolver));
 			}
 
-			if(!description.TryGetEnumValue(out JollyQuotesApi api))
+			string name = QuoteUtility.GetActualApiName(api);
+
+			return CreateGenerator_Internal(name, resolver);
+		}
+
+		/// <inheritdoc/>
+		public QuoteApiDescription CreateDescription(string apiName)
+		{
+			if (string.IsNullOrWhiteSpace(apiName))
 			{
-				throw new ArgumentException("Only built-in JollyQuotes APIs are supported", nameof(description));
+				throw Error.NullOrEmpty(nameof(apiName));
 			}
 
-			return CreateGenerator(api, resolver);
+			return CreateDescription_Internal(apiName);
+		}
+
+		/// <inheritdoc/>
+		public IQuoteGenerator CreateGenerator(string apiName, IResourceResolver resolver)
+		{
+			if (string.IsNullOrWhiteSpace(apiName))
+			{
+				throw Error.NullOrEmpty(nameof(apiName));
+			}
+
+			if (resolver is null)
+			{
+				throw Error.Null(nameof(resolver));
+			}
+
+			return CreateGenerator_Internal(apiName, resolver);
+		}
+
+		/// <inheritdoc/>
+		public IQuoteGenerator CreateGenerator(QuoteApiDescription description, IResourceResolver resolver)
+		{
+			if (description is null)
+			{
+				throw Error.Null(nameof(description));
+			}
+
+			if (resolver is null)
+			{
+				throw Error.Null(nameof(resolver));
+			}
+
+			return CreateGenerator_Internal(description.Name, resolver);
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="IQuoteGenerator"/> for a specified built-in <c>JollyQuotes</c> API.
+		/// Converts the specified <paramref name="apiName"/> into most appropriate API name.
 		/// </summary>
-		/// <param name="api">Represents the <c>JollyQuotes</c> API to create the <see cref="IQuoteGenerator"/> for.</param>
-		/// <param name="resolver"><see cref="IResourceResolver"/> that is used to access the requested resources.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		/// <param name="apiName">Name of API to convert to the most appropriate form.</param>
 		/// <exception cref="ArgumentException">
-		/// <paramref name="api"/> must represent a single valid <c>JollyQuotes</c> API. -or-
-		/// The <c>Tronald Dump</c> API requires the <paramref name="resolver"/> to implement the <see cref="IStreamResolver"/> interface.
+		/// <paramref name="apiName"/> is <see langword="null"/> or empty. -or-
+		/// API with the specified <paramref name="apiName"/> not found.
 		/// </exception>
-		public virtual IQuoteGenerator CreateGenerator(JollyQuotesApi api, IResourceResolver resolver)
+		public string GetActualName(string apiName)
 		{
-			return QuoteUtility.CreateGenerator(api, resolver, Possibility);
+			if (!TryGetActualName(apiName, out string? actualName))
+			{
+				throw QuoteUtility.Exc_UnknownApiName(apiName);
+			}
+
+			return actualName;
+		}
+
+		/// <inheritdoc/>
+		public bool HasApi(string apiName)
+		{
+			if (!TryGetActualName(apiName, out _))
+			{
+				if (string.IsNullOrWhiteSpace(apiName))
+				{
+					throw Error.NullOrEmpty(nameof(apiName));
+				}
+
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Attempts to remove information about API with the specified <paramref name="apiName"/>.
+		/// </summary>
+		/// <param name="apiName"></param>
+		/// <returns><see langword="true"/> is the API was successfully removed, <see langword="false"/> if no such API found.</returns>
+		/// <exception cref="ArgumentException"><paramref name="apiName"/> is <see langword="null"/> or empty.</exception>
+		public bool RemoveApi(string apiName)
+		{
+			if (string.IsNullOrWhiteSpace(apiName))
+			{
+				throw Error.NullOrEmpty(nameof(apiName));
+			}
+
+			string key = GetApiKey(apiName);
+			return _entries.Remove(key);
+		}
+
+		/// <summary>
+		/// Attempts to add an API with the specified <paramref name="apiName"/> to the handler.
+		/// </summary>
+		/// <param name="apiName">Name of the API to add.</param>
+		/// <param name="descriptionFactory">Factory method that creates a new <see cref="QuoteApiDescription"/> for the target API.</param>
+		/// <param name="generatorFactory">Factory method that creates a new <see cref="IQuoteGenerator"/> for the target API.</param>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="descriptionFactory"/> is <see langword="null"/>. -or-
+		/// <paramref name="generatorFactory"/> is <see langword="null"/>.
+		/// </exception>
+		/// <exception cref="ArgumentException"><paramref name="apiName"/> is <see langword="null"/> or empty.</exception>
+		public bool TryAddApi(
+			string apiName,
+			Func<QuoteApiDescription> descriptionFactory,
+			Func<IResourceResolver, IQuoteGenerator> generatorFactory
+		)
+		{
+			if (string.IsNullOrWhiteSpace(apiName))
+			{
+				throw Error.NullOrEmpty(nameof(apiName));
+			}
+
+			if (descriptionFactory is null)
+			{
+				throw Error.Null(nameof(descriptionFactory));
+			}
+
+			if (generatorFactory is null)
+			{
+				throw Error.Null(nameof(generatorFactory));
+			}
+
+			if (_entries.ContainsKey(apiName))
+			{
+				return false;
+			}
+
+			QuoteEntry entry = new(apiName, descriptionFactory, generatorFactory);
+
+			string key = GetApiKey(apiName);
+			_entries.Add(key, entry);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Attempts to convert the specified <paramref name="apiName"/> into most appropriate API name.
+		/// </summary>
+		/// <param name="apiName">Name of API to convert to the most appropriate form.</param>
+		/// <param name="actualName">Converted API name.</param>
+		/// <returns><see langword="true"/> if the <paramref name="apiName"/> was successfully converted, <see langword="false"/> otherwise.</returns>
+		public bool TryGetActualName(string? apiName, [NotNullWhen(true)] out string? actualName)
+		{
+			if (!string.IsNullOrWhiteSpace(apiName))
+			{
+				string name = GetApiKey(apiName);
+
+				if (_entries.TryGetValue(name, out QuoteEntry? entry))
+				{
+					actualName = entry.ApiName;
+					return true;
+				}
+			}
+
+			actualName = default;
+			return false;
+		}
+
+		/// <summary>
+		/// Converts the specified <paramref name="apiName"/> into its data key.
+		/// </summary>
+		/// <param name="apiName">Name of API to convert to the most appropriate form.</param>
+		protected virtual string GetApiKey(string apiName)
+		{
+			return apiName.ToLowerInvariant().Trim();
+		}
+
+		private QuoteApiDescription CreateDescription_Internal(string apiName)
+		{
+			QuoteEntry entry = GetEntry(apiName);
+			return entry.CreateDescription();
+		}
+
+		private IQuoteGenerator CreateGenerator_Internal(string apiName, IResourceResolver resolver)
+		{
+			QuoteEntry entry = GetEntry(apiName);
+
+			return entry.CreateGenerator(resolver);
+		}
+
+		private QuoteEntry GetEntry(string apiName)
+		{
+			string apiKey = GetApiKey(apiName);
+
+			if (!_entries.TryGetValue(apiKey, out QuoteEntry? entry))
+			{
+				throw QuoteUtility.Exc_UnknownApiName(apiName);
+			}
+
+			return entry;
 		}
 	}
 }

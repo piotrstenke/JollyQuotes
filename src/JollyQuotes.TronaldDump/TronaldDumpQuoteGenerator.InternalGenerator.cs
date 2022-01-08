@@ -11,6 +11,8 @@ namespace JollyQuotes.TronaldDump
 
 			private readonly TronaldDumpQuoteGenerator _generator;
 
+			public override string ApiName => _generator.ApiName;
+
 			/// <inheritdoc cref="TronaldDumpQuoteGenerator.ModelConverter"/>
 			public ITronaldDumpModelConverter ModelConverter => _generator.ModelConverter;
 

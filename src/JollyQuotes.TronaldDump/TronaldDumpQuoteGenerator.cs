@@ -15,6 +15,9 @@ namespace JollyQuotes.TronaldDump
 	{
 		private readonly InternalGenerator _internalGenerator;
 
+		/// <inheritdoc/>
+		public override string ApiName => TronaldDumpResources.ApiName;
+
 		/// <summary>
 		/// <see cref="ITronaldDumpModelConverter"/> used to convert models received from the <see cref="Service"/>.
 		/// </summary>
@@ -45,7 +48,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that is used as the target <see cref="QuoteResolver{T}.Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="APIPage"/>.</exception>
+		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> must be <see langword="null"/> or equal to <see cref="ApiPage"/>.</exception>
 		public TronaldDumpQuoteGenerator(HttpClient client)
 			: this(client, new TronaldDumpModelConverter(), new ThreadRandom())
 		{
@@ -162,25 +165,19 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		protected override void Dispose(bool disposing)
 		{
-			if (!Disposed)
+			if (Disposed)
 			{
-				if (Service is IDisposable d)
-				{
-					d.Dispose();
-				}
-
-				if (RandomNumberGenerator is IDisposable r)
-				{
-					r.Dispose();
-				}
-
-				if (ModelConverter is IDisposable m)
-				{
-					m.Dispose();
-				}
-
-				base.Dispose(disposing);
+				return;
 			}
+
+			if (disposing)
+			{
+				TryDispose(Service);
+				TryDispose(RandomNumberGenerator);
+				TryDispose(ModelConverter);
+			}
+
+			base.Dispose(disposing);
 		}
 
 		/// <inheritdoc cref="EnumerableQuoteGenerator{T}.WithCache.DownloadAllQuotes(string)"/>

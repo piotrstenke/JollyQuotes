@@ -8,13 +8,6 @@ namespace JollyQuotes
 	{
 		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static InvalidOperationException InvOp(string? message)
-		{
-			return new InvalidOperationException(message);
-		}
-
-		[DebuggerStepThrough]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ArgumentException Arg(string? message)
 		{
 			return new ArgumentException(message);
@@ -31,6 +24,13 @@ namespace JollyQuotes
 		public static ArgumentException Empty(string paramName)
 		{
 			return new ArgumentException($"{paramName} cannot be empty", paramName);
+		}
+
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static InvalidOperationException InvOp(string? message)
+		{
+			return new InvalidOperationException(message);
 		}
 
 		[DebuggerStepThrough]
@@ -56,7 +56,6 @@ namespace JollyQuotes
 		{
 			return new ArgumentOutOfRangeException(paramName1, $"value must be greater than or equal to the value of '{paramName2}");
 		}
-
 
 		[DebuggerStepThrough]
 		public static ArgumentOutOfRangeException MustBeLessThan(string paramName, object? value)
