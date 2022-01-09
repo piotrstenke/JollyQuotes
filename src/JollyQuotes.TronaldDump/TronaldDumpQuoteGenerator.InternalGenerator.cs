@@ -45,6 +45,8 @@ namespace JollyQuotes.TronaldDump
 			[Obsolete(ERROR_ENUMERABLE_NOT_SUPPORTED)]
 			protected override IEnumerable<TronaldDumpQuote> DownloadAllQuotes()
 			{
+				// This method is never called.
+
 #pragma warning disable RCS1079 // Throwing of new NotImplementedException.
 				throw new NotImplementedException();
 #pragma warning restore RCS1079 // Throwing of new NotImplementedException.
@@ -66,6 +68,8 @@ namespace JollyQuotes.TronaldDump
 			[Obsolete(ERROR_ENUMERABLE_NOT_SUPPORTED)]
 			protected override IEnumerator<TronaldDumpQuote> DownloadAndEnumerate()
 			{
+				// This method is never called.
+
 #pragma warning disable RCS1079 // Throwing of new NotImplementedException.
 				throw new NotImplementedException();
 #pragma warning restore RCS1079 // Throwing of new NotImplementedException.

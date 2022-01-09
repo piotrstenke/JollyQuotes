@@ -17,9 +17,9 @@ namespace JollyQuotes
 
 			public string ApiName => Generator.ApiName;
 
-			public bool Enabled { get; set; }
-
 			public QuoteApiDescription Description => _description ??= _apiHandler.CreateDescription(ApiName);
+
+			public bool Enabled { get; set; }
 
 			public IQuoteGenerator Generator { get; }
 
@@ -33,19 +33,19 @@ namespace JollyQuotes
 
 		private const string SOURCE = ApiNames.JollyQuotes;
 
-		private readonly Dictionary<string, int> _map;
 		private readonly List<GeneratorEntry> _generators;
+		private readonly Dictionary<string, int> _map;
 
 		/// <inheritdoc/>
 		public IQuoteApiHandler ApiHandler { get; }
+
+		/// <inheritdoc/>
+		public override string ApiName => ApiNames.JollyQuotes;
 
 		/// <summary>
 		/// Determines possibility for a given <c>JollyQuotes</c> API to be used when generating new quote.
 		/// </summary>
 		public IOptionalPossibility ApiPossibility { get; }
-
-		/// <inheritdoc/>
-		public override string ApiName => ApiNames.JollyQuotes;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CompositeQuoteGenerator"/> class with target <paramref name="apiHandler"/> and <paramref name="apiPossibility"/> specified.
@@ -88,7 +88,7 @@ namespace JollyQuotes
 			IOptionalPossibility? apiPossibility = default
 		) : base(resolver, SOURCE)
 		{
-			if(apiHandler is null)
+			if (apiHandler is null)
 			{
 				throw Error.Null(nameof(apiHandler));
 			}
@@ -98,7 +98,7 @@ namespace JollyQuotes
 
 			ApiHandler = apiHandler;
 
-			if(apiPossibility is null)
+			if (apiPossibility is null)
 			{
 				string[] apis = ApiHandler.GetApis().ToArray();
 				ApiPossibility = QuoteUtility.GetDefaultPossibility(apis);
@@ -109,26 +109,6 @@ namespace JollyQuotes
 				ApiPossibility = apiPossibility;
 				InitializeGenerators(ApiHandler.GetApis());
 			}
-		}
-
-		private void InitializeGenerators(IEnumerable<string> apis)
-		{
-			foreach (string apiName in apis)
-			{
-				IQuoteGenerator generator = ApiHandler.CreateGenerator(apiName, Resolver);
-
-				_map.Add(apiName, _generators.Count);
-				_generators.Add(new(generator, ApiHandler));
-			}
-		}
-
-		/// <inheritdoc/>
-		public void ForceUpdate()
-		{
-			_generators.Clear();
-			_map.Clear();
-
-			InitializeGenerators(ApiHandler.GetApis());
 		}
 
 		/// <inheritdoc/>
@@ -146,12 +126,6 @@ namespace JollyQuotes
 			SetState(apiName, false);
 		}
 
-		private void SetState(string apiName, bool enabled)
-		{
-			GeneratorEntry entry = GetEntry(apiName);
-			entry.Enabled = enabled;
-		}
-
 		/// <inheritdoc/>
 		public void EnableAll()
 		{
@@ -165,6 +139,15 @@ namespace JollyQuotes
 		public void EnableApi(string apiName)
 		{
 			SetState(apiName, true);
+		}
+
+		/// <inheritdoc/>
+		public void ForceUpdate()
+		{
+			_generators.Clear();
+			_map.Clear();
+
+			InitializeGenerators(ApiHandler.GetApis());
 		}
 
 		/// <inheritdoc/>
@@ -225,26 +208,24 @@ namespace JollyQuotes
 			return _generators.Select(g => g.Generator);
 		}
 
-		/// <inheritdoc/>
-		public bool IsEnabled(string apiName)
+		/// <summary>
+		/// Returns a randomly picked <see cref="QuoteApiDescription"/>.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
+		public QuoteApiDescription GetRandomDescription()
 		{
-			GeneratorEntry entry = GetEntry(apiName);
-			return entry.Enabled;
+			GeneratorEntry entry = GetRandomApi();
+			return entry.Description;
 		}
 
-		/// <inheritdoc/>
-		public bool IsRegistered(string apiName)
+		/// <summary>
+		/// Returns a randomly picked <see cref="IQuoteGenerator"/>.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
+		public IQuoteGenerator GetRandomGenerator()
 		{
-			return TryGetEntry(apiName, out _);
-		}
-
-		/// <inheritdoc/>
-		public void SwitchTo(string apiName)
-		{
-			GeneratorEntry entry = GetEntry(apiName);
-			DisableAll();
-
-			entry.Enabled = true;
+			GeneratorEntry entry = GetRandomApi();
+			return entry.Generator;
 		}
 
 		/// <inheritdoc/>
@@ -268,36 +249,36 @@ namespace JollyQuotes
 			return generator.GetRandomQuote(tag);
 		}
 
-		/// <summary>
-		/// Returns a randomly picked <see cref="IQuoteGenerator"/>.
-		/// </summary>
-		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
-		public IQuoteGenerator GetRandomGenerator()
+		/// <inheritdoc/>
+		public bool IsEnabled(string apiName)
 		{
-			GeneratorEntry entry = GetRandomApi();
-			return entry.Generator;
+			GeneratorEntry entry = GetEntry(apiName);
+			return entry.Enabled;
 		}
 
-		/// <summary>
-		/// Returns a randomly picked <see cref="QuoteApiDescription"/>.
-		/// </summary>
-		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
-		public QuoteApiDescription GetRandomDescription()
+		/// <inheritdoc/>
+		public bool IsRegistered(string apiName)
 		{
-			GeneratorEntry entry = GetRandomApi();
-			return entry.Description;
+			return TryGetEntry(apiName, out _);
 		}
 
-		private GeneratorEntry GetRandomApi()
+		/// <inheritdoc/>
+		public void SwitchTo(string apiName)
 		{
-			NamedOption result = ApiPossibility.Determine();
+			GeneratorEntry entry = GetEntry(apiName);
+			DisableAll();
 
-			if (!TryGetEntry(result.Name, out GeneratorEntry? entry))
-			{
-				throw QuoteUtility.Exc_PossibilityReturnedUnknownApi(result.Name);
-			}
+			entry.Enabled = true;
+		}
 
-			return entry;
+		IEnumerator<IQuoteGenerator> IEnumerable<IQuoteGenerator>.GetEnumerator()
+		{
+			return GetGenerators().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetGenerators().GetEnumerator();
 		}
 
 		/// <inheritdoc/>
@@ -322,17 +303,46 @@ namespace JollyQuotes
 			base.Dispose(disposing);
 		}
 
-		IEnumerator<IQuoteGenerator> IEnumerable<IQuoteGenerator>.GetEnumerator()
+		private GeneratorEntry GetEntry(string apiName)
 		{
-			return GetGenerators().GetEnumerator();
+			if (!TryGetEntry(apiName, out GeneratorEntry? entry))
+			{
+				throw QuoteUtility.Exc_UnknownApiName(apiName);
+			}
+
+			return entry;
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
+		private GeneratorEntry GetRandomApi()
 		{
-			return GetGenerators().GetEnumerator();
+			NamedOption result = ApiPossibility.Determine();
+
+			if (!TryGetEntry(result.Name, out GeneratorEntry? entry))
+			{
+				throw QuoteUtility.Exc_PossibilityReturnedUnknownApi(result.Name);
+			}
+
+			return entry;
 		}
 
-		private bool TryGetEntry(string apiName, [NotNullWhen(true)]out GeneratorEntry? entry)
+		private void InitializeGenerators(IEnumerable<string> apis)
+		{
+			foreach (string apiName in apis)
+			{
+				IQuoteGenerator generator = ApiHandler.CreateGenerator(apiName, Resolver);
+
+				_map.Add(apiName, _generators.Count);
+				_generators.Add(new(generator, ApiHandler));
+			}
+		}
+
+		private void SetState(string apiName, bool enabled)
+		{
+			GeneratorEntry entry = GetEntry(apiName);
+			entry.Enabled = enabled;
+		}
+
+		private bool TryGetEntry(string apiName, [NotNullWhen(true)] out GeneratorEntry? entry)
 		{
 			if (string.IsNullOrWhiteSpace(apiName))
 			{
@@ -347,16 +357,6 @@ namespace JollyQuotes
 
 			entry = _generators[i];
 			return true;
-		}
-
-		private GeneratorEntry GetEntry(string apiName)
-		{
-			if (!TryGetEntry(apiName, out GeneratorEntry? entry))
-			{
-				throw QuoteUtility.Exc_UnknownApiName(apiName);
-			}
-
-			return entry;
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace JollyQuotes
 		/// <see cref="IQuoteGenerator"/> that provides special handling of <see cref="IResourceResolver"/>s of type <see cref="JollyQuotes.HttpResolver"/>
 		/// and a mechanism for caching <see cref="IQuote"/>s.
 		/// </summary>
-		public abstract new class WithCache : QuoteResolver<T>.WithCache
+		public new abstract class WithCache : QuoteResolver<T>.WithCache
 		{
 			/// <summary>
 			/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.

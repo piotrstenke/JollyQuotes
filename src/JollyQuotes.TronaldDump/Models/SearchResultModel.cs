@@ -9,23 +9,71 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record SearchResultModel<T> : ISearchResultModel where T : class
 	{
+		private readonly int _total;
+		private readonly int _count;
+		private readonly T _embedded;
+
 		/// <inheritdoc/>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <c>0</c>. -or- Value must be less than or equal to <see cref="Total"/>.</exception>
 		[JsonProperty("count", Order = 0, Required = Required.Always)]
-		public int Count { get; init; }
+		public int Count
+		{
+			get => _count;
+			init
+			{
+				if (value < 0)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
+				}
+
+				if(_count > _total)
+				{
+					throw Error.MustBeLessThanOrEqualTo(nameof(value), nameof(Total));
+				}
+
+				_count = value;
+			}
+		}
 
 		/// <summary>
 		/// Values present in the current page of the search result.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_embedded", Order = 2, Required = Required.Always)]
-		public T Embedded { get; init; }
+		public T Embedded
+		{
+			get => _embedded;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_embedded = value;
+			}
+		}
 
 		/// <inheritdoc/>
 		[JsonProperty("_links", Order = 3)]
 		public PageHierarchyModel? Links { get; init; }
 
 		/// <inheritdoc/>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <c>0</c>.</exception>
 		[JsonProperty("total", Order = 1, Required = Required.Always)]
-		public int Total { get; init; }
+		public int Total
+		{
+			get => _total;
+			init
+			{
+				if(value < 0)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
+				}
+
+				_total = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SearchResultModel{T}"/> class with <paramref name="embedded"/> data,
@@ -38,7 +86,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="total"/> must be greater than or equal to <c>0</c>. -or-
 		/// <paramref name="count"/> must be greater than or equal to <c>0</c>. -or-
-		/// <paramref name="count"/> must be less than or equal <paramref name="total"/>.
+		/// <paramref name="count"/> must be less than or equal to <paramref name="total"/>.
 		/// </exception>
 		public SearchResultModel(int count, int total, T embedded) : this(count, total, embedded, null)
 		{
@@ -81,10 +129,10 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.MustBeLessThanOrEqualTo(nameof(count), nameof(total));
 			}
 
-			Count = count;
-			Total = total;
+			_count = count;
+			_total = total;
 			Links = links;
-			Embedded = embedded;
+			_embedded = embedded;
 		}
 	}
 }

@@ -10,6 +10,8 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record QuoteSearchModel
 	{
+		private readonly int _page;
+
 		/// <summary>
 		/// A search query build from phrases separated by a plus '+'.
 		/// </summary>
@@ -25,9 +27,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// The current page of the search result.
 		/// </summary>
-		/// <remarks>The lowest possible value is <c>0</c>.</remarks>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <c>0</c>.</exception>
 		[JsonProperty("page", Order = 2)]
-		public int Page { get; init; }
+		public int Page
+		{
+			get => _page;
+			init
+			{
+				if(value < 0)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
+				}
+
+				_page = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with query <paramref name="phrases"/> and associated <paramref name="tag"/> specified.
@@ -110,12 +124,12 @@ namespace JollyQuotes.TronaldDump.Models
 
 			Query = query;
 			Tag = tag;
-			Page = page;
+			_page = page;
 		}
 
 		private static ArgumentException Exc_CannotBeEmpty(string paramName)
 		{
-			return new ArgumentException($"{paramName} must be either null or not empty", paramName);
+			return Error.Arg($"{paramName} must be either null or not empty", paramName);
 		}
 
 		private static string? JoinPhrases(string[]? phrases)

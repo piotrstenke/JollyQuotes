@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.TronaldDump.Models
@@ -9,6 +10,10 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record QuoteSourceModel
 	{
+		private readonly string _id;
+		private readonly string _url;
+		private readonly SelfLinkModel _links;
+
 		/// <summary>
 		/// Date the quote source was added to the database at.
 		/// </summary>
@@ -24,14 +29,40 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Id of the quote source.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("quote_source_id", Order = 0, Required = Required.Always)]
-		public string Id { get; init; }
+		public string Id
+		{
+			get => _id;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_id = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the quote source data.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_links", Order = 6, Required = Required.Always)]
-		public SelfLinkModel Links { get; init; }
+		public SelfLinkModel Links
+		{
+			get => _links;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_links = value;
+			}
+		}
 
 		/// <summary>
 		/// Remarks about the quote source.
@@ -48,8 +79,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// URL of the actual quote source.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("url", Order = 1, Required = Required.Always)]
-		public string Url { get; init; }
+		public string Url
+		{
+			get => _url;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_url = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteSourceModel"/> class with <paramref name="id"/>, target <paramref name="url"/>, <paramref name="filename"/>, <paramref name="remarks"/> and date of creation specified.
@@ -110,13 +154,13 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			Id = id;
-			Url = url;
+			_id = id;
+			_url = url;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 			FileName = filename;
 			Remarks = remarks;
-			Links = links;
+			_links = links;
 		}
 	}
 }

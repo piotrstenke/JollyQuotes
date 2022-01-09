@@ -10,14 +10,15 @@ namespace JollyQuotes.KanyeRest
 	[JsonObject]
 	public sealed record KanyeRestQuote : IQuote
 	{
-		private const string _author = "Kanye West";
-		private const string _source = KanyeRestResources.ApiPage;
+		private const string AUTHOR = "Kanye West";
+		private const string SOURCE = KanyeRestResources.ApiPage;
 
 		private readonly Id _id;
 
 		/// <summary>
 		/// Text of the quote.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("quote", Required = Required.Always)]
 		public string Quote
 		{
@@ -26,9 +27,9 @@ namespace JollyQuotes.KanyeRest
 		}
 
 		Id IQuote.Id => _id;
-		string IQuote.Author => _author;
+		string IQuote.Author => AUTHOR;
 		DateTime? IQuote.Date => default;
-		string IQuote.Source => _source;
+		string IQuote.Source => SOURCE;
 		string IQuote.Value => Quote;
 		string[] IQuote.Tags => Array.Empty<string>();
 
@@ -36,7 +37,7 @@ namespace JollyQuotes.KanyeRest
 		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="quote"/> specified.
 		/// </summary>
 		/// <param name="quote">Text of the quote.</param>
-		/// <exception cref="ArgumentException"><paramref name="quote"/> cannot be <see langword="null"/> or empty.</exception>
+		/// <exception cref="ArgumentException"><paramref name="quote"/> is <see langword="null"/> or empty.</exception>
 		public KanyeRestQuote(string quote)
 		{
 			if (string.IsNullOrWhiteSpace(quote))

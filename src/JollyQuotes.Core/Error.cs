@@ -21,12 +21,6 @@ namespace JollyQuotes
 		}
 
 		[DebuggerStepThrough]
-		public static ArgumentException Empty(string paramName)
-		{
-			return new ArgumentException($"{paramName} cannot be empty", paramName);
-		}
-
-		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static InvalidOperationException InvOp(string? message)
 		{

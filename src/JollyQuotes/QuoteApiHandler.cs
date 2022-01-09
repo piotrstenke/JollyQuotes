@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace JollyQuotes
@@ -76,40 +76,6 @@ namespace JollyQuotes
 		}
 
 		/// <inheritdoc/>
-		public IEnumerable<string> GetApis()
-		{
-			return _entries.Keys;
-		}
-
-		IEnumerator<string> IEnumerable<string>.GetEnumerator()
-		{
-			return GetApis().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return ((IEnumerable<string>)this).GetEnumerator();
-		}
-
-		QuoteApiDescription IBuiltInQuoteApiHandler.CreateDescription(JollyQuotesApi api)
-		{
-			string name = QuoteUtility.GetActualApiName(api);
-			return CreateDescription_Internal(name);
-		}
-
-		IQuoteGenerator IBuiltInQuoteApiHandler.CreateGenerator(JollyQuotesApi api, IResourceResolver resolver)
-		{
-			if (resolver is null)
-			{
-				throw Error.Null(nameof(resolver));
-			}
-
-			string name = QuoteUtility.GetActualApiName(api);
-
-			return CreateGenerator_Internal(name, resolver);
-		}
-
-		/// <inheritdoc/>
 		public QuoteApiDescription CreateDescription(string apiName)
 		{
 			if (string.IsNullOrWhiteSpace(apiName))
@@ -168,6 +134,12 @@ namespace JollyQuotes
 			}
 
 			return actualName;
+		}
+
+		/// <inheritdoc/>
+		public IEnumerable<string> GetApis()
+		{
+			return _entries.Keys;
 		}
 
 		/// <inheritdoc/>
@@ -269,6 +241,34 @@ namespace JollyQuotes
 
 			actualName = default;
 			return false;
+		}
+
+		QuoteApiDescription IBuiltInQuoteApiHandler.CreateDescription(JollyQuotesApi api)
+		{
+			string name = QuoteUtility.GetActualApiName(api);
+			return CreateDescription_Internal(name);
+		}
+
+		IQuoteGenerator IBuiltInQuoteApiHandler.CreateGenerator(JollyQuotesApi api, IResourceResolver resolver)
+		{
+			if (resolver is null)
+			{
+				throw Error.Null(nameof(resolver));
+			}
+
+			string name = QuoteUtility.GetActualApiName(api);
+
+			return CreateGenerator_Internal(name, resolver);
+		}
+
+		IEnumerator<string> IEnumerable<string>.GetEnumerator()
+		{
+			return GetApis().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return ((IEnumerable<string>)this).GetEnumerator();
 		}
 
 		/// <summary>

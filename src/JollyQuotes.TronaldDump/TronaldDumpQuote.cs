@@ -11,7 +11,11 @@ namespace JollyQuotes.TronaldDump
 	[JsonObject]
 	public sealed record TronaldDumpQuote : IQuote
 	{
-		private const string _author = "Donald Trump";
+		private const string AUTHOR = "Donald Trump";
+
+		private readonly string[] _tags;
+		private readonly string _source;
+		private readonly string _value;
 
 		/// <summary>
 		/// Date the quote was added to the database at.
@@ -38,18 +42,57 @@ namespace JollyQuotes.TronaldDump
 		/// <summary>
 		/// Array of tags associated with this quote.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("tags", Order = 5, Required = Required.Always)]
-		public string[] Tags { get; init; }
+		public string[] Tags
+		{
+			get => _tags;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_tags = value;
+			}
+		}
 
 		/// <inheritdoc/>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("quote", Order = 1, Required = Required.Always)]
-		public string Value { get; init; }
+		public string Value
+		{
+			get => _value;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_value = value;
+			}
+		}
 
 		/// <inheritdoc/>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("source", Order = 6, Required = Required.Always)]
-		public string Source { get; init; }
+		public string Source
+		{
+			get => _source;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
 
-		string IQuote.Author => _author;
+				_source = value;
+			}
+		}
+
+		string IQuote.Author => AUTHOR;
 		DateTime? IQuote.Date => AppearedAt;
 
 		/// <summary>
@@ -128,9 +171,9 @@ namespace JollyQuotes.TronaldDump
 			}
 
 			Id = id;
-			Value = value;
-			Source = source;
-			Tags = tags;
+			_value = value;
+			_source = source;
+			_tags = tags;
 			AppearedAt = appearedAt;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;

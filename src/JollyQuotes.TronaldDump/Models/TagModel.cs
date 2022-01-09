@@ -10,6 +10,9 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record TagModel
 	{
+		private readonly string _value;
+		private readonly SelfLinkModel _links;
+
 		/// <summary>
 		/// Date the tag was added to the database at.
 		/// </summary>
@@ -25,14 +28,40 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Actual tag.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("value", Order = 0, Required = Required.Always)]
-		public string Value { get; init; }
+		public string Value
+		{
+			get => _value;
+			init
+			{
+				if(string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_value = value;
+			}
+		}
 
 		/// <summary>
 		/// Link that was used to retrieve this tag.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_links", Order = 3, Required = Required.Always)]
-		public SelfLinkModel Links { get; init; }
+		public SelfLinkModel Links
+		{
+			get => _links;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_links = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TagModel"/> class with actual tag <paramref name="value"/>, <paramref name="links"/> and creation date specified.
@@ -68,8 +97,8 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			Value = value;
-			Links = links;
+			_value = value;
+			_links = links;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 		}

@@ -10,6 +10,11 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record AuthorModel
 	{
+		private readonly SelfLinkModel _links;
+		private readonly string _name;
+		private readonly string _slug;
+		private readonly string _id;
+
 		/// <summary>
 		/// Bio of the author.
 		/// </summary>
@@ -25,26 +30,78 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Id of the author.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("author_id", Order = 0, Required = Required.Always)]
-		public string Id { get; init; }
+		public string Id
+		{
+			get => _id;
+			init
+			{
+				if(string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_id = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the author data.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_links", Order = 6, Required = Required.Always)]
-		public SelfLinkModel Links { get; init; }
+		public SelfLinkModel Links
+		{
+			get => _links;
+			init
+			{
+				if(value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_links = value;
+			}
+		}
 
 		/// <summary>
 		/// Name of the author.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("name", Order = 1, Required = Required.Always)]
-		public string Name { get; init; }
+		public string Name
+		{
+			get => _name;
+			init
+			{
+				if(string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_name = value;
+			}
+		}
 
 		/// <summary>
 		/// Slugified version of the <see cref="Name"/>.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("slug", Order = 2, Required = Required.Always)]
-		public string Slug { get; init; }
+		public string Slug
+		{
+			get => _slug;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_slug = value;
+			}
+		}
 
 		/// <summary>
 		/// Date the data of the author was updated at.
@@ -124,11 +181,11 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			Id = id;
-			Name = name;
-			Slug = slug;
+			_id = id;
+			_name = name;
+			_slug = slug;
 			Bio = bio;
-			Links = links;
+			_links = links;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;
 		}

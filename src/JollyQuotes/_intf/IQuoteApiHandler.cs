@@ -9,11 +9,6 @@ namespace JollyQuotes
 	public interface IQuoteApiHandler
 	{
 		/// <summary>
-		/// Returns a collection of names of all supported APIs.
-		/// </summary>
-		IEnumerable<string> GetApis();
-
-		/// <summary>
 		/// Creates a new <see cref="QuoteApiDescription"/> for API with the specified <paramref name="apiName"/>.
 		/// </summary>
 		/// <param name="apiName">Name of API to create the <see cref="QuoteApiDescription"/> for.</param>
@@ -42,6 +37,11 @@ namespace JollyQuotes
 		/// API with the specified <paramref name="apiName"/> not found.
 		/// </exception>
 		IQuoteGenerator CreateGenerator(string apiName, IResourceResolver resolver);
+
+		/// <summary>
+		/// Returns a collection of names of all supported APIs.
+		/// </summary>
+		IEnumerable<string> GetApis();
 
 		/// <summary>
 		/// Determines whether the handler contains information about API with the specified <paramref name="apiName"/>.

@@ -14,11 +14,6 @@ namespace JollyQuotes
 		IQuoteApiHandler ApiHandler { get; }
 
 		/// <summary>
-		/// Forces the generator to update its internal container of <see cref="IQuoteGenerator"/>s.
-		/// </summary>
-		void ForceUpdate();
-
-		/// <summary>
 		/// Disables all APIs.
 		/// </summary>
 		void DisableAll();
@@ -47,6 +42,11 @@ namespace JollyQuotes
 		/// API with the specified <paramref name="apiName"/> not found.
 		/// </exception>
 		void EnableApi(string apiName);
+
+		/// <summary>
+		/// Forces the generator to update its internal container of <see cref="IQuoteGenerator"/>s.
+		/// </summary>
+		void ForceUpdate();
 
 		/// <summary>
 		/// Returns a collection of <see cref="QuoteApiDescription"/>s representing all APIs known by the generator.

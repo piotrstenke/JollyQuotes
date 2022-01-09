@@ -30,32 +30,6 @@ namespace JollyQuotes
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="IOptionalPossibility"/> with <see cref="NamedOption"/>s created from the result of calling <see cref="IQuoteApiHandler.GetApis()"/>.
-		/// </summary>
-		/// <param name="apiHandler"><see cref="IQuoteApiHandler"/> to create the <see cref="IOptionalPossibility"/> for.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="apiHandler"/> is <see langword="null"/>.</exception>
-		public static IOptionalPossibility GetDefaultPossibility(this IQuoteApiHandler apiHandler)
-		{
-			if(apiHandler is null)
-			{
-				throw Error.Null(nameof(apiHandler));
-			}
-
-			IEnumerable<string> apis = apiHandler.GetApis();
-
-			return GetDefaultPossibility(apis.ToArray());
-		}
-
-		/// <summary>
-		/// Creates a new <see cref="IOptionalPossibility"/> for the specified <paramref name="apis"/> with default possibility for each.
-		/// </summary>
-		/// <param name="apis">Names of APIs that serve as <see cref="NamedOption"/>s in the returned <see cref="IOptionalPossibility"/>.</param>
-		public static IOptionalPossibility GetDefaultPossibility(string[]? apis)
-		{
-			return OptionalPossibility.EqualOptions(apis);
-		}
-
-		/// <summary>
 		/// Creates a new <see cref="IQuoteGenerator"/> for a specified built-in <c>JollyQuotes</c> API.
 		/// </summary>
 		/// <param name="api">Represents the <c>JollyQuotes</c> API to create the <see cref="IQuoteGenerator"/> for.</param>
@@ -92,6 +66,32 @@ namespace JollyQuotes
 				JollyQuotesApi.Quotable => ApiNames.Quotable,
 				_ => throw Exc_InvalidEnum(nameof(api))
 			};
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="IOptionalPossibility"/> with <see cref="NamedOption"/>s created from the result of calling <see cref="IQuoteApiHandler.GetApis()"/>.
+		/// </summary>
+		/// <param name="apiHandler"><see cref="IQuoteApiHandler"/> to create the <see cref="IOptionalPossibility"/> for.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="apiHandler"/> is <see langword="null"/>.</exception>
+		public static IOptionalPossibility GetDefaultPossibility(this IQuoteApiHandler apiHandler)
+		{
+			if (apiHandler is null)
+			{
+				throw Error.Null(nameof(apiHandler));
+			}
+
+			IEnumerable<string> apis = apiHandler.GetApis();
+
+			return GetDefaultPossibility(apis.ToArray());
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="IOptionalPossibility"/> for the specified <paramref name="apis"/> with default possibility for each.
+		/// </summary>
+		/// <param name="apis">Names of APIs that serve as <see cref="NamedOption"/>s in the returned <see cref="IOptionalPossibility"/>.</param>
+		public static IOptionalPossibility GetDefaultPossibility(string[]? apis)
+		{
+			return OptionalPossibility.EqualOptions(apis);
 		}
 
 		/// <summary>
@@ -140,6 +140,15 @@ namespace JollyQuotes
 			}
 
 			return all;
+		}
+
+		/// <summary>
+		/// Determines whether the specified value of <see cref="JollyQuotesApi"/> represents a valid single <c>JollyQuotes</c> API.
+		/// </summary>
+		/// <param name="api">Value of <see cref="JollyQuotesApi"/> to check.</param>
+		public static bool IsSingleApi(this JollyQuotesApi api)
+		{
+			return api.EnumToIndex() > -1;
 		}
 
 		/// <summary>
@@ -323,15 +332,6 @@ namespace JollyQuotes
 			return TryParseApi_Internal(source, out api);
 		}
 
-		/// <summary>
-		/// Determines whether the specified value of <see cref="JollyQuotesApi"/> represents a valid single <c>JollyQuotes</c> API.
-		/// </summary>
-		/// <param name="api">Value of <see cref="JollyQuotesApi"/> to check.</param>
-		public static bool IsSingleApi(this JollyQuotesApi api)
-		{
-			return api.EnumToIndex() > -1;
-		}
-
 		internal static int EnumToIndex(this JollyQuotesApi api)
 		{
 			return api switch
@@ -350,6 +350,12 @@ namespace JollyQuotes
 		}
 
 		[DebuggerStepThrough]
+		internal static InvalidOperationException Exc_PossibilityReturnedUnknownApi(string resultName)
+		{
+			return new InvalidOperationException($"ApiPossibility.Determine() returned an unknown API with name '{resultName}'");
+		}
+
+		[DebuggerStepThrough]
 		internal static ArgumentException Exc_UnknownApiName(string apiName)
 		{
 			return new ArgumentException($"Api with the specified name '{apiName}' not found", nameof(apiName));
@@ -364,12 +370,6 @@ namespace JollyQuotes
 			}
 
 			return Exc_UnknownApiName(apiName);
-		}
-
-		[DebuggerStepThrough]
-		internal static InvalidOperationException Exc_PossibilityReturnedUnknownApi(string resultName)
-		{
-			return new InvalidOperationException($"ApiPossibility.Determine() returned an unknown API with name '{resultName}'");
 		}
 
 		internal static JollyQuotesApi[] GetFlags(this JollyQuotesApi api)

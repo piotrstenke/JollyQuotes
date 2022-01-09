@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 
@@ -140,35 +139,6 @@ namespace JollyQuotes
 			EnabledApis = JollyQuotesApi.All;
 		}
 
-		private static IOptionalPossibility GetDefaultApiPossibility()
-		{
-			const int CAPACITY = QuoteUtility.NUM_QUOTE_APIS;
-			const int MAX_POSSIBILITY = 800;
-			const int DEFAULT_POSSIBILITY = 1;
-			const int KANYE_POSSIBILITY = DEFAULT_POSSIBILITY;
-			const int TRONALD_POSSIBILITY = DEFAULT_POSSIBILITY;
-			const int QUOTABLE_POSSIBILITY = MAX_POSSIBILITY - KANYE_POSSIBILITY - TRONALD_POSSIBILITY;
-
-			OptionalPossibility possibility = new()
-			{
-				Capacity = CAPACITY,
-				Max = MAX_POSSIBILITY
-			};
-
-			possibility
-				.AddOption(ApiNames.KanyeRest, KANYE_POSSIBILITY)
-				.AddOption(ApiNames.TronaldDump, TRONALD_POSSIBILITY)
-				.AddOption(ApiNames.Quotable, QUOTABLE_POSSIBILITY);
-
-			return possibility;
-		}
-
-		/// <inheritdoc/>
-		public void ForceUpdate()
-		{
-			InitializeGenerators(_generators);
-		}
-
 		/// <inheritdoc/>
 		public void DisableAll()
 		{
@@ -221,12 +191,6 @@ namespace JollyQuotes
 			EnabledApis = JollyQuotesApi.All;
 		}
 
-		[DebuggerStepThrough]
-		private static ArgumentException Exc_InvalidApi(JollyQuotesApi api)
-		{
-			return new ArgumentException($"Invalid {nameof(JollyQuotesApi)} value: '{api}'", nameof(api));
-		}
-
 		/// <summary>
 		/// Enables the specified <c>JollyQuotes</c> APIs.
 		/// </summary>
@@ -265,6 +229,12 @@ namespace JollyQuotes
 
 				return false;
 			}
+		}
+
+		/// <inheritdoc/>
+		public void ForceUpdate()
+		{
+			InitializeGenerators(_generators);
 		}
 
 		/// <inheritdoc/>
@@ -355,6 +325,26 @@ namespace JollyQuotes
 		public IEnumerable<IQuoteGenerator> GetGenerators()
 		{
 			return _generators.Select(g => g.Generator);
+		}
+
+		/// <summary>
+		/// Returns a randomly picked <see cref="QuoteApiDescription"/>.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
+		public QuoteApiDescription GetRandomDescription()
+		{
+			JollyQuotesApi api = GetRandomApi();
+			return GetDescription(api);
+		}
+
+		/// <summary>
+		/// Returns a randomly picked <see cref="IQuoteGenerator"/>.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
+		public IQuoteGenerator GetRandomGenerator()
+		{
+			JollyQuotesApi api = GetRandomApi();
+			return GetGenerator(api);
 		}
 
 		/// <inheritdoc/>
@@ -484,36 +474,33 @@ namespace JollyQuotes
 			base.Dispose(disposing);
 		}
 
-		/// <summary>
-		/// Returns a randomly picked <see cref="IQuoteGenerator"/>.
-		/// </summary>
-		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
-		public IQuoteGenerator GetRandomGenerator()
+		[DebuggerStepThrough]
+		private static ArgumentException Exc_InvalidApi(JollyQuotesApi api)
 		{
-			JollyQuotesApi api = GetRandomApi();
-			return GetGenerator(api);
+			return new ArgumentException($"Invalid {nameof(JollyQuotesApi)} value: '{api}'", nameof(api));
 		}
 
-		/// <summary>
-		/// Returns a randomly picked <see cref="QuoteApiDescription"/>.
-		/// </summary>
-		/// <exception cref="InvalidOperationException"><see cref="IOptionalPossibility.Determine()"/> of <see cref="ApiPossibility"/> returned an unknown API.</exception>
-		public QuoteApiDescription GetRandomDescription()
+		private static IOptionalPossibility GetDefaultApiPossibility()
 		{
-			JollyQuotesApi api = GetRandomApi();
-			return GetDescription(api);
-		}
+			const int CAPACITY = QuoteUtility.NUM_QUOTE_APIS;
+			const int MAX_POSSIBILITY = 800;
+			const int DEFAULT_POSSIBILITY = 1;
+			const int KANYE_POSSIBILITY = DEFAULT_POSSIBILITY;
+			const int TRONALD_POSSIBILITY = DEFAULT_POSSIBILITY;
+			const int QUOTABLE_POSSIBILITY = MAX_POSSIBILITY - KANYE_POSSIBILITY - TRONALD_POSSIBILITY;
 
-		private JollyQuotesApi GetRandomApi()
-		{
-			NamedOption result = ApiPossibility.Determine();
-
-			if (!QuoteUtility.TryParseApi(result.Name, out JollyQuotesApi api))
+			OptionalPossibility possibility = new()
 			{
-				throw QuoteUtility.Exc_PossibilityReturnedUnknownApi(result.Name);
-			}
+				Capacity = CAPACITY,
+				Max = MAX_POSSIBILITY
+			};
 
-			return api;
+			possibility
+				.AddOption(ApiNames.KanyeRest, KANYE_POSSIBILITY)
+				.AddOption(ApiNames.TronaldDump, TRONALD_POSSIBILITY)
+				.AddOption(ApiNames.Quotable, QUOTABLE_POSSIBILITY);
+
+			return possibility;
 		}
 
 		private static JollyQuotesApi ParseApi(string apiName)
@@ -524,6 +511,13 @@ namespace JollyQuotes
 			}
 
 			return api;
+		}
+
+		private GeneratorEntry[] CreateGeneratorArray()
+		{
+			GeneratorEntry[] generators = new GeneratorEntry[QuoteUtility.NUM_QUOTE_APIS];
+			InitializeGenerators(generators);
+			return generators;
 		}
 
 		private GeneratorEntry GetEntry(JollyQuotesApi api)
@@ -538,11 +532,16 @@ namespace JollyQuotes
 			return _generators[index];
 		}
 
-		private GeneratorEntry[] CreateGeneratorArray()
+		private JollyQuotesApi GetRandomApi()
 		{
-			GeneratorEntry[] generators = new GeneratorEntry[QuoteUtility.NUM_QUOTE_APIS];
-			InitializeGenerators(generators);
-			return generators;
+			NamedOption result = ApiPossibility.Determine();
+
+			if (!QuoteUtility.TryParseApi(result.Name, out JollyQuotesApi api))
+			{
+				throw QuoteUtility.Exc_PossibilityReturnedUnknownApi(result.Name);
+			}
+
+			return api;
 		}
 
 		private void InitializeGenerators(GeneratorEntry[] generators)

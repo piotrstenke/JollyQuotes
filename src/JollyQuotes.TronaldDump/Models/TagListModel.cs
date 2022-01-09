@@ -11,18 +11,32 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record TagListModel
 	{
+		private readonly TagModel[] _tags;
+
 		/// <summary>
 		/// An array of underlaying tags.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("tag", Required = Required.Always)]
-		public TagModel[] Tags { get; init; }
+		public TagModel[] Tags
+		{
+			get => _tags;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_tags = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TagListModel"/> class with an array of underlaying <paramref name="tags"/> specified.
 		/// </summary>
 		/// <param name="tags">An array of underlaying tags.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="tags"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="tags"/> is empty.</exception>
 		[JsonConstructor]
 		public TagListModel(TagModel[] tags)
 		{
@@ -31,12 +45,7 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(tags));
 			}
 
-			if (tags.Length == 0)
-			{
-				throw Error.Empty(nameof(tags));
-			}
-
-			Tags = tags;
+			_tags = tags;
 		}
 
 		/// <inheritdoc/>

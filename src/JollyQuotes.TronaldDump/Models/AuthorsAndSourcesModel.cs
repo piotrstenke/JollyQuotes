@@ -11,17 +11,46 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record AuthorsAndSourcesModel
 	{
+		private readonly AuthorModel[] _authors;
+		private readonly QuoteSourceModel[] _sources;
+
 		/// <summary>
 		/// Array of authors of the current resource.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("author", Required = Required.Always)]
-		public AuthorModel[] Authors { get; init; }
+		public AuthorModel[] Authors
+		{
+			get => _authors;
+			init
+			{
+				if(value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_authors = value;
+			}
+		}
 
 		/// <summary>
 		/// Array of sources of the current resource.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("source", Required = Required.Always)]
-		public QuoteSourceModel[] Sources { get; init; }
+		public QuoteSourceModel[] Sources
+		{
+			get => _sources;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_sources = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorsAndSourcesModel"/> class with arrays of target <paramref name="authors"/> and <paramref name="sources"/> specified.
@@ -29,7 +58,6 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="authors">Array of authors of the current resource.</param>
 		/// <param name="sources">Array of sources of the current resource.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="authors"/> is <see langword="null"/>. -or- <paramref name="sources"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="authors"/> is empty. -or- <paramref name="sources"/> is empty.</exception>
 		[JsonConstructor]
 		public AuthorsAndSourcesModel(AuthorModel[] authors, QuoteSourceModel[] sources)
 		{
@@ -43,18 +71,8 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(sources));
 			}
 
-			if (authors.Length == 0)
-			{
-				throw Error.Empty(nameof(authors));
-			}
-
-			if (sources.Length == 0)
-			{
-				throw Error.Empty(nameof(sources));
-			}
-
-			Authors = authors;
-			Sources = sources;
+			_authors = authors;
+			_sources = sources;
 		}
 
 		/// <summary>
@@ -75,8 +93,8 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(source));
 			}
 
-			Authors = new AuthorModel[] { author };
-			Sources = new QuoteSourceModel[] { source };
+			_authors = new AuthorModel[] { author };
+			_sources = new QuoteSourceModel[] { source };
 		}
 
 		/// <inheritdoc/>

@@ -10,11 +10,26 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record LinkModel
 	{
+		private readonly string _href;
+
 		/// <summary>
 		/// Actual link.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("href", Required = Required.Always)]
-		public string Href { get; init; }
+		public string Href
+		{
+			get => _href;
+			init
+			{
+				if(string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_href = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LinkModel"/> class with a <paramref name="href"/> specified.
@@ -29,7 +44,7 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.NullOrEmpty(nameof(href));
 			}
 
-			Href = href;
+			_href = href;
 		}
 
 		/// <inheritdoc/>

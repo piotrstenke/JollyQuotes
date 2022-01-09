@@ -10,11 +10,26 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record SelfLinkModel
 	{
+		private readonly LinkModel _self;
+
 		/// <summary>
 		/// Link that was used to access the current resource.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("self", Required = Required.Always)]
-		public LinkModel Self { get; init; }
+		public LinkModel Self
+		{
+			get => _self;
+			init
+			{
+				if(value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_self = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SelfLinkModel"/> class with a <paramref name="self"/> link model specified.
@@ -26,10 +41,10 @@ namespace JollyQuotes.TronaldDump.Models
 		{
 			if (self is null)
 			{
-				throw new ArgumentNullException(nameof(self));
+				throw Error.Null(nameof(self));
 			}
 
-			Self = self;
+			_self = self;
 		}
 
 		/// <summary>
@@ -39,7 +54,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <exception cref="ArgumentException"><paramref name="self"/> is null or empty.</exception>
 		public SelfLinkModel(string self)
 		{
-			Self = new LinkModel(self);
+			_self = new LinkModel(self);
 		}
 
 		/// <inheritdoc/>

@@ -110,6 +110,11 @@ namespace JollyQuotes
 			return QuoteUtility.CreateGenerator(api, resolver, Possibility);
 		}
 
+		IEnumerable<string> IQuoteApiHandler.GetApis()
+		{
+			return ApiNames.GetAll();
+		}
+
 		bool IQuoteApiHandler.HasApi(string apiName)
 		{
 			if (QuoteUtility.TryParseApi(apiName, out _))
@@ -123,11 +128,6 @@ namespace JollyQuotes
 			}
 
 			return false;
-		}
-
-		IEnumerable<string> IQuoteApiHandler.GetApis()
-		{
-			return ApiNames.GetAll();
 		}
 	}
 }

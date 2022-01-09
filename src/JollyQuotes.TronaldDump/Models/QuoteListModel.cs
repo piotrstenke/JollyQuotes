@@ -11,18 +11,32 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record QuoteListModel
 	{
+		private readonly QuoteModel[] _quotes;
+
 		/// <summary>
 		/// Quotes this list contains.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("quotes", Required = Required.Always)]
-		public QuoteModel[] Quotes { get; init; }
+		public QuoteModel[] Quotes
+		{
+			get => _quotes;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_quotes = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteListModel"/> class with an array of underlaying <paramref name="quotes"/> specified.
 		/// </summary>
 		/// <param name="quotes">Quotes this list contains.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="quotes"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="quotes"/> is empty.</exception>
 		[JsonConstructor]
 		public QuoteListModel(QuoteModel[] quotes)
 		{
@@ -31,12 +45,7 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(quotes));
 			}
 
-			if (quotes.Length == 0)
-			{
-				throw Error.Empty(nameof(quotes));
-			}
-
-			Quotes = quotes;
+			_quotes = quotes;
 		}
 
 		/// <inheritdoc/>

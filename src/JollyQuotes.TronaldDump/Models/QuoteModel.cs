@@ -11,6 +11,12 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record QuoteModel
 	{
+		private readonly string _id;
+		private readonly string _value;
+		private readonly string[] _tags;
+		private readonly AuthorsAndSourcesModel _embedded;
+		private readonly SelfLinkModel _links;
+
 		/// <summary>
 		/// Date the quote was said/written at.
 		/// </summary>
@@ -32,32 +38,97 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Id of the quote.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("quote_id", Order = 0, Required = Required.Always)]
-		public string Id { get; init; }
+		public string Id
+		{
+			get => _id;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_id = value;
+			}
+		}
 
 		/// <summary>
 		/// Array of tags associated with this quote.
 		/// </summary>
-		[JsonProperty("tags", Order = 5, Required = Required.Always)]
-		public string[] Tags { get; init; }
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
+		[JsonProperty("tags", Order = 5, Required = Required.DisallowNull)]
+		public string[] Tags
+		{
+			get => _tags;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_tags = value;
+			}
+		}
 
 		/// <summary>
 		/// Actual quote.
 		/// </summary>
+		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("value", Order = 1, Required = Required.Always)]
-		public string Value { get; init; }
+		public string Value
+		{
+			get => _value;
+			init
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					throw Error.NullOrEmpty(nameof(value));
+				}
+
+				_value = value;
+			}
+		}
 
 		/// <summary>
 		/// Contains information about the quote's author and source.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_embedded", Order = 6, Required = Required.Always)]
-		public AuthorsAndSourcesModel Embedded { get; init; }
+		public AuthorsAndSourcesModel Embedded
+		{
+			get => _embedded;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_embedded = value;
+			}
+		}
 
 		/// <summary>
 		/// Links to data of the quote.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_links")]
-		public SelfLinkModel Links { get; init; }
+		public SelfLinkModel Links
+		{
+			get => _links;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_links = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, <paramref name="value"/>, <paramref name="tags"/>, child <paramref name="links"/>, <paramref name="embedded"/> data and dates of first appearance and creation.
@@ -143,11 +214,11 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(embedded));
 			}
 
-			Id = id;
-			Value = value;
-			Tags = tags;
-			Embedded = embedded;
-			Links = links;
+			_id = id;
+			_value = value;
+			_tags = tags;
+			_embedded = embedded;
+			_links = links;
 			AppearedAt = appearedAt;
 			CreatedAt = createdAt;
 			UpdatedAt = updatedAt;

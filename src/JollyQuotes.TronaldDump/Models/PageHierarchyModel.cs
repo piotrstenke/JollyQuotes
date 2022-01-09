@@ -10,35 +10,106 @@ namespace JollyQuotes.TronaldDump.Models
 	[JsonObject]
 	public sealed record PageHierarchyModel
 	{
+		private readonly LinkModel _first;
+		private readonly LinkModel _last;
+		private readonly LinkModel _next;
+		private readonly LinkModel _prev;
+		private readonly LinkModel _self;
+
 		/// <summary>
 		/// Link to the first page in the hierarchy.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("first", Order = 1, Required = Required.Always)]
-		public LinkModel First { get; init; }
+		public LinkModel First
+		{
+			get => _first;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_first = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the last page in the hierarchy.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("last", Order = 4, Required = Required.Always)]
-		public LinkModel Last { get; init; }
+		public LinkModel Last
+		{
+			get => _last;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_last = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the next page in the hierarchy.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("next", Order = 3, Required = Required.Always)]
-		public LinkModel Next { get; init; }
+		public LinkModel Next
+		{
+			get => _next;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_next = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the previous page in the hierarchy.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("prev", Order = 2, Required = Required.Always)]
-		public LinkModel Prev { get; init; }
+		public LinkModel Prev
+		{
+			get => _prev;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_prev = value;
+			}
+		}
 
 		/// <summary>
 		/// Link to the current page in the hierarchy.
 		/// </summary>
+		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("self", Order = 0, Required = Required.Always)]
-		public LinkModel Self { get; init; }
+		public LinkModel Self
+		{
+			get => _self;
+			init
+			{
+				if (value is null)
+				{
+					throw Error.Null(nameof(value));
+				}
+
+				_self = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PageHierarchyModel"/> class with a single <see cref="LinkModel"/> specified for all properties.
@@ -52,11 +123,11 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(self));
 			}
 
-			Self = self;
-			Prev = self;
-			Next = self;
-			First = self;
-			Last = self;
+			_self = self;
+			_prev = self;
+			_next = self;
+			_first = self;
+			_last = self;
 		}
 
 		/// <summary>
@@ -118,11 +189,11 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(last));
 			}
 
-			Self = self;
-			Prev = prev;
-			Next = next;
-			First = first;
-			Last = last;
+			_self = self;
+			_prev = prev;
+			_next = next;
+			_first = first;
+			_last = last;
 		}
 	}
 }
