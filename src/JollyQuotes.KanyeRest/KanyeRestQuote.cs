@@ -19,7 +19,7 @@ namespace JollyQuotes.KanyeRest
 		/// Text of the quote.
 		/// </summary>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
-		[JsonProperty("value", Required = Required.Always)]
+		[JsonProperty("quote", Required = Required.Always)]
 		public string Value
 		{
 			get => _id.Value;
@@ -33,13 +33,14 @@ namespace JollyQuotes.KanyeRest
 		string[] IQuote.Tags => Array.Empty<string>();
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="value"/> specified.
+		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="quote"/> specified.
 		/// </summary>
-		/// <param name="value">Text of the quote.</param>
-		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
-		public KanyeRestQuote(string value)
+		/// <param name="quote">Text of the quote.</param>
+		/// <exception cref="ArgumentException"><paramref name="quote"/> is <see langword="null"/> or empty.</exception>
+		[JsonConstructor]
+		public KanyeRestQuote(string quote)
 		{
-			_id = new(value);
+			_id = new(quote);
 		}
 
 		/// <inheritdoc/>

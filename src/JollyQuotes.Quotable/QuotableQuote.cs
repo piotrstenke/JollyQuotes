@@ -124,7 +124,7 @@ namespace JollyQuotes.Quotable
 		string IQuote.Source => QuotableResources.ApiPage + $"/quotes/{Id}";
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuotableQuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="value"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and date of the quote's creation.
+		/// Initializes a new instance of the <see cref="QuotableQuote"/> class with an <paramref name="id"/>, actual <paramref name="value"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and date of the quote's creation.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
 		/// <param name="value">Text of the quote.</param>
@@ -151,7 +151,7 @@ namespace JollyQuotes.Quotable
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuotableQuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="value"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and dates of creation and last update.
+		/// Initializes a new instance of the <see cref="QuotableQuote"/> class with an <paramref name="id"/>, actual <paramref name="value"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and dates of creation and last update.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
 		/// <param name="value">Text of the quote.</param>

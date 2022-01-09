@@ -29,5 +29,12 @@ namespace JollyQuotes.TronaldDump
 		/// <param name="model"><see cref="QuoteListModel"/> to convert.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="model"/> is <see langword="null"/>.</exception>
 		IEnumerable<TronaldDumpQuote> EnumerateQuotes(QuoteListModel model);
+
+		/// <summary>
+		/// Builds a search query from the specified <paramref name="searchModel"/>.
+		/// </summary>
+		/// <param name="searchModel"><see cref="QuoteSearchModel"/> to build the query from.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="searchModel"/> is <see langword="null"/>.</exception>
+		string GetSearchQuery(QuoteSearchModel searchModel);
 	}
 }

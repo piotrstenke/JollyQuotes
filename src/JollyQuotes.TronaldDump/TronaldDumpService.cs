@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using JollyQuotes.TronaldDump.Models;
 
@@ -16,6 +15,11 @@ namespace JollyQuotes.TronaldDump
 		public new IStreamResolver Resolver => (base.Resolver as IStreamResolver)!;
 
 		/// <summary>
+		/// <see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.
+		/// </summary>
+		public ITronaldDumpModelConverter ModelConverter { get; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class.
 		/// </summary>
 		public TronaldDumpService() : this(CreateDefaultResolver())
@@ -27,7 +31,17 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
-		public TronaldDumpService(HttpClient client) : base(client)
+		public TronaldDumpService(HttpClient client) : this(client, default)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with a <paramref name="client"/> as the target <see cref="IResourceResolver"/> and a <see cref="ITronaldDumpModelConverter"/> specified.
+		/// </summary>
+		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
+		public TronaldDumpService(HttpClient client, ITronaldDumpModelConverter? modelConverter) : this(new HttpResolver(client), modelConverter)
 		{
 		}
 
@@ -36,8 +50,19 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access requested <c>Tronald Dump</c> resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
-		public TronaldDumpService(IStreamResolver resolver) : base(resolver)
+		public TronaldDumpService(IStreamResolver resolver) : this(resolver, default)
 		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with an underlaying <paramref name="resolver"/> and a <see cref="ITronaldDumpModelConverter"/> specified.
+		/// </summary>
+		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access requested <c>Tronald Dump</c> resources.</param>
+		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
+		public TronaldDumpService(IStreamResolver resolver, ITronaldDumpModelConverter? modelConverter) : base(resolver)
+		{
+			ModelConverter = modelConverter ?? new TronaldDumpModelConverter();
 		}
 
 		/// <inheritdoc/>
@@ -122,45 +147,8 @@ namespace JollyQuotes.TronaldDump
 				throw Error.Null(nameof(searchModel));
 			}
 
-			StringBuilder builder = new();
-			builder.Append("search/quote?");
-
-			bool hasParam = false;
-
-			if (searchModel.Query is not null)
-			{
-				hasParam = true;
-				builder.Append("query=");
-				builder.Append(searchModel.Query);
-			}
-
-			if (searchModel.Tag is not null)
-			{
-				EnsureParameter();
-				builder.Append("tag=");
-				builder.Append(searchModel.Tag);
-			}
-
-			if (searchModel.Page >= 0)
-			{
-				EnsureParameter();
-				builder.Append("page=");
-				builder.Append(searchModel.Page);
-			}
-
-			return Resolver.ResolveAsync<SearchResultModel<QuoteListModel>>(builder.ToString());
-
-			void EnsureParameter()
-			{
-				if (hasParam)
-				{
-					builder.Append('&');
-				}
-				else
-				{
-					hasParam = true;
-				}
-			}
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			return Resolver.ResolveAsync<SearchResultModel<QuoteListModel>>(query);
 		}
 	}
 }

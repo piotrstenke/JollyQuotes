@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using JollyQuotes.TronaldDump.Models;
 
 namespace JollyQuotes.TronaldDump
@@ -63,6 +64,55 @@ namespace JollyQuotes.TronaldDump
 				foreach (QuoteModel quote in model.Quotes)
 				{
 					yield return ConvertQuoteModelInternal(quote);
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public string GetSearchQuery(QuoteSearchModel searchModel)
+		{
+			if(searchModel is null)
+			{
+				throw Error.Null(nameof(searchModel));
+			}
+
+			StringBuilder builder = new();
+			builder.Append("search/quote?");
+
+			bool hasParam = false;
+
+			if (searchModel.Query is not null)
+			{
+				hasParam = true;
+				builder.Append("query=");
+				builder.Append(searchModel.Query);
+			}
+
+			if (searchModel.Tag is not null)
+			{
+				EnsureParameter();
+				builder.Append("tag=");
+				builder.Append(searchModel.Tag);
+			}
+
+			if (searchModel.Page >= 0)
+			{
+				EnsureParameter();
+				builder.Append("page=");
+				builder.Append(searchModel.Page);
+			}
+
+			return builder.ToString();
+
+			void EnsureParameter()
+			{
+				if (hasParam)
+				{
+					builder.Append('&');
+				}
+				else
+				{
+					hasParam = true;
 				}
 			}
 		}

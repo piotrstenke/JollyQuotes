@@ -84,7 +84,7 @@ namespace JollyQuotes.TronaldDump
 		public TronaldDumpQuoteGenerator(ITronaldDumpService service) : base(GetResolverFromService(service), BaseAddress)
 		{
 			Service = service;
-			ModelConverter = new TronaldDumpModelConverter();
+			ModelConverter = CreateConverter(service);
 			RandomNumberGenerator = new ThreadRandom();
 			_internalGenerator = new(this);
 		}
@@ -110,9 +110,16 @@ namespace JollyQuotes.TronaldDump
 		) : base(GetResolverFromService(service), BaseAddress, cache, possibility)
 		{
 			Service = service;
-			ModelConverter = modelConverter ?? new TronaldDumpModelConverter();
+			ModelConverter = modelConverter ?? CreateConverter(service);
 			RandomNumberGenerator = random ?? new ThreadRandom();
 			_internalGenerator = new(this);
+		}
+
+		private static ITronaldDumpModelConverter CreateConverter(ITronaldDumpService service)
+		{
+			return service is TronaldDumpService s
+				? s.ModelConverter
+				: new TronaldDumpModelConverter();
 		}
 
 		/// <summary>
@@ -122,8 +129,8 @@ namespace JollyQuotes.TronaldDump
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
 		public TronaldDumpQuoteGenerator(IStreamResolver resolver) : base(resolver, BaseAddress)
 		{
-			Service = new TronaldDumpService(resolver);
 			ModelConverter = new TronaldDumpModelConverter();
+			Service = new TronaldDumpService(resolver, ModelConverter);
 			RandomNumberGenerator = new ThreadRandom();
 			_internalGenerator = new(this);
 		}
@@ -146,7 +153,7 @@ namespace JollyQuotes.TronaldDump
 			IRandomNumberGenerator? random = default,
 			IQuoteCache<TronaldDumpQuote>? cache = default,
 			IPossibility? possibility = default
-		) : this(new TronaldDumpService(resolver), modelConverter, random, cache, possibility)
+		) : this(new TronaldDumpService(resolver, modelConverter), modelConverter, random, cache, possibility)
 		{
 		}
 
