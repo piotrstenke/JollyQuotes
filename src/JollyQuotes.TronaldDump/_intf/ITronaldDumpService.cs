@@ -20,7 +20,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="id">Id of quote author to get information about.</param>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty.</exception>
-		/// <exception cref="QuoteException">No information about quote author with <paramref name="id"/> was found.</exception>
+		/// <exception cref="QuoteException">Quote author with the specified <paramref name="id"/> does not exist.</exception>
 		Task<AuthorModel> GetAuthor(string id);
 
 		/// <summary>
@@ -33,7 +33,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="id">Id of quote to get information about.</param>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty.</exception>
-		/// <exception cref="QuoteException">No information about quote with <paramref name="id"/> was found.</exception>
+		/// <exception cref="QuoteException">Quote with the specified <paramref name="id"/> does not exist.</exception>
 		Task<QuoteModel> GetQuote(string id);
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="id">Id of quote source to get information about.</param>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty.</exception>
-		/// <exception cref="QuoteException">No information about quote source with <paramref name="id"/> was found.</exception>
+		/// <exception cref="QuoteException">Quote source with the specified <paramref name="id"/> does not exist.</exception>
 		Task<QuoteSourceModel> GetSource(string id);
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="tag">Tag to get the information about.</param>
 		/// <exception cref="ArgumentException"><paramref name="tag"/> is <see langword="null"/> or empty.</exception>
-		/// <exception cref="QuoteException">No information about <paramref name="tag"/> was found.</exception>
+		/// <exception cref="QuoteException">Unknown tag.</exception>
 		Task<TagModel> GetTag(string tag);
 
 		/// <summary>

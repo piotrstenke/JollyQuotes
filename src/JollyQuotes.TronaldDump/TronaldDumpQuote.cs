@@ -16,28 +16,42 @@ namespace JollyQuotes.TronaldDump
 		private readonly string[] _tags;
 		private readonly string _source;
 		private readonly string _value;
+		private readonly Id _id;
 
 		/// <summary>
 		/// Date the quote was added to the database at.
 		/// </summary>
-		[JsonProperty("created_at", Order = 3, Required = Required.Always)]
+		[JsonProperty("createdAt", Order = 3, Required = Required.Always)]
 		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was last updated at.
 		/// </summary>
-		[JsonProperty("updated_at", Order = 4)]
+		[JsonProperty("updatedAt", Order = 4)]
 		public DateTime UpdatedAt { get; init; }
 
 		/// <summary>
 		/// Date the quote was said/written at.
 		/// </summary>
-		[JsonProperty("appeared_at", Order = 2, Required = Required.Always)]
+		[JsonProperty("appearedAt", Order = 2, Required = Required.Always)]
 		public DateTime AppearedAt { get; init; }
 
 		/// <inheritdoc/>
-		[JsonProperty("quote_id", Order = 0, Required = Required.Always)]
-		public Id Id { get; init; }
+		/// <exception cref="ArgumentException">Value must be initialized.</exception>
+		[JsonProperty("id", Order = 0, Required = Required.Always)]
+		public Id Id
+		{
+			get => _id;
+			init
+			{
+				if(value == default)
+				{
+					throw Error.NotInitialized(nameof(value));
+				}
+
+				_id = value;
+			}
+		}
 
 		/// <summary>
 		/// Array of tags associated with this quote.
@@ -60,7 +74,7 @@ namespace JollyQuotes.TronaldDump
 
 		/// <inheritdoc/>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
-		[JsonProperty("quote", Order = 1, Required = Required.Always)]
+		[JsonProperty("value", Order = 1, Required = Required.Always)]
 		public string Value
 		{
 			get => _value;
@@ -108,6 +122,7 @@ namespace JollyQuotes.TronaldDump
 		/// <param name="createdAt">Date the quote was added to the database at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="tags"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
+		/// <paramref name="id"/> must be initialized. -or-
 		/// <paramref name="value"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="source"/> is <see langword="null"/> or empty.
 		/// </exception>
@@ -136,6 +151,7 @@ namespace JollyQuotes.TronaldDump
 		/// <param name="updatedAt">Date the quote was last updated at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="tags"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException">
+		/// <paramref name="id"/> must be initialized. -or-
 		/// <paramref name="value"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="source"/> is <see langword="null"/> or empty.
 		/// </exception>
@@ -150,9 +166,9 @@ namespace JollyQuotes.TronaldDump
 			DateTime updatedAt
 		)
 		{
-			if (string.IsNullOrWhiteSpace(id))
+			if (id == default)
 			{
-				throw Error.NullOrEmpty(nameof(id));
+				throw Error.NotInitialized(nameof(id));
 			}
 
 			if (string.IsNullOrWhiteSpace(value))
@@ -170,7 +186,7 @@ namespace JollyQuotes.TronaldDump
 				throw Error.Null(nameof(tags));
 			}
 
-			Id = id;
+			_id = id;
 			_value = value;
 			_source = source;
 			_tags = tags;

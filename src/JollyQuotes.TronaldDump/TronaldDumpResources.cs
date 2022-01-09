@@ -16,15 +16,15 @@ namespace JollyQuotes.TronaldDump
 		/// <summary>
 		/// Entry point for API calls.
 		/// </summary>
-		public const string ApiPage = "https://www.tronalddump.io/";
+		public const string ApiPage = "https://www.tronalddump.io";
 
 		/// <summary>
 		/// Link to page with documentation of the <c>Tronald Dump</c> API.
 		/// </summary>
-		public const string DocsPage = "https://docs.tronalddump.io/";
+		public const string DocsPage = "https://docs.tronalddump.io";
 
 		/// <summary>
-		/// Link to the GitHub page of the <c>Tronald Dump</c> app.
+		/// Link to the GitHub page of the <c>Tronald Dump</c> source code.
 		/// </summary>
 		public const string GitHubPage = "https://github.com/tronalddump-io/tronald-app";
 

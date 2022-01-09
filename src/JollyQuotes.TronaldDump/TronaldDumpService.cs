@@ -47,7 +47,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"No information about quote author with id '{id}' was found");
+					throw new QuoteException($"Quote author with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -67,7 +67,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"No information about quote with id '{id}' was found");
+					throw new QuoteException($"Quote with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -93,7 +93,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"No information about quote source with id '{id}' was found");
+					throw new QuoteException($"Quote source with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -107,7 +107,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"No information about tag '{tag}' was found");
+					throw new QuoteException($"Unknown tag: '{tag}'");
 				}
 
 				return t.Result;

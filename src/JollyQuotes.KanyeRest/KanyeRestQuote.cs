@@ -19,8 +19,8 @@ namespace JollyQuotes.KanyeRest
 		/// Text of the quote.
 		/// </summary>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
-		[JsonProperty("quote", Required = Required.Always)]
-		public string Quote
+		[JsonProperty("value", Required = Required.Always)]
+		public string Value
 		{
 			get => _id.Value;
 			init => _id = new(value);
@@ -30,28 +30,22 @@ namespace JollyQuotes.KanyeRest
 		string IQuote.Author => AUTHOR;
 		DateTime? IQuote.Date => default;
 		string IQuote.Source => SOURCE;
-		string IQuote.Value => Quote;
 		string[] IQuote.Tags => Array.Empty<string>();
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="quote"/> specified.
+		/// Initializes a new instance of the <see cref="KanyeRestQuote"/> class with a <paramref name="value"/> specified.
 		/// </summary>
-		/// <param name="quote">Text of the quote.</param>
-		/// <exception cref="ArgumentException"><paramref name="quote"/> is <see langword="null"/> or empty.</exception>
-		public KanyeRestQuote(string quote)
+		/// <param name="value">Text of the quote.</param>
+		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
+		public KanyeRestQuote(string value)
 		{
-			if (string.IsNullOrWhiteSpace(quote))
-			{
-				throw Error.NullOrEmpty(nameof(quote));
-			}
-
-			Quote = quote;
+			_id = new(value);
 		}
 
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return Quote;
+			return Value;
 		}
 	}
 }

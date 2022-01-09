@@ -33,7 +33,7 @@ namespace JollyQuotes
 		string[] Tags { get; }
 
 		/// <summary>
-		/// Actual quote.
+		/// Actual text of the quote.
 		/// </summary>
 		string Value { get; }
 	}

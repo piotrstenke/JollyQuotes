@@ -21,7 +21,7 @@
 		public const string Database = "https://raw.githubusercontent.com/ajzbc/kanye.rest/master/quotes.json";
 
 		/// <summary>
-		/// Link to the GitHub page of <c>kanye.rest</c> app.
+		/// Link to the GitHub page of <c>kanye.rest</c> source code.
 		/// </summary>
 		public const string GitHubPage = "https://github.com/ajzbc/kanye.rest";
 

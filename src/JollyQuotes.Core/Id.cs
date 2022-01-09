@@ -165,6 +165,11 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
+			if(Value is null)
+			{
+				return 0;
+			}
+
 			return Value.GetHashCode();
 		}
 

@@ -76,6 +76,12 @@ namespace JollyQuotes
 		}
 
 		[DebuggerStepThrough]
+		public static ArgumentException NotInitialized(string paramName)
+		{
+			return new ArgumentException("Value must be initialized", paramName);
+		}
+
+		[DebuggerStepThrough]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ArgumentNullException Null(string paramName)
 		{

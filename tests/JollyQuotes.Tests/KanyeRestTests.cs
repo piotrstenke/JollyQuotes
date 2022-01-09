@@ -35,7 +35,7 @@ namespace JollyQuotes.Tests
 			KanyeRestQuote quote = await _service.GetRandomQuote();
 
 			Assert.NotNull(quote);
-			Assert.False(string.IsNullOrWhiteSpace(quote.Quote));
+			Assert.False(string.IsNullOrWhiteSpace(quote.Value));
 		}
 	}
 }
