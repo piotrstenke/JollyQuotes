@@ -93,5 +93,12 @@ namespace JollyQuotes
 		{
 			return new ArgumentException($"{paramName} cannot be null or empty", paramName);
 		}
+
+		[DebuggerStepThrough]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static QuoteException Quote(string? message)
+		{
+			return new QuoteException(message);
+		}
 	}
 }

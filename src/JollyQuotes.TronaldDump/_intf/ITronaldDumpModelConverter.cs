@@ -5,7 +5,7 @@ using JollyQuotes.TronaldDump.Models;
 namespace JollyQuotes.TronaldDump
 {
 	/// <summary>
-	/// Provides method for converting <c>Tronald Dump</c> models to more user-friendly classes.
+	/// Provides method for converting raw <c>Tronald Dump</c> models to more user-friendly objects.
 	/// </summary>
 	public interface ITronaldDumpModelConverter
 	{

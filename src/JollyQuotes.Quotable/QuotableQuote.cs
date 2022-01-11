@@ -24,7 +24,7 @@ namespace JollyQuotes.Quotable
 			get => _id;
 			init
 			{
-				if(value == default)
+				if (value == default)
 				{
 					throw Error.NotInitialized(nameof(value));
 				}
@@ -41,7 +41,7 @@ namespace JollyQuotes.Quotable
 			get => _value;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}
@@ -178,17 +178,17 @@ namespace JollyQuotes.Quotable
 			DateTime updatedAt
 		)
 		{
-			if(id == default)
+			if (id == default)
 			{
 				throw Error.NotInitialized(nameof(id));
 			}
 
-			if(string.IsNullOrWhiteSpace(value))
+			if (string.IsNullOrWhiteSpace(value))
 			{
 				throw Error.NullOrEmpty(nameof(value));
 			}
 
-			if(string.IsNullOrWhiteSpace(author))
+			if (string.IsNullOrWhiteSpace(author))
 			{
 				throw Error.NullOrEmpty(nameof(author));
 			}
@@ -198,7 +198,7 @@ namespace JollyQuotes.Quotable
 				throw Error.NullOrEmpty(nameof(authorSlug));
 			}
 
-			if(tags is null)
+			if (tags is null)
 			{
 				throw Error.Null(nameof(tags));
 			}

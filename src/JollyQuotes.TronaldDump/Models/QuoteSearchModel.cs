@@ -13,13 +13,13 @@ namespace JollyQuotes.TronaldDump.Models
 		private readonly int _page;
 
 		/// <summary>
-		/// A search query build from phrases separated by a plus '+'.
+		/// Phrases to search by.
 		/// </summary>
-		[JsonProperty("query", Order = 0)]
-		public string? Query { get; init; }
+		[JsonProperty("phrases", Order = 0)]
+		public string[]? Phrases { get; init; }
 
 		/// <summary>
-		/// Tag to search associated quotes with.
+		/// Tag to search by.
 		/// </summary>
 		[JsonProperty("tag", Order = 1)]
 		public string? Tag { get; init; }
@@ -44,102 +44,29 @@ namespace JollyQuotes.TronaldDump.Models
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with query <paramref name="phrases"/> and associated <paramref name="tag"/> specified.
+		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class.
 		/// </summary>
-		/// <param name="phrases">An array of <see cref="string"/>s that will be joined with plus '+' sign to create a proper query.</param>
-		/// <param name="tag">Tag to search associated quotes with.</param>
-		/// <exception cref="ArgumentException">
-		/// Either created query or <paramref name="tag"/> must be not <see langword="null"/>. -or-
-		/// Created query must be either <see langword="null"/> or not empty. -or
-		/// <paramref name="tag"/> must be either <see langword="null"/> or not empty.
-		/// </exception>
-		public QuoteSearchModel(string[]? phrases, string? tag) : this(JoinPhrases(phrases), tag, 0)
+		public QuoteSearchModel()
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with query <paramref name="phrases"/>, associated <paramref name="tag"/> and current <paramref name="page"/> specified.
+		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with target <paramref name="phrases"/>
 		/// </summary>
-		/// <param name="phrases">An array of <see cref="string"/>s that will be joined with plus '+' sign to create a proper query.</param>
-		/// <param name="tag">Tag to search associated quotes with.</param>
+		/// <param name="phrases">Phrases to search by.</param>
+		/// <param name="tag">Tag to search by.</param>
 		/// <param name="page">The current page of the search result.</param>
-		/// <exception cref="ArgumentException">
-		/// Either created query or <paramref name="tag"/> must be not <see langword="null"/>. -or-
-		/// Created query must be either <see langword="null"/> or not empty. -or
-		/// <paramref name="tag"/> must be either <see langword="null"/> or not empty.
-		/// </exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="page"/> must be greater than or equal to<c>0</c>.</exception>
-		public QuoteSearchModel(string[]? phrases, string? tag, int page) : this(JoinPhrases(phrases), tag, page)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with a <paramref name="query"/> and associated <paramref name="tag"/> specified.
-		/// </summary>
-		/// <param name="query">A search query build from phrases separated by a plus '+'.</param>
-		/// <param name="tag">Tag to search associated quotes with.</param>
-		/// <exception cref="ArgumentException">
-		/// Either <paramref name="query"/> or <paramref name="tag"/> must be not <see langword="null"/>. -or-
-		/// <paramref name="query"/> must be either <see langword="null"/> or not empty. -or
-		/// <paramref name="tag"/> must be either <see langword="null"/> or not empty.
-		/// </exception>
-		public QuoteSearchModel(string? query, string? tag) : this(query, tag, 0)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with a <paramref name="query"/>, associated <paramref name="tag"/> and current <paramref name="page"/> specified.
-		/// </summary>
-		/// <param name="query"> A search query build from phrases separated by a plus '+'.</param>
-		/// <param name="tag">Tag to search associated quotes with.</param>
-		/// <param name="page">The current page of the search result.</param>
-		/// <exception cref="ArgumentException">
-		/// Either <paramref name="query"/> or <paramref name="tag"/> must be not <see langword="null"/>. -or-
-		/// <paramref name="query"/> must be either <see langword="null"/> or not empty. -or
-		/// <paramref name="tag"/> must be either <see langword="null"/> or not empty.
-		/// </exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="page"/> must be greater than or equal to <c>0</c>.</exception>
 		[JsonConstructor]
-		public QuoteSearchModel(string? query, string? tag, int page)
+		public QuoteSearchModel(string[]? phrases = default, string? tag = default, int page = default)
 		{
-			if (query is null && tag is null)
-			{
-				throw Error.Arg($"Either {nameof(query)} or {nameof(tag)} must be not null");
-			}
-
-			if (query is not null && string.IsNullOrWhiteSpace(query))
-			{
-				throw Exc_CannotBeEmpty(nameof(query));
-			}
-
-			if (tag is not null && string.IsNullOrWhiteSpace(tag))
-			{
-				throw Exc_CannotBeEmpty(nameof(tag));
-			}
-
 			if (page < 0)
 			{
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(page), 0);
 			}
 
-			Query = query;
+			Phrases = phrases;
 			Tag = tag;
 			_page = page;
-		}
-
-		private static ArgumentException Exc_CannotBeEmpty(string paramName)
-		{
-			return Error.Arg($"{paramName} must be either null or not empty", paramName);
-		}
-
-		private static string? JoinPhrases(string[]? phrases)
-		{
-			if (phrases is null || phrases.Length == 0)
-			{
-				return null;
-			}
-
-			return string.Join('+', phrases);
 		}
 	}
 }

@@ -190,7 +190,11 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc cref="EnumerableQuoteGenerator{T}.WithCache.DownloadAllQuotes(string)"/>
 		protected virtual IEnumerable<TronaldDumpQuote> DownloadAllQuotes(string tag)
 		{
-			QuoteSearchModel search = new(null as string, tag);
+			QuoteSearchModel search = new()
+			{
+				Tag = tag
+			};
+
 			SearchResultModel<QuoteListModel> result = Service.SearchQuotes(search).Result;
 
 			if (result.Count == 0)
@@ -239,7 +243,11 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		protected override TronaldDumpQuote? DownloadRandomQuote(string tag)
 		{
-			QuoteSearchModel search = new(null as string, tag);
+			QuoteSearchModel search = new()
+			{
+				Tag = tag
+			};
+
 			SearchResultModel<QuoteListModel> result = Service.SearchQuotes(search).Result;
 
 			if (result.Count == 0)

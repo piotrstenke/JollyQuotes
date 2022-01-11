@@ -1,11 +1,23 @@
 ﻿using System;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace JollyQuotes
 {
 	internal static class Internals
 	{
+		public static bool ApplyQuery(ref string link, string query)
+		{
+			if(query.Length > 0)
+			{
+				link += $"?{query}";
+				return true;
+			}
+
+			return false;
+		}
+
 		public static HttpClient CreateDefaultClient()
 		{
 			HttpClient client = new();
@@ -46,6 +58,18 @@ namespace JollyQuotes
 			client.BaseAddress = uri;
 
 			return new HttpResolver(client);
+		}
+
+		public static void EnsureParameter(ref bool hasParam, StringBuilder builder)
+		{
+			if (hasParam)
+			{
+				builder.Append('&');
+			}
+			else
+			{
+				hasParam = true;
+			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

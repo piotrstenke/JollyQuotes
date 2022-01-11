@@ -4,8 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using JollyQuotes.TronaldDump.Models;
 
-using static JollyQuotes.TronaldDump.TronaldDumpResources;
-
 namespace JollyQuotes.TronaldDump
 {
 	/// <inheritdoc cref="ITronaldDumpService"/>
@@ -22,7 +20,7 @@ namespace JollyQuotes.TronaldDump
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class.
 		/// </summary>
-		public TronaldDumpService() : this(CreateDefaultResolver())
+		public TronaldDumpService() : this(TronaldDumpResources.CreateDefaultResolver())
 		{
 		}
 
@@ -36,7 +34,7 @@ namespace JollyQuotes.TronaldDump
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with a <paramref name="client"/> as the target <see cref="IResourceResolver"/> and a <see cref="ITronaldDumpModelConverter"/> specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with a <paramref name="client"/> as the target <see cref="IResourceResolver"/> and a <paramref name="modelConverter"/> specified.
 		/// </summary>
 		/// <param name="client"><see cref="HttpClient"/> that will be used as the target <see cref="Resolver"/>.</param>
 		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.</param>
@@ -55,7 +53,7 @@ namespace JollyQuotes.TronaldDump
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with an underlaying <paramref name="resolver"/> and a <see cref="ITronaldDumpModelConverter"/> specified.
+		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class with an underlaying <paramref name="resolver"/> and a <paramref name="modelConverter"/> specified.
 		/// </summary>
 		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access requested <c>Tronald Dump</c> resources.</param>
 		/// <param name="modelConverter"><see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.</param>
@@ -72,7 +70,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"Quote author with id '{id}' does not exist");
+					throw Error.Quote($"Quote author with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -92,7 +90,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"Quote with id '{id}' does not exist");
+					throw Error.Quote($"Quote with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -118,7 +116,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"Quote source with id '{id}' does not exist");
+					throw Error.Quote($"Quote source with id '{id}' does not exist");
 				}
 
 				return t.Result;
@@ -132,7 +130,7 @@ namespace JollyQuotes.TronaldDump
 			{
 				if (t.Result is null)
 				{
-					throw new QuoteException($"Unknown tag: '{tag}'");
+					throw Error.Quote($"Unknown tag: '{tag}'");
 				}
 
 				return t.Result;
@@ -147,8 +145,11 @@ namespace JollyQuotes.TronaldDump
 				throw Error.Null(nameof(searchModel));
 			}
 
+			string link = "search/quote";
 			string query = ModelConverter.GetSearchQuery(searchModel);
-			return Resolver.ResolveAsync<SearchResultModel<QuoteListModel>>(query);
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.ResolveAsync<SearchResultModel<QuoteListModel>>(link);
 		}
 	}
 }

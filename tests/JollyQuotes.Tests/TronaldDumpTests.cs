@@ -111,7 +111,7 @@ namespace JollyQuotes.Tests
 
 			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?query={phrase}");
 
-			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, null));
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(new string[] { phrase }, null));
 
 			Assert.Equal(expected, actual);
 		}
@@ -123,7 +123,7 @@ namespace JollyQuotes.Tests
 
 			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?tag={randomTag.Value}");
 
-			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(null as string, randomTag.Value));
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(null, randomTag.Value));
 
 			Assert.Equal(expected, actual);
 		}
@@ -151,7 +151,7 @@ namespace JollyQuotes.Tests
 
 			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?tag={randomTag.Value}&query={phrase}");
 
-			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, randomTag.Value));
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(new string[] { phrase }, randomTag.Value));
 
 			Assert.Equal(expected, actual);
 		}
@@ -164,7 +164,7 @@ namespace JollyQuotes.Tests
 
 			SearchResultModel<QuoteListModel> expected = await _resolver.ResolveAsync<SearchResultModel<QuoteListModel>>($"search/quote?query={phrase}&page={page}");
 
-			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(phrase, null, page));
+			SearchResultModel<QuoteListModel> actual = await _service.SearchQuotes(new(new string[] { phrase }, null, page));
 
 			Assert.Equal(expected, actual);
 		}

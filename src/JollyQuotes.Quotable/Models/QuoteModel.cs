@@ -29,7 +29,7 @@ namespace JollyQuotes.Quotable.Models
 			get => _id;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}
@@ -105,7 +105,7 @@ namespace JollyQuotes.Quotable.Models
 			get => _tags;
 			init
 			{
-				if(value is null)
+				if (value is null)
 				{
 					throw Error.Null(nameof(value));
 				}
@@ -124,7 +124,7 @@ namespace JollyQuotes.Quotable.Models
 			get => _length;
 			init
 			{
-				if(value < 0)
+				if (value < 0)
 				{
 					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
 				}
@@ -234,7 +234,7 @@ namespace JollyQuotes.Quotable.Models
 			int length
 		)
 		{
-			if(string.IsNullOrWhiteSpace(id))
+			if (string.IsNullOrWhiteSpace(id))
 			{
 				throw Error.NullOrEmpty(nameof(id));
 			}
@@ -254,12 +254,12 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.NullOrEmpty(nameof(authorSlug));
 			}
 
-			if(tags is null)
+			if (tags is null)
 			{
 				throw Error.Null(nameof(tags));
 			}
 
-			if(length < 0)
+			if (length < 0)
 			{
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(length), 0);
 			}
@@ -278,7 +278,7 @@ namespace JollyQuotes.Quotable.Models
 		[DebuggerStepThrough]
 		private static int GetQuoteLength(string content)
 		{
-			if(content is null)
+			if (content is null)
 			{
 				throw Error.Null(nameof(content));
 			}
