@@ -57,7 +57,7 @@ namespace JollyQuotes
 		/// <param name="client">Underlaying client that is used to access required resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="client"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="client"/> cannot be <see langword="null"/> or empty when no source specified.</exception>
-		protected QuoteClient(HttpClient client) : base(new HttpResolver(client), Internals.RetrieveSourceFromClient(client))
+		protected QuoteClient(HttpClient client) : base(new HttpResolver(client), client.RetrieveSourceFromClient())
 		{
 		}
 
@@ -67,7 +67,7 @@ namespace JollyQuotes
 		/// <param name="resolver"><see cref="JollyQuotes.HttpResolver"/> that is used to access the requested resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><see cref="HttpClient.BaseAddress"/> of <paramref name="resolver"/> cannot be <see langword="null"/> or empty when no source specified.</exception>
-		protected QuoteClient(HttpResolver resolver) : base(resolver, Internals.RetrieveSourceFromClient(resolver.BaseClient))
+		protected QuoteClient(HttpResolver resolver) : base(resolver, resolver.BaseClient.RetrieveSourceFromClient())
 		{
 		}
 

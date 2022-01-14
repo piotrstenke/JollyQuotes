@@ -24,7 +24,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _authors;
 			init
 			{
-				if(value is null)
+				if (value is null)
 				{
 					throw Error.Null(nameof(value));
 				}

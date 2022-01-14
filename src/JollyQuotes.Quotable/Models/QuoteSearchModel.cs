@@ -6,10 +6,11 @@ using Newtonsoft.Json;
 namespace JollyQuotes.Quotable.Models
 {
 	/// <summary>
-	/// Contains data needed to perform a quote search.
+	/// Contains data required to perform a quote search.
 	/// </summary>
 	[Serializable]
-	public sealed record QuoteSearchModel
+	[JsonObject]
+	public record QuoteSearchModel
 	{
 		private readonly string[]? _authors;
 		private readonly string[]? _authorIds;
@@ -169,9 +170,9 @@ namespace JollyQuotes.Quotable.Models
 		/// <param name="tags">Tags associated with the quote searched for.</param>
 		/// <param name="authors">Collection of all possible authors of the returned quote.</param>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="maxLength"/> must be greater than or equal to <c>0</c>.
+		/// <paramref name="maxLength"/> must be greater than or equal to <c>0</c>. -or-
 		/// <paramref name="minLength"/> must be greater than or equal to <c>0</c>. -or-
-		/// Value must be less than or equal to <paramref name="maxLength"/>.
+		/// <paramref name="minLength"/> must be less than or equal to <paramref name="maxLength"/>.
 		/// </exception>
 		public QuoteSearchModel(
 			int minLength = default,
@@ -217,11 +218,16 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <inheritdoc/>
-		public bool Equals(QuoteSearchModel? other)
+		public virtual bool Equals(QuoteSearchModel? other)
 		{
 			if (other is null)
 			{
 				return false;
+			}
+
+			if (ReferenceEquals(this, other))
+			{
+				return true;
 			}
 
 			return
@@ -243,7 +249,7 @@ namespace JollyQuotes.Quotable.Models
 			{
 				foreach (string author in _authors)
 				{
-					hash.Add(author.GetHashCode());
+					hash.Add(author);
 				}
 			}
 
@@ -251,7 +257,7 @@ namespace JollyQuotes.Quotable.Models
 			{
 				foreach (string id in _authorIds)
 				{
-					hash.Add(id.GetHashCode());
+					hash.Add(id);
 				}
 			}
 

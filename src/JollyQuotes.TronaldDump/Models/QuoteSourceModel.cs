@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.TronaldDump.Models
@@ -13,6 +12,7 @@ namespace JollyQuotes.TronaldDump.Models
 		private readonly string _id;
 		private readonly string _url;
 		private readonly SelfLinkModel _links;
+		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Date the quote source was added to the database at.
@@ -73,8 +73,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Date the quote source was last updated at.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
 		[JsonProperty("updated_at", Order = 3, Required = Required.DisallowNull)]
-		public DateTime UpdatedAt { get; init; }
+		public DateTime UpdatedAt
+		{
+			get => _updatedAt;
+			init
+			{
+				if (value < CreatedAt)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
+				}
+
+				_updatedAt = value;
+			}
+		}
 
 		/// <summary>
 		/// URL of the actual quote source.
@@ -129,6 +142,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="updatedAt">Date the quote source was last updated at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty. -or- <paramref name="url"/> is <see langword="null"/> or empty.</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
 		public QuoteSourceModel(
 			string id,
@@ -137,7 +151,8 @@ namespace JollyQuotes.TronaldDump.Models
 			string? remarks,
 			SelfLinkModel links,
 			DateTime createdAt,
-			DateTime updatedAt)
+			DateTime updatedAt
+		)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -154,10 +169,15 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
+			if (updatedAt < createdAt)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
+			}
+
 			_id = id;
 			_url = url;
 			CreatedAt = createdAt;
-			UpdatedAt = updatedAt;
+			_updatedAt = updatedAt;
 			FileName = filename;
 			Remarks = remarks;
 			_links = links;

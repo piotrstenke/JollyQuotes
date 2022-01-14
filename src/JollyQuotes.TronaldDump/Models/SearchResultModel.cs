@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.TronaldDump.Models
@@ -7,7 +8,7 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <typeparam name="T">Type of data searched for.</typeparam>
 	[Serializable]
 	[JsonObject]
-	public sealed record SearchResultModel<T> : ISearchResultModel where T : class
+	public sealed record SearchResultModel<T> : ISearchResultModel where T : IEnumerable
 	{
 		private readonly int _total;
 		private readonly int _count;
@@ -26,7 +27,7 @@ namespace JollyQuotes.TronaldDump.Models
 					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
 				}
 
-				if(_count > _total)
+				if (_count > _total)
 				{
 					throw Error.MustBeLessThanOrEqualTo(nameof(value), nameof(Total));
 				}
@@ -35,9 +36,7 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 		}
 
-		/// <summary>
-		/// Values present in the current page of the search result.
-		/// </summary>
+		/// <inheritdoc cref="ISearchResultModel.Embedded"/>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
 		[JsonProperty("_embedded", Order = 2, Required = Required.Always)]
 		public T Embedded
@@ -66,7 +65,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _total;
 			init
 			{
-				if(value < 0)
+				if (value < 0)
 				{
 					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
 				}
@@ -74,6 +73,8 @@ namespace JollyQuotes.TronaldDump.Models
 				_total = value;
 			}
 		}
+
+		IEnumerable ISearchResultModel.Embedded => Embedded;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SearchResultModel{T}"/> class with <paramref name="embedded"/> data,
@@ -133,6 +134,74 @@ namespace JollyQuotes.TronaldDump.Models
 			_total = total;
 			Links = links;
 			_embedded = embedded;
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(SearchResultModel<T>? other)
+		{
+			if (other is null)
+			{
+				return false;
+			}
+
+			if (ReferenceEquals(this, other))
+			{
+				return true;
+			}
+
+			if (other.Count != Count || other.Links != Links)
+			{
+				return false;
+			}
+
+			if (other.Embedded is IEquatable<T> eq)
+			{
+				return eq.Equals(Embedded);
+			}
+
+			IEnumerator e1 = other.Embedded.GetEnumerator();
+			IEnumerator e2 = Embedded.GetEnumerator();
+
+			while (true)
+			{
+				bool move1 = e1.MoveNext();
+				bool move2 = e2.MoveNext();
+
+				if (move1 && move2)
+				{
+					if (e1.Current != e2.Current)
+					{
+						return false;
+					}
+				}
+				else
+				{
+					return !move1 && !move2;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			HashCode code = new();
+
+			code.Add(Count);
+			code.Add(Links);
+
+			if (Embedded is IEquatable<T>)
+			{
+				code.Add(Embedded);
+			}
+			else
+			{
+				foreach (T obj in Embedded)
+				{
+					code.Add(obj);
+				}
+			}
+
+			return code.ToHashCode();
 		}
 	}
 }

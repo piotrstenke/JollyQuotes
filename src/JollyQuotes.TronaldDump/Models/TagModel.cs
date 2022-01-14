@@ -12,6 +12,7 @@ namespace JollyQuotes.TronaldDump.Models
 	{
 		private readonly string _value;
 		private readonly SelfLinkModel _links;
+		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Date the tag was added to the database at.
@@ -22,8 +23,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Date the tag was updated at.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
 		[JsonProperty("updated_at", Order = 2)]
-		public DateTime UpdatedAt { get; init; }
+		public DateTime UpdatedAt
+		{
+			get => _updatedAt;
+			init
+			{
+				if (value < CreatedAt)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
+				}
+
+				_updatedAt = value;
+			}
+		}
 
 		/// <summary>
 		/// Actual tag.
@@ -35,7 +49,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _value;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}
@@ -84,6 +98,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <param name="updatedAt">Date the tag was updated at.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="links"/> is <see langword="null"/>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
 		public TagModel(string value, SelfLinkModel links, DateTime createdAt, DateTime updatedAt)
 		{
@@ -97,10 +112,15 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
+			if (updatedAt < createdAt)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
+			}
+
 			_value = value;
 			_links = links;
+			_updatedAt = updatedAt;
 			CreatedAt = createdAt;
-			UpdatedAt = updatedAt;
 		}
 	}
 }

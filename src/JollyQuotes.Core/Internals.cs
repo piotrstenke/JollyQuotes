@@ -7,9 +7,14 @@ namespace JollyQuotes
 {
 	internal static class Internals
 	{
+		public static void ApplyParameter(this StringBuilder builder)
+		{
+			builder.Append('&');
+		}
+
 		public static bool ApplyQuery(ref string link, string query)
 		{
-			if(query.Length > 0)
+			if (query.Length > 0)
 			{
 				link += $"?{query}";
 				return true;
@@ -60,11 +65,11 @@ namespace JollyQuotes
 			return new HttpResolver(client);
 		}
 
-		public static void EnsureParameter(ref bool hasParam, StringBuilder builder)
+		public static void EnsureParameter(this StringBuilder builder, ref bool hasParam)
 		{
 			if (hasParam)
 			{
-				builder.Append('&');
+				ApplyParameter(builder);
 			}
 			else
 			{
@@ -73,7 +78,7 @@ namespace JollyQuotes
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IResourceResolver GetResolverFromService(IQuoteService service)
+		public static IResourceResolver GetResolverFromService(this IQuoteService service)
 		{
 			if (service is null)
 			{
@@ -83,7 +88,7 @@ namespace JollyQuotes
 			return service.Resolver;
 		}
 
-		public static string RetrieveSourceFromClient(HttpClient client)
+		public static string RetrieveSourceFromClient(this HttpClient client)
 		{
 			if (client is null)
 			{

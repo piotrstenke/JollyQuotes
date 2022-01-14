@@ -34,7 +34,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _page;
 			init
 			{
-				if(value < 0)
+				if (value < 0)
 				{
 					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), 0);
 				}

@@ -81,7 +81,7 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		/// <param name="service"><see cref="ITronaldDumpService"/> used to perform actions using the <c>Tronald Dump</c> API</param>
 		/// <exception cref="ArgumentNullException"><paramref name="service"/> is <see langword="null"/>.</exception>
-		public TronaldDumpQuoteGenerator(ITronaldDumpService service) : base(GetResolverFromService(service), BaseAddress)
+		public TronaldDumpQuoteGenerator(ITronaldDumpService service) : base(service.GetResolverFromService(), BASE_ADDRESS)
 		{
 			Service = service;
 			ModelConverter = CreateConverter(service);
@@ -107,7 +107,7 @@ namespace JollyQuotes.TronaldDump
 			IRandomNumberGenerator? random = default,
 			IQuoteCache<TronaldDumpQuote>? cache = default,
 			IPossibility? possibility = default
-		) : base(GetResolverFromService(service), BaseAddress, cache, possibility)
+		) : base(service.GetResolverFromService(), BASE_ADDRESS, cache, possibility)
 		{
 			Service = service;
 			ModelConverter = modelConverter ?? CreateConverter(service);
@@ -115,19 +115,12 @@ namespace JollyQuotes.TronaldDump
 			_internalGenerator = new(this);
 		}
 
-		private static ITronaldDumpModelConverter CreateConverter(ITronaldDumpService service)
-		{
-			return service is TronaldDumpService s
-				? s.ModelConverter
-				: new TronaldDumpModelConverter();
-		}
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpQuoteGenerator"/> class with an underlaying <paramref name="resolver"/> specified.
 		/// </summary>
 		/// <param name="resolver"><see cref="IStreamResolver"/> that is used to access the requested <c>Tronald Dump</c> resources.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null"/>.</exception>
-		public TronaldDumpQuoteGenerator(IStreamResolver resolver) : base(resolver, BaseAddress)
+		public TronaldDumpQuoteGenerator(IStreamResolver resolver) : base(resolver, BASE_ADDRESS)
 		{
 			ModelConverter = new TronaldDumpModelConverter();
 			Service = new TronaldDumpService(resolver, ModelConverter);
@@ -274,6 +267,13 @@ namespace JollyQuotes.TronaldDump
 			QuoteModel model = result.Embedded.Quotes[targetQuote];
 
 			return ModelConverter.ConvertQuoteModel(model);
+		}
+
+		private static ITronaldDumpModelConverter CreateConverter(ITronaldDumpService service)
+		{
+			return service is TronaldDumpService s
+				? s.ModelConverter
+				: new TronaldDumpModelConverter();
 		}
 	}
 }

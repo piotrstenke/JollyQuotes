@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -9,7 +11,7 @@ namespace JollyQuotes.TronaldDump.Models
 	/// </summary>
 	[Serializable]
 	[JsonObject]
-	public sealed record QuoteListModel
+	public sealed record QuoteListModel : IEnumerable<QuoteModel>
 	{
 		private readonly QuoteModel[] _quotes;
 
@@ -77,6 +79,17 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return hash.ToHashCode();
+		}
+
+		/// <inheritdoc/>
+		public IEnumerator<QuoteModel> GetEnumerator()
+		{
+			return ((IEnumerable<QuoteModel>)_quotes).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return _quotes.GetEnumerator();
 		}
 	}
 }

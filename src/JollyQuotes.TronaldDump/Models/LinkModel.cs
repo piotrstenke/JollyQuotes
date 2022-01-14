@@ -22,7 +22,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _href;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}

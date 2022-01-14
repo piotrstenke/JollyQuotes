@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using JollyQuotes.TronaldDump.Models;
 
-using static JollyQuotes.Internals;
-
 namespace JollyQuotes.TronaldDump
 {
 	/// <inheritdoc cref="ITronaldDumpModelConverter"/>
@@ -73,7 +71,7 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		public string GetSearchQuery(QuoteSearchModel searchModel)
 		{
-			if(searchModel is null)
+			if (searchModel is null)
 			{
 				throw Error.Null(nameof(searchModel));
 			}
@@ -90,14 +88,14 @@ namespace JollyQuotes.TronaldDump
 
 			if (!string.IsNullOrWhiteSpace(searchModel.Tag))
 			{
-				EnsureParameter(ref hasParam, builder);
+				builder.EnsureParameter(ref hasParam);
 				builder.Append("tag=");
 				builder.Append(searchModel.Tag);
 			}
 
 			if (searchModel.Page > 0)
 			{
-				EnsureParameter(ref hasParam, builder);
+				builder.EnsureParameter(ref hasParam);
 				builder.Append("page=");
 				builder.Append(searchModel.Page);
 			}

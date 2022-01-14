@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace JollyQuotes
@@ -30,10 +29,8 @@ namespace JollyQuotes
 		/// </summary>
 		/// <typeparam name="T">Type of resource to resolve.</typeparam>
 		/// <param name="source">Source of data used to resolve the resource.</param>
-		/// <param name="resource">Resolved resource.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-		/// <returns><see langword="true"/> if the resource was successfully resolved, <see langword="false"/> otherwise.</returns>
-		bool TryResolve<T>(string source, [NotNullWhen(true)] out T? resource);
+		ResolverResponse<T> TryResolve<T>(string source);
 
 		/// <summary>
 		/// Attempts to asynchronously resolve a resource of type <typeparamref name="T"/> using data found in the <paramref name="source"/>.
@@ -41,6 +38,6 @@ namespace JollyQuotes
 		/// <typeparam name="T">Type of resource to resolve.</typeparam>
 		/// <param name="source">Source of data used to resolve the resource.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-		Task<T?> TryResolveAsync<T>(string source);
+		Task<ResolverResponse<T>> TryResolveAsync<T>(string source);
 	}
 }

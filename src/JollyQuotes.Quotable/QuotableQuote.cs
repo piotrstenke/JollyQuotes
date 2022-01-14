@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.Quotable
@@ -15,6 +16,7 @@ namespace JollyQuotes.Quotable
 		private readonly string _value;
 		private readonly string _author;
 		private readonly string _authorSlug;
+		private readonly DateTime _updatedAt;
 
 		/// <inheritdoc/>
 		/// <exception cref="ArgumentException">Value must be initialized.</exception>
@@ -116,8 +118,21 @@ namespace JollyQuotes.Quotable
 		/// <summary>
 		/// Date of the quote's most recent update.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
 		[JsonProperty("updatedAt", Order = 6)]
-		public DateTime UpdatedAt { get; init; }
+		public DateTime UpdatedAt
+		{
+			get => _updatedAt;
+			init
+			{
+				if (value < CreatedAt)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
+				}
+
+				_updatedAt = value;
+			}
+		}
 
 		string IQuote.Author => AuthorSlug;
 		DateTime? IQuote.Date => default;
@@ -167,6 +182,7 @@ namespace JollyQuotes.Quotable
 		/// <paramref name="author"/> is <see langword="null"/> or empty.
 		/// <paramref name="authorSlug"/> is <see langword="null"/> or empty.
 		/// </exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
 		public QuotableQuote(
 			Id id,
@@ -203,13 +219,57 @@ namespace JollyQuotes.Quotable
 				throw Error.Null(nameof(tags));
 			}
 
+			if (updatedAt < createdAt)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
+			}
+
 			_id = id;
 			_value = value;
 			_author = author;
 			_authorSlug = authorSlug;
 			_tags = tags;
+			_updatedAt = updatedAt;
 			CreatedAt = createdAt;
-			UpdatedAt = updatedAt;
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(QuotableQuote? other)
+		{
+			if (other is null)
+			{
+				return false;
+			}
+
+			return
+				other.Id == Id &&
+				other.Author == Author &&
+				other.AuthorSlug == AuthorSlug &&
+				other.Value == Value &&
+				other.CreatedAt == CreatedAt &&
+				other.UpdatedAt == UpdatedAt &&
+				other.Tags.Length == Tags.Length &&
+				other.Tags.SequenceEqual(Tags);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			HashCode hash = new();
+
+			hash.Add(Id);
+			hash.Add(Author);
+			hash.Add(AuthorSlug);
+			hash.Add(Value);
+			hash.Add(CreatedAt);
+			hash.Add(UpdatedAt);
+
+			foreach (string tag in Tags)
+			{
+				hash.Add(tag);
+			}
+
+			return hash.ToHashCode();
 		}
 	}
 }

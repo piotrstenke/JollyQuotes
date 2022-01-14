@@ -83,7 +83,7 @@ namespace JollyQuotes.KanyeRest
 			IKanyeRestService service,
 			IQuoteCache<KanyeRestQuote>? cache = default,
 			IPossibility? possibility = default
-		) : base(GetResolverFromService(service), BASE_ADDRESS, cache, possibility)
+		) : base(service.GetResolverFromService(), BASE_ADDRESS, cache, possibility)
 		{
 			Service = service;
 		}

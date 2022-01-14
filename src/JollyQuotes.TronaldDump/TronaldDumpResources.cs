@@ -48,12 +48,12 @@ namespace JollyQuotes.TronaldDump
 		/// </summary>
 		public const int MemeWidth = 1024;
 
-		internal const string BaseAddress = ApiPage;
+		internal const string BASE_ADDRESS = ApiPage;
 
 		internal static HttpResolver CreateDefaultResolver()
 		{
 			HttpClient client = Internals.CreateDefaultClient();
-			client.BaseAddress = new Uri(BaseAddress);
+			client.BaseAddress = new Uri(BASE_ADDRESS);
 			return new HttpResolver(client);
 		}
 	}

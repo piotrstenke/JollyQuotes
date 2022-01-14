@@ -1,5 +1,6 @@
-﻿using System.Net.Http;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using JollyQuotes.Quotable.Models;
 
@@ -60,18 +61,62 @@ namespace JollyQuotes.Quotable
 		}
 
 		/// <inheritdoc/>
+		public Task<AuthorModel> GetAuthor(string slug)
+		{
+			return Resolver.TryResolveAsync<AuthorModel>($"author/{slug}").OnResponse(t =>
+			{
+				if (!t.HasResult)
+				{
+					throw Error.Quote($"Author with slug '{slug}' does not exist");
+				}
+
+				return t.Result;
+			});
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<AuthorModel>> GetAuthors()
+		{
+			return Resolver.ResolveAsync<SearchResultModel<AuthorModel>>("authors");
+		}
+
+		/// <inheritdoc/>
 		public Task<QuoteModel> GetQuote(string id)
 		{
-			if(string.IsNullOrWhiteSpace(id))
+			if (string.IsNullOrWhiteSpace(id))
 			{
 				throw Error.NullOrEmpty(nameof(id));
 			}
 
-			return Resolver.TryResolveAsync<QuoteModel>($"quotes/{id}").ContinueWith(t =>
+			return Resolver.TryResolveAsync<QuoteModel>($"quotes/{id}").OnResponse(t =>
 			{
-				if(t.Result is null)
+				if (!t.HasResult)
 				{
 					throw Error.Quote($"Quote with id '{id}' does not exist");
+				}
+
+				return t.Result;
+			});
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<QuoteModel>> GetQuotes()
+		{
+			return Resolver.ResolveAsync<SearchResultModel<QuoteModel>>("quotes");
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<QuoteModel>> GetQuotes(QuoteListSearchModel searchModel)
+		{
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "quotes";
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.TryResolveAsync<SearchResultModel<QuoteModel>>(link).OnResponse(t =>
+			{
+				if (!t.HasResult)
+				{
+					throw Error.Quote("Could not find any matching quotes");
 				}
 
 				return t.Result;
@@ -87,20 +132,39 @@ namespace JollyQuotes.Quotable
 		/// <inheritdoc/>
 		public Task<QuoteModel> GetRandomQuote(QuoteSearchModel searchModel)
 		{
-			if(searchModel is null)
-			{
-				throw Error.Null(nameof(searchModel));
-			}
-
-			string link = "random";
 			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "random";
 			Internals.ApplyQuery(ref link, query);
 
-			return Resolver.TryResolveAsync<QuoteModel>(link).ContinueWith(t =>
+			return Resolver.TryResolveAsync<QuoteModel>(link).OnResponse(t =>
 			{
-				if(t.Result is null)
+				if (!t.HasResult)
 				{
-					throw Error.Quote("Could not find any matching quote");
+					throw Error.Quote("Could not find any matching quotes");
+				}
+
+				return t.Result;
+			});
+		}
+
+		/// <inheritdoc/>
+		public Task<TagModel> GetTags()
+		{
+			return Resolver.ResolveAsync<TagModel>("tags");
+		}
+
+		/// <inheritdoc/>
+		public Task<List<TagModel>> GetTags(TagSearchModel searchModel)
+		{
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "tags";
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.TryResolveAsync<List<TagModel>>(link).OnResponse(t =>
+			{
+				if (!t.HasResult)
+				{
+					throw Error.Quote("Could not find any matching tags");
 				}
 
 				return t.Result;

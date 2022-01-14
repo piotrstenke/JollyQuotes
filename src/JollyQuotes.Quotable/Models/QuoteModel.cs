@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
@@ -18,6 +19,7 @@ namespace JollyQuotes.Quotable.Models
 		private readonly string _author;
 		private readonly string _authorSlug;
 		private readonly int _length;
+		private readonly DateTime _dateModified;
 
 		/// <summary>
 		/// Id of the quote.
@@ -77,7 +79,7 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Slug version of the <see cref="Author"/>.
+		/// Slug version of the <see cref="Author"/>'s name.
 		/// </summary>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[JsonProperty("authorSlug", Order = 3, Required = Required.Always)]
@@ -143,12 +145,25 @@ namespace JollyQuotes.Quotable.Models
 		/// <summary>
 		/// Date of the quote's most recent update.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="DateAdded"/>.</exception>
 		[JsonConverter(typeof(Quote.DateOnlyConverter))]
 		[JsonProperty("dateModified", Order = 7)]
-		public DateTime DateModified { get; init; }
+		public DateTime DateModified
+		{
+			get => _dateModified;
+			init
+			{
+				if (value < DateAdded)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(DateAdded));
+				}
+
+				_dateModified = value;
+			}
+		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and date of the quote's creation.
+		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and date of the quote's creation specified.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
 		/// <param name="content">Text of the quote.</param>
@@ -175,7 +190,7 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and dates of creation and last update.
+		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and dates of creation and last update specified.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
 		/// <param name="content">Text of the quote.</param>
@@ -191,6 +206,7 @@ namespace JollyQuotes.Quotable.Models
 		/// <paramref name="author"/> is <see langword="null"/> or empty.
 		/// <paramref name="authorSlug"/> is <see langword="null"/> or empty.
 		/// </exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="dateModified"/> must be greater than or equal to <paramref name="dateAdded"/>.</exception>
 		public QuoteModel(
 			string id,
 			string content,
@@ -204,7 +220,7 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/>, <paramref name="length"/> of the quote and dates of creation and last update.
+		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/>, <paramref name="length"/> of the quote and dates of creation and last update specified.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
 		/// <param name="content">Text of the quote.</param>
@@ -221,7 +237,8 @@ namespace JollyQuotes.Quotable.Models
 		/// <paramref name="author"/> is <see langword="null"/> or empty.
 		/// <paramref name="authorSlug"/> is <see langword="null"/> or empty.
 		/// </exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> must be greater than or equal to <c>0</c>.</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="dateModified"/> must be greater than or equal to <paramref name="dateAdded"/>.</exception>
 		[JsonConstructor]
 		public QuoteModel(
 			string id,
@@ -259,6 +276,11 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.Null(nameof(tags));
 			}
 
+			if (dateModified < dateAdded)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(dateModified), nameof(dateAdded));
+			}
+
 			if (length < 0)
 			{
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(length), 0);
@@ -272,6 +294,50 @@ namespace JollyQuotes.Quotable.Models
 			_tags = tags;
 			DateAdded = dateAdded;
 			DateModified = dateModified;
+		}
+
+		/// <inheritdoc/>
+		public bool Equals(QuoteModel? other)
+		{
+			if (other is null)
+			{
+				return false;
+			}
+
+			if (ReferenceEquals(this, other))
+			{
+				return true;
+			}
+
+			return
+				other.Id == Id &&
+				other.Author == Author &&
+				other.AuthorSlug == AuthorSlug &&
+				other.Content == Content &&
+				other.DateAdded == DateAdded &&
+				other.DateModified == DateModified &&
+				other.Tags.Length == Tags.Length &&
+				other.Tags.SequenceEqual(Tags);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			HashCode hash = new();
+
+			hash.Add(Id);
+			hash.Add(Author);
+			hash.Add(AuthorSlug);
+			hash.Add(Content);
+			hash.Add(DateAdded);
+			hash.Add(DateModified);
+
+			foreach (string tag in Tags)
+			{
+				hash.Add(tag);
+			}
+
+			return hash.ToHashCode();
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

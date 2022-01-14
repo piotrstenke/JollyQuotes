@@ -16,6 +16,7 @@ namespace JollyQuotes.TronaldDump.Models
 		private readonly string[] _tags;
 		private readonly AuthorsAndSourcesModel _embedded;
 		private readonly SelfLinkModel _links;
+		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Date the quote was said/written at.
@@ -32,8 +33,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Date the quote was last updated at.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
 		[JsonProperty("updated_at", Order = 4)]
-		public DateTime UpdatedAt { get; init; }
+		public DateTime UpdatedAt
+		{
+			get => _updatedAt;
+			init
+			{
+				if (value < CreatedAt)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
+				}
+
+				_updatedAt = value;
+			}
+		}
 
 		/// <summary>
 		/// Id of the quote.
@@ -178,6 +192,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <paramref name="id"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="value"/> is <see langword="null"/> or empty.
 		/// </exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
 		public QuoteModel(
 			string id,
@@ -212,6 +227,11 @@ namespace JollyQuotes.TronaldDump.Models
 			if (embedded is null)
 			{
 				throw Error.Null(nameof(embedded));
+			}
+
+			if (updatedAt < createdAt)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
 			}
 
 			_id = id;

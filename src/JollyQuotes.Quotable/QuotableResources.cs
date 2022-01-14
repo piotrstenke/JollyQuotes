@@ -22,6 +22,11 @@ namespace JollyQuotes.Quotable
 		public const string ApiPage = "https://api.quotable.io";
 
 		/// <summary>
+		/// Default number of results on a response page.
+		/// </summary>
+		public const int DefaultResultsPerPage = 20;
+
+		/// <summary>
 		/// Link to page with documentation of the <c>quotable</c> API.
 		/// </summary>
 		public const string DocsPage = "https://github.com/lukePeavey/quotable/blob/master/README.md";
@@ -31,14 +36,63 @@ namespace JollyQuotes.Quotable
 		/// </summary>
 		public const string GitHubPage = "https://github.com/lukePeavey/quotable";
 
+		/// <summary>
+		/// Maximum number of results on a response page.
+		/// </summary>
+		public const int MaxResultsPerPage = 150;
+
+		/// <summary>
+		/// Minimum number of results on a response page.
+		/// </summary>
+		public const int MinResultsPerPage = 1;
+
 		internal const string AUTHOR_ID_OBSOLETE = "Author id was deprecated by the maintainers of quotable.io. ";
 
-		internal const string BaseAddress = ApiPage;
+		internal const string BASE_ADDRESS = ApiPage;
+
+		internal const string MAX_RESULTS_PER_PAGE_NAME = nameof(QuotableResources) + "." + nameof(MaxResultsPerPage);
+
+		/// <inheritdoc cref="IQuotableModelConverter.GetName(SortOrder)"/>
+		public static string GetName(SortOrder value)
+		{
+			return value switch
+			{
+				SortOrder.Ascending => "asc",
+				SortOrder.Descending => "desc",
+				_ => throw Error.InvalidEnumValue(value)
+			};
+		}
+
+		/// <inheritdoc cref="IQuotableModelConverter.GetName(SortBy)"/>
+		public static string GetName(SortBy value)
+		{
+			return value switch
+			{
+				SortBy.Name => "name",
+				SortBy.DateAddded => "dateAdded",
+				SortBy.DateModified => "dateModified",
+				SortBy.QuoteCount => "quoteCount",
+				_ => throw Error.InvalidEnumValue(value)
+			};
+		}
+
+		/// <inheritdoc cref="IQuotableModelConverter.GetName(QuoteSortBy)"/>
+		public static string GetName(QuoteSortBy value)
+		{
+			return value switch
+			{
+				QuoteSortBy.DateAddded => "dateAdded",
+				QuoteSortBy.DateModified => "dateModified",
+				QuoteSortBy.Author => "author",
+				QuoteSortBy.Content => "content",
+				_ => throw Error.InvalidEnumValue(value)
+			};
+		}
 
 		internal static HttpResolver CreateDefaultResolver()
 		{
 			HttpClient client = Internals.CreateDefaultClient();
-			client.BaseAddress = new Uri(BaseAddress);
+			client.BaseAddress = new Uri(BASE_ADDRESS);
 			return new HttpResolver(client);
 		}
 

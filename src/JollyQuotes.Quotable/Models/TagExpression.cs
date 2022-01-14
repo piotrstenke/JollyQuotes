@@ -134,6 +134,11 @@ namespace JollyQuotes.Quotable.Models
 				return false;
 			}
 
+			if (ReferenceEquals(this, other))
+			{
+				return true;
+			}
+
 			if (IsEndNode)
 			{
 				if (other.IsEndNode)

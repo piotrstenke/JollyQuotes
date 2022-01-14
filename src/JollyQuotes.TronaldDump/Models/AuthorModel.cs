@@ -14,6 +14,7 @@ namespace JollyQuotes.TronaldDump.Models
 		private readonly string _name;
 		private readonly string _slug;
 		private readonly string _id;
+		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Bio of the author.
@@ -37,7 +38,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _id;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}
@@ -56,7 +57,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _links;
 			init
 			{
-				if(value is null)
+				if (value is null)
 				{
 					throw Error.Null(nameof(value));
 				}
@@ -75,7 +76,7 @@ namespace JollyQuotes.TronaldDump.Models
 			get => _name;
 			init
 			{
-				if(string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					throw Error.NullOrEmpty(nameof(value));
 				}
@@ -106,8 +107,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <summary>
 		/// Date the data of the author was updated at.
 		/// </summary>
+		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
 		[JsonProperty("updated_at", Order = 5)]
-		public DateTime UpdatedAt { get; init; }
+		public DateTime UpdatedAt
+		{
+			get => _updatedAt;
+			init
+			{
+				if (value < CreatedAt)
+				{
+					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
+				}
+
+				_updatedAt = value;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="bio"/>, self <paramref name="links"/> and date of creation and last update specified.
@@ -151,6 +165,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <paramref name="name"/> is <see langword="null"/> or empty. -or-
 		/// <paramref name="slug"/> is <see langword="null"/> or empty.
 		/// </exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
 		public AuthorModel(
 			string id,
@@ -181,13 +196,18 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
+			if (updatedAt < createdAt)
+			{
+				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
+			}
+
 			_id = id;
 			_name = name;
 			_slug = slug;
 			Bio = bio;
 			_links = links;
 			CreatedAt = createdAt;
-			UpdatedAt = updatedAt;
+			_updatedAt = updatedAt;
 		}
 	}
 }

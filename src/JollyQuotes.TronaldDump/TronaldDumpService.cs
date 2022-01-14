@@ -9,13 +9,13 @@ namespace JollyQuotes.TronaldDump
 	/// <inheritdoc cref="ITronaldDumpService"/>
 	public class TronaldDumpService : QuoteService, ITronaldDumpService
 	{
-		/// <inheritdoc/>
-		public new IStreamResolver Resolver => (base.Resolver as IStreamResolver)!;
-
 		/// <summary>
 		/// <see cref="ITronaldDumpModelConverter"/> used to convert data received from the <c>Tronald Dump</c> API to usable objects.
 		/// </summary>
 		public ITronaldDumpModelConverter ModelConverter { get; }
+
+		/// <inheritdoc/>
+		public new IStreamResolver Resolver => (base.Resolver as IStreamResolver)!;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TronaldDumpService"/> class.
@@ -66,9 +66,9 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		public Task<AuthorModel> GetAuthor(string id)
 		{
-			return Resolver.TryResolveAsync<AuthorModel>($"author/{id}").ContinueWith(t =>
+			return Resolver.TryResolveAsync<AuthorModel>($"author/{id}").OnResponse(t =>
 			{
-				if (t.Result is null)
+				if (!t.HasResult)
 				{
 					throw Error.Quote($"Quote author with id '{id}' does not exist");
 				}
@@ -86,9 +86,9 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		public Task<QuoteModel> GetQuote(string id)
 		{
-			return Resolver.TryResolveAsync<QuoteModel>($"quote/{id}").ContinueWith(t =>
+			return Resolver.TryResolveAsync<QuoteModel>($"quote/{id}").OnResponse(t =>
 			{
-				if (t.Result is null)
+				if (!t.HasResult)
 				{
 					throw Error.Quote($"Quote with id '{id}' does not exist");
 				}
@@ -112,9 +112,9 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		public Task<QuoteSourceModel> GetSource(string id)
 		{
-			return Resolver.TryResolveAsync<QuoteSourceModel>($"quote-source/{id}").ContinueWith(t =>
+			return Resolver.TryResolveAsync<QuoteSourceModel>($"quote-source/{id}").OnResponse(t =>
 			{
-				if (t.Result is null)
+				if (!t.HasResult)
 				{
 					throw Error.Quote($"Quote source with id '{id}' does not exist");
 				}
@@ -126,9 +126,9 @@ namespace JollyQuotes.TronaldDump
 		/// <inheritdoc/>
 		public Task<TagModel> GetTag(string tag)
 		{
-			return Resolver.TryResolveAsync<TagModel>($"tag/{tag}").ContinueWith(t =>
+			return Resolver.TryResolveAsync<TagModel>($"tag/{tag}").OnResponse(t =>
 			{
-				if (t.Result is null)
+				if (!t.HasResult)
 				{
 					throw Error.Quote($"Unknown tag: '{tag}'");
 				}

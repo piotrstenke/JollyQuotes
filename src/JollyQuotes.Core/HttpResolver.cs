@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -94,6 +93,11 @@ namespace JollyQuotes
 		/// </exception>
 		public virtual async Task<T> ResolveAsync<T>(string source)
 		{
+			if (string.IsNullOrWhiteSpace(source))
+			{
+				throw Error.NullOrEmpty(nameof(source));
+			}
+
 			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 
@@ -125,8 +129,13 @@ namespace JollyQuotes
 		/// <param name="source">Source of data to download.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		/// <exception cref="HttpRequestException">The HTTP response is unsuccessful.</exception>
-		public async Task<Stream> ResolveStreamAsync(string source)
+		public virtual async Task<Stream> ResolveStreamAsync(string source)
 		{
+			if (string.IsNullOrWhiteSpace(source))
+			{
+				throw Error.NullOrEmpty(nameof(source));
+			}
+
 			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 
@@ -137,14 +146,10 @@ namespace JollyQuotes
 		/// Attempts to download json data from the specified <paramref name="source"/> and deserializes it into a new <typeparamref name="T"/> object.
 		/// </summary>
 		/// <param name="source">Link to the json data.</param>
-		/// <param name="resource">Resolved resource.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-		/// <returns><see langword="true"/> if the data was successfully downloaded, <see langword="false"/> otherwise.</returns>
-		public virtual bool TryResolve<T>(string source, [NotNullWhen(true)] out T? resource)
+		public virtual HttpResolverResponse<T> TryResolve<T>(string source)
 		{
-			resource = TryResolveAsync<T>(source).Result;
-
-			return resource is not null;
+			return TryResolveAsync<T>(source).Result;
 		}
 
 		/// <summary>
@@ -156,30 +161,31 @@ namespace JollyQuotes
 		/// The HTTP response is unsuccessful. -or-
 		/// Object could not be deserialized from response.
 		/// </exception>
-		public virtual async Task<T?> TryResolveAsync<T>(string source)
+		public virtual Task<HttpResolverResponse<T>> TryResolveAsync<T>(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
-
-			if (!response.IsSuccessStatusCode)
+			if (string.IsNullOrWhiteSpace(source))
 			{
-				return default;
+				throw Error.NullOrEmpty(nameof(source));
 			}
 
-			string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-			return JsonConvert.DeserializeObject<T>(json, Quote.JsonSettings);
+			return TryResolve(source, response => response.Content.ReadAsStringAsync().ContinueWith(t =>
+			{
+				string json = t.Result;
+				T? result = JsonConvert.DeserializeObject<T>(json, Quote.JsonSettings);
+
+				return new HttpResolverResponse<T>(response, json, result);
+			}));
 		}
 
 		/// <summary>
 		/// Attempts to download a <see cref="Stream"/> of data from the specified <paramref name="source"/>.
 		/// </summary>
 		/// <param name="source">Source of data to download.</param>
-		/// <param name="stream"><see cref="Stream"/> that contains the downloaded data.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
 		/// <returns><see langword="true"/> if the data was successfully downloaded, <see langword="false"/> otherwise.</returns>
-		public bool TryResolveStream(string source, [NotNullWhen(true)] out Stream? stream)
+		public virtual HttpResolverResponse<Stream> TryResolveStream(string source)
 		{
-			stream = TryResolveStreamAsync(source).Result;
-			return stream is not null;
+			return TryResolveStreamAsync(source).Result;
 		}
 
 		/// <summary>
@@ -187,16 +193,40 @@ namespace JollyQuotes
 		/// </summary>
 		/// <param name="source">Source of data to download.</param>
 		/// <exception cref="ArgumentException"><paramref name="source"/> is <see langword="null"/> or empty.</exception>
-		public async Task<Stream?> TryResolveStreamAsync(string source)
+		public virtual Task<HttpResolverResponse<Stream>> TryResolveStreamAsync(string source)
 		{
-			HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
-
-			if (!response.IsSuccessStatusCode)
+			if (string.IsNullOrWhiteSpace(source))
 			{
-				return null;
+				throw Error.NullOrEmpty(nameof(source));
 			}
 
-			return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+			return TryResolve(source, response => response.Content.ReadAsStreamAsync().ContinueWith(t =>
+			{
+				Stream stream = t.Result;
+				return new HttpResolverResponse<Stream>(response, result: stream);
+			}));
+		}
+
+		ResolverResponse<T> IResourceResolver.TryResolve<T>(string source)
+		{
+			return ((IResourceResolver)this).TryResolveAsync<T>(source).Result;
+		}
+
+		async Task<ResolverResponse<T>> IResourceResolver.TryResolveAsync<T>(string source)
+		{
+			HttpResolverResponse<T> response = await TryResolveAsync<T>(source).ConfigureAwait(false);
+			return response;
+		}
+
+		ResolverResponse<Stream> IStreamResolver.TryResolveStream(string source)
+		{
+			return ((IStreamResolver)this).TryResolveStreamAsync(source).Result;
+		}
+
+		async Task<ResolverResponse<Stream>> IStreamResolver.TryResolveStreamAsync(string source)
+		{
+			HttpResolverResponse<Stream> response = await TryResolveStreamAsync(source).ConfigureAwait(false);
+			return response;
 		}
 
 		/// <summary>
@@ -216,13 +246,40 @@ namespace JollyQuotes
 			}
 		}
 
+		/// <summary>
+		/// Provides default mechanism for accessing web data.
+		/// </summary>
+		/// <typeparam name="T">Type of data to access.</typeparam>
+		/// <param name="source">Source of the data.</param>
+		/// <param name="onSuccess">Function performed when a <see cref="HttpResponseMessage"/> is successful.</param>
+		protected async Task<HttpResolverResponse<T>> TryResolve<T>(string source, Func<HttpResponseMessage, Task<HttpResolverResponse<T>>> onSuccess)
+		{
+			try
+			{
+				HttpResponseMessage response = await GetResponse(source).ConfigureAwait(false);
+
+				try
+				{
+					if (response.IsSuccessStatusCode)
+					{
+						return await onSuccess(response).ConfigureAwait(false);
+					}
+
+					return new HttpResolverResponse<T>(response);
+				}
+				catch (Exception e)
+				{
+					return new HttpResolverResponse<T>(response, e);
+				}
+			}
+			catch (Exception e)
+			{
+				return new HttpResolverResponse<T>(e);
+			}
+		}
+
 		private async Task<HttpResponseMessage> GetResponse(string source)
 		{
-			if (string.IsNullOrWhiteSpace(source))
-			{
-				throw Error.NullOrEmpty(nameof(source));
-			}
-
 			return await BaseClient.GetAsync(source).ConfigureAwait(false);
 		}
 	}

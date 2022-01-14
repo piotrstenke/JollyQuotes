@@ -87,7 +87,7 @@ namespace JollyQuotes
 				HttpClient client,
 				IQuoteCache<T>? cache = default,
 				IPossibility? possibility = default
-			) : base(new HttpResolver(client), Internals.RetrieveSourceFromClient(client), cache, possibility)
+			) : base(new HttpResolver(client), client.RetrieveSourceFromClient(), cache, possibility)
 			{
 			}
 
@@ -106,7 +106,7 @@ namespace JollyQuotes
 				HttpResolver resolver,
 				IQuoteCache<T>? cache = default,
 				IPossibility? possibility = default
-			) : base(resolver, Internals.RetrieveSourceFromClient(resolver.BaseClient), cache, possibility)
+			) : base(resolver, resolver.BaseClient.RetrieveSourceFromClient(), cache, possibility)
 			{
 			}
 

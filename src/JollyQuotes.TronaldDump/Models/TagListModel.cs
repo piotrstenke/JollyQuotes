@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -9,7 +11,7 @@ namespace JollyQuotes.TronaldDump.Models
 	/// </summary>
 	[Serializable]
 	[JsonObject]
-	public sealed record TagListModel
+	public sealed record TagListModel : IEnumerable<TagModel>
 	{
 		private readonly TagModel[] _tags;
 
@@ -77,6 +79,17 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return hash.ToHashCode();
+		}
+
+		/// <inheritdoc/>
+		public IEnumerator<TagModel> GetEnumerator()
+		{
+			return ((IEnumerable<TagModel>)_tags).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return _tags.GetEnumerator();
 		}
 	}
 }
