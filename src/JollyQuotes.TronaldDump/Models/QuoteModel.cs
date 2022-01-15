@@ -7,47 +7,20 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a quote that is returned by the <c>Tronald Dump</c> API.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record QuoteModel
+	public sealed record QuoteModel : DatabaseModel
 	{
 		private readonly string _id;
 		private readonly string _value;
 		private readonly string[] _tags;
 		private readonly AuthorsAndSourcesModel _embedded;
 		private readonly SelfLinkModel _links;
-		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Date the quote was said/written at.
 		/// </summary>
 		[JsonProperty("appeared_at", Order = 2, Required = Required.Always)]
 		public DateTime AppearedAt { get; init; }
-
-		/// <summary>
-		/// Date the quote was added to the database at.
-		/// </summary>
-		[JsonProperty("created_at", Order = 3, Required = Required.Always)]
-		public DateTime CreatedAt { get; init; }
-
-		/// <summary>
-		/// Date the quote was last updated at.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
-		[JsonProperty("updated_at", Order = 4)]
-		public DateTime UpdatedAt
-		{
-			get => _updatedAt;
-			init
-			{
-				if (value < CreatedAt)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
-				}
-
-				_updatedAt = value;
-			}
-		}
 
 		/// <summary>
 		/// Id of the quote.
@@ -72,7 +45,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Array of tags associated with this quote.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("tags", Order = 5, Required = Required.DisallowNull)]
+		[JsonProperty("tags", Order = 3, Required = Required.DisallowNull)]
 		public string[] Tags
 		{
 			get => _tags;
@@ -110,7 +83,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Contains information about the quote's author and source.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("_embedded", Order = 6, Required = Required.Always)]
+		[JsonProperty("_embedded", Order = 4, Required = Required.Always)]
 		public AuthorsAndSourcesModel Embedded
 		{
 			get => _embedded;
@@ -129,7 +102,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Links to data of the quote.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("_links")]
+		[JsonProperty("_links", Order = 5)]
 		public SelfLinkModel Links
 		{
 			get => _links;
@@ -202,7 +175,8 @@ namespace JollyQuotes.TronaldDump.Models
 			AuthorsAndSourcesModel embedded,
 			DateTime appearedAt,
 			DateTime createdAt,
-			DateTime updatedAt)
+			DateTime updatedAt
+		) : base(createdAt, updatedAt)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -229,19 +203,12 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(embedded));
 			}
 
-			if (updatedAt < createdAt)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
-			}
-
 			_id = id;
 			_value = value;
 			_tags = tags;
 			_embedded = embedded;
 			_links = links;
 			AppearedAt = appearedAt;
-			CreatedAt = createdAt;
-			UpdatedAt = updatedAt;
 		}
 
 		/// <inheritdoc/>
@@ -249,18 +216,14 @@ namespace JollyQuotes.TronaldDump.Models
 		{
 			HashCode hash = new();
 
-			hash.Add(Id);
-			hash.Add(Value);
+			hash.Add(_id);
+			hash.Add(_value);
 			hash.Add(AppearedAt);
 			hash.Add(CreatedAt);
 			hash.Add(UpdatedAt);
-			hash.Add(Links);
-			hash.Add(Embedded);
-
-			foreach (string tag in Tags)
-			{
-				hash.Add(tag);
-			}
+			hash.Add(_links);
+			hash.Add(_embedded);
+			hash.AddSequence(_tags);
 
 			return hash.ToHashCode();
 		}
@@ -279,15 +242,15 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return
-				other.Id == Id &&
+				other._id == _id &&
 				other.AppearedAt == AppearedAt &&
 				other.CreatedAt == CreatedAt &&
 				other.UpdatedAt == UpdatedAt &&
-				other.Value == Value &&
-				other.Links == Links &&
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags) &&
-				other.Embedded == Embedded;
+				other._value == _value &&
+				other._links == _links &&
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags) &&
+				other._embedded == _embedded;
 		}
 	}
 }

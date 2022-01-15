@@ -6,7 +6,6 @@ namespace JollyQuotes.KanyeRest
 	/// <summary>
 	/// Represents a quote that is returned by the <c>kanye.rest</c> API.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record KanyeRestQuote : IQuote
 	{

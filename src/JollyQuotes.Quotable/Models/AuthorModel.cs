@@ -6,15 +6,13 @@ namespace JollyQuotes.Quotable.Models
 	/// <summary>
 	/// Represents an author of a quote.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record AuthorModel
+	public sealed record AuthorModel : DatabaseModel
 	{
 		private readonly string _id;
 		private readonly string _name;
 		private readonly string _slug;
 		private readonly int _quoteCount;
-		private readonly DateTime _dateModified;
 
 		/// <summary>
 		/// Id of the author.
@@ -110,33 +108,6 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Date the author was added at.
-		/// </summary>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateAdded", Order = 7, Required = Required.Always)]
-		public DateTime DateAdded { get; init; }
-
-		/// <summary>
-		/// Date of the author's most recent update.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="DateAdded"/>.</exception>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateModified", Order = 8)]
-		public DateTime DateModified
-		{
-			get => _dateModified;
-			init
-			{
-				if (value < DateAdded)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(DateAdded));
-				}
-
-				_dateModified = value;
-			}
-		}
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorModel"/> class with author's <paramref name="id"/>, <paramref name="name"/>, <paramref name="slug"/>, <paramref name="quoteCount"/> and date of creation specified.
 		/// </summary>
 		/// <param name="id">Id of the author.</param>
@@ -220,7 +191,7 @@ namespace JollyQuotes.Quotable.Models
 			string? link = default,
 			string? bio = default,
 			string? description = default
-		)
+		) : base(dateAdded, dateModified)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -242,17 +213,10 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(quoteCount), 0);
 			}
 
-			if (dateModified < dateAdded)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(dateModified), nameof(dateAdded));
-			}
-
 			_id = id;
 			_name = name;
 			_slug = slug;
 			_quoteCount = quoteCount;
-			_dateModified = dateModified;
-			DateAdded = dateAdded;
 			Link = link;
 			Bio = bio;
 			Description = description;

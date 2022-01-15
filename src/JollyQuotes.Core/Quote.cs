@@ -9,7 +9,6 @@ namespace JollyQuotes
 	/// Contains a quote, its author, source, date and related tags.
 	/// </summary>
 	/// <remarks>This class implements the <see cref="IEquatable{T}"/> interface - two instances are compare by their value, not reference.</remarks>
-	[Serializable]
 	[JsonObject]
 	public record Quote : IQuote
 	{
@@ -192,12 +191,12 @@ namespace JollyQuotes
 		{
 			return
 				other is not null &&
-				other.Value == Value &&
-				other.Author == Author &&
-				other.Source == Source &&
+				other._value == _value &&
+				other._author == _author &&
+				other._source == _source &&
 				other.Date == Date &&
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags);
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags);
 		}
 
 		/// <inheritdoc/>
@@ -205,15 +204,11 @@ namespace JollyQuotes
 		{
 			HashCode hash = new();
 
-			hash.Add(Author);
-			hash.Add(Value);
-			hash.Add(Source);
+			hash.Add(_author);
+			hash.Add(_value);
+			hash.Add(_source);
 			hash.Add(Date);
-
-			for (int i = 0; i < Tags.Length; i++)
-			{
-				hash.Add(Tags[i]);
-			}
+			hash.AddSequence(_tags);
 
 			return hash.ToHashCode();
 		}
@@ -223,7 +218,7 @@ namespace JollyQuotes
 		/// </summary>
 		protected virtual Id GetId()
 		{
-			return new Id(Value);
+			return new Id(_value);
 		}
 	}
 }

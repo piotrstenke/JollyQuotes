@@ -33,21 +33,11 @@ namespace JollyQuotes.Quotable
 		}
 
 		/// <inheritdoc/>
-		public string GetName(SortOrder value)
+		public string GetFieldQuery(QuoteSearchFields fields)
 		{
-			return QuotableResources.GetName(value);
-		}
-
-		/// <inheritdoc/>
-		public string GetName(SortBy value)
-		{
-			return QuotableResources.GetName(value);
-		}
-
-		/// <inheritdoc/>
-		public string GetName(QuoteSortBy value)
-		{
-			return QuotableResources.GetName(value);
+			StringBuilder builder = new();
+			WriteFieldQuery(builder, fields);
+			return builder.ToString();
 		}
 
 		/// <inheritdoc/>
@@ -61,7 +51,7 @@ namespace JollyQuotes.Quotable
 			StringBuilder builder = new();
 			bool hasParam = false;
 
-			WriteSearchQuery(searchModel, ref hasParam, builder);
+			WriteSearchQuery(builder, searchModel, ref hasParam);
 
 			return builder.ToString();
 		}
@@ -77,29 +67,9 @@ namespace JollyQuotes.Quotable
 			StringBuilder builder = new();
 			bool hasParam = false;
 
-			WriteSearchQuery(searchModel, ref hasParam, builder);
-
-			if (searchModel.Limit != QuotableResources.DefaultResultsPerPage)
-			{
-				builder.EnsureParameter(ref hasParam);
-				builder.Append("limit=");
-				builder.Append(searchModel.Limit);
-			}
-
-			if (searchModel.Page > 1)
-			{
-				builder.EnsureParameter(ref hasParam);
-				builder.Append("page=");
-				builder.Append(searchModel.Page);
-			}
-
-			builder.EnsureParameter(ref hasParam);
-			builder.Append("sortBy=");
-			builder.Append(GetName(searchModel.SortBy));
-
-			builder.EnsureParameter(ref hasParam);
-			builder.Append("order=");
-			builder.Append(GetName(searchModel.Order));
+			WriteSearchQuery(builder, searchModel, ref hasParam);
+			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
+			WriteSortQuery(builder, searchModel.SortBy, searchModel.Order, ref hasParam);
 
 			return builder.ToString();
 		}
@@ -113,12 +83,107 @@ namespace JollyQuotes.Quotable
 			}
 
 			StringBuilder builder = new();
+			bool hasParam = false;
 
-			builder.Append("sortBy=");
-			builder.Append(GetName(searchModel.SortBy));
-			builder.ApplyParameter();
-			builder.Append("order=");
-			builder.Append(GetName(searchModel.Order));
+			WriteSortQuery(builder, searchModel.SortBy, searchModel.Order, ref hasParam);
+
+			return builder.ToString();
+		}
+
+		/// <inheritdoc/>
+		public string GetSearchQuery(AuthorSearchModel searchModel)
+		{
+			if (searchModel is null)
+			{
+				throw Error.Null(nameof(searchModel));
+			}
+
+			StringBuilder builder = new();
+			bool hasParam = false;
+
+			if (searchModel.HasSlug)
+			{
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("slug=");
+				WriteOrQuery(builder, searchModel.Slugs);
+			}
+
+			WriteSortQuery(builder, searchModel.SortBy, searchModel.Order, ref hasParam);
+			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
+
+			return builder.ToString();
+		}
+
+		/// <inheritdoc/>
+		public string GetSearchQuery(AuthorNameSearchModel searchModel)
+		{
+			if (searchModel is null)
+			{
+				throw Error.Null(nameof(searchModel));
+			}
+
+			StringBuilder builder = new();
+
+			builder.Append("query=");
+			builder.Append(searchModel.Query);
+
+			if (!searchModel.AutoComplete)
+			{
+				builder.ApplyParameter();
+				builder.Append("autocomplete=false");
+			}
+
+			if (searchModel.MatchTreshold != MatchThreshold.Default)
+			{
+				builder.ApplyParameter();
+				builder.Append("matchThreshold=");
+				builder.Append((int)searchModel.MatchTreshold);
+			}
+
+			bool hasParam = false;
+			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
+
+			return builder.ToString();
+		}
+
+		/// <inheritdoc/>
+		public string GetSearchQuery(QuoteContentSearchModel searchModel)
+		{
+			if (searchModel is null)
+			{
+				throw Error.Null(nameof(searchModel));
+			}
+
+			StringBuilder builder = new();
+
+			builder.Append("query=");
+			builder.Append(searchModel.Query);
+
+			if (searchModel.Fields != QuoteSearchFields.All)
+			{
+				string fields = GetFieldQuery(searchModel.Fields);
+
+				builder.ApplyParameter();
+				builder.Append("fields=");
+				builder.Append(fields);
+			}
+
+			if (searchModel.FuzzyMaxEdits != FuzzyMatchingTreshold.Default)
+			{
+				builder.ApplyParameter();
+				builder.Append("fuzzyMaxEdits=");
+				builder.Append(searchModel.FuzzyMaxExpansions);
+			}
+
+			if (searchModel.FuzzyMaxExpansions != QuotableResources.FuzzyDefaultExpansions)
+			{
+				builder.ApplyParameter();
+				builder.Append("fuzzyMaxExpansions=");
+				builder.Append(searchModel.FuzzyMaxExpansions);
+			}
+
+			bool hasParam = false;
+			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
 
 			return builder.ToString();
 		}
@@ -132,12 +197,72 @@ namespace JollyQuotes.Quotable
 			}
 
 			StringBuilder builder = new();
-			WriteTagExpression(expression, builder);
+			WriteTagExpression(builder, expression);
 
 			return builder.ToString();
 		}
 
-		private static void WriteSearchQuery(QuoteSearchModel searchModel, ref bool hasParam, StringBuilder builder)
+		private static void WriteFieldQuery(StringBuilder builder, QuoteSearchFields fields)
+		{
+			bool applyComma = false;
+
+			if (fields.HasFlag(QuoteSearchFields.Content))
+			{
+				applyComma = true;
+				builder.Append("content");
+			}
+
+			if (fields.HasFlag(QuoteSearchFields.Author))
+			{
+				EnsureComma();
+				builder.Append("author");
+			}
+
+			if (fields.HasFlag(QuoteSearchFields.Tags))
+			{
+				EnsureComma();
+				builder.Append("tags");
+			}
+
+			void EnsureComma()
+			{
+				if (applyComma)
+				{
+					builder.Append(',');
+				}
+				else
+				{
+					applyComma = true;
+				}
+			}
+		}
+
+		private static bool WriteLimitPage(StringBuilder builder, int limit, int page, ref bool hasParam)
+		{
+			if (limit != QuotableResources.ResultsPerPageDefault)
+			{
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("limit=");
+				builder.Append(limit);
+			}
+
+			if (page > 1)
+			{
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("page=");
+				builder.Append(page);
+			}
+
+			return hasParam;
+		}
+
+		private static void WriteOrQuery(StringBuilder builder, string[] values)
+		{
+			string text = string.Join(SearchOperator.Or.ToChar(), values);
+			builder.Append(text);
+		}
+
+		private static void WriteSearchQuery(StringBuilder builder, QuoteSearchModel searchModel, ref bool hasParam)
 		{
 			if (searchModel.MinLength > 0)
 			{
@@ -157,14 +282,14 @@ namespace JollyQuotes.Quotable
 			{
 				builder.EnsureParameter(ref hasParam);
 				builder.Append("tags=");
-				WriteTagExpression(searchModel.Tags, builder);
+				WriteTagExpression(builder, searchModel.Tags);
 			}
 
 			if (searchModel.HasAuthor)
 			{
 				builder.EnsureParameter(ref hasParam);
 				builder.Append("author=");
-				builder.Append(string.Join(SearchOperator.Or.ToChar(), searchModel.Authors));
+				WriteOrQuery(builder, searchModel.Authors);
 			}
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -172,12 +297,56 @@ namespace JollyQuotes.Quotable
 			{
 				builder.EnsureParameter(ref hasParam);
 				builder.Append("authorId=");
-				builder.Append(string.Join(SearchOperator.Or.ToChar(), searchModel.AuthorIds));
+				WriteOrQuery(builder, searchModel.AuthorIds);
 			}
 #pragma warning restore CS0618 // Type or member is obsolete
 		}
 
-		private static void WriteTagExpression(TagExpression expression, StringBuilder builder)
+		private static void WriteSortOrder(StringBuilder builder, SortOrder order, SortOrder defaultOrder, ref bool hasParam)
+		{
+			if (order != defaultOrder)
+			{
+				string name = order.GetName();
+
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("order=");
+				builder.Append(name);
+			}
+		}
+
+		private static void WriteSortQuery(StringBuilder builder, SortBy sortBy, SortOrder order, ref bool hasParam)
+		{
+			SortOrder defaultOrder = sortBy.GetDefaultSortOrder();
+
+			if (sortBy != default)
+			{
+				string name = sortBy.GetName();
+
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("sortBy=");
+				builder.Append(name);
+			}
+
+			WriteSortOrder(builder, order, defaultOrder, ref hasParam);
+		}
+
+		private static void WriteSortQuery(StringBuilder builder, QuoteSortBy sortBy, SortOrder order, ref bool hasParam)
+		{
+			SortOrder defaultOrder = sortBy.GetDefaultSortOrder();
+
+			if (sortBy != default)
+			{
+				string name = sortBy.GetName();
+
+				builder.EnsureParameter(ref hasParam);
+				builder.Append("sortBy=");
+				builder.Append(name);
+			}
+
+			WriteSortOrder(builder, order, defaultOrder, ref hasParam);
+		}
+
+		private static void WriteTagExpression(StringBuilder builder, TagExpression expression)
 		{
 			if (expression.IsEndNode)
 			{
@@ -185,9 +354,9 @@ namespace JollyQuotes.Quotable
 			}
 			else
 			{
-				WriteTagExpression(expression.Left, builder);
+				WriteTagExpression(builder, expression.Left);
 				builder.Append(expression.Operator.ToChar());
-				WriteTagExpression(expression.Left, builder);
+				WriteTagExpression(builder, expression.Left);
 			}
 		}
 	}

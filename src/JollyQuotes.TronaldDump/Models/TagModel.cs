@@ -6,38 +6,11 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a tag.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record TagModel
+	public sealed record TagModel : DatabaseModel
 	{
 		private readonly string _value;
 		private readonly SelfLinkModel _links;
-		private readonly DateTime _updatedAt;
-
-		/// <summary>
-		/// Date the tag was added to the database at.
-		/// </summary>
-		[JsonProperty("created_at", Order = 1, Required = Required.Always)]
-		public DateTime CreatedAt { get; init; }
-
-		/// <summary>
-		/// Date the tag was updated at.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
-		[JsonProperty("updated_at", Order = 2)]
-		public DateTime UpdatedAt
-		{
-			get => _updatedAt;
-			init
-			{
-				if (value < CreatedAt)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
-				}
-
-				_updatedAt = value;
-			}
-		}
 
 		/// <summary>
 		/// Actual tag.
@@ -62,7 +35,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link that was used to retrieve this tag.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("_links", Order = 3, Required = Required.Always)]
+		[JsonProperty("_links", Order = 1, Required = Required.Always)]
 		public SelfLinkModel Links
 		{
 			get => _links;
@@ -100,7 +73,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <exception cref="ArgumentException"><paramref name="value"/> is <see langword="null"/> or empty.</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="updatedAt"/> must be greater than or equal to <paramref name="createdAt"/>.</exception>
 		[JsonConstructor]
-		public TagModel(string value, SelfLinkModel links, DateTime createdAt, DateTime updatedAt)
+		public TagModel(string value, SelfLinkModel links, DateTime createdAt, DateTime updatedAt) : base(createdAt, updatedAt)
 		{
 			if (string.IsNullOrWhiteSpace(value))
 			{
@@ -112,15 +85,8 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			if (updatedAt < createdAt)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
-			}
-
 			_value = value;
 			_links = links;
-			_updatedAt = updatedAt;
-			CreatedAt = createdAt;
 		}
 	}
 }

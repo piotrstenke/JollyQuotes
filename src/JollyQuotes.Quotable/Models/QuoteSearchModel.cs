@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.Quotable.Models
@@ -8,7 +7,6 @@ namespace JollyQuotes.Quotable.Models
 	/// <summary>
 	/// Contains data required to perform a quote search.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public record QuoteSearchModel
 	{
@@ -69,21 +67,21 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Determines whether the <see cref="Author"/> is included in the search query.
+		/// Determines whether an <see cref="Author"/> is included in the search query.
 		/// </summary>
 		[MemberNotNullWhen(true, nameof(Author), nameof(Authors))]
 		[JsonIgnore]
-		public bool HasAuthor => _authors is not null;
+		public bool HasAuthor => _authors is not null && _authors.Length > 0;
 
 		/// <summary>
-		/// Determines whether the <see cref="AuthorId"/> is included in the search query.
+		/// Determines whether an <see cref="AuthorId"/> is included in the search query.
 		/// </summary>
 #pragma warning disable CS0618 // Type or member is obsolete
 		[MemberNotNullWhen(true, nameof(AuthorId), nameof(AuthorIds))]
 #pragma warning restore CS0618 // Type or member is obsolete
 		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use HasAuthor instead.")]
 		[JsonIgnore]
-		public bool HasAuthorId => _authorIds is not null;
+		public bool HasAuthorId => _authorIds is not null && _authorIds.Length > 0;
 
 		/// <summary>
 		/// Author of the target quote.
@@ -95,14 +93,14 @@ namespace JollyQuotes.Quotable.Models
 		{
 			get
 			{
-				if (_authors is null)
+				if (_authors is null || _authors.Length == 0)
 				{
 					return null;
 				}
 
 				return _authors[0];
 			}
-			init => SetFirstElement(value, ref _authors);
+			init => Internals.SetFirstElement(value, ref _authors);
 		}
 
 		/// <summary>
@@ -112,7 +110,7 @@ namespace JollyQuotes.Quotable.Models
 		public string[]? Authors
 		{
 			get => _authors;
-			init => _authors = value is null || value.Length == 0 ? null : value;
+			init => _authors = value;
 		}
 
 		/// <summary>
@@ -127,26 +125,25 @@ namespace JollyQuotes.Quotable.Models
 		{
 			get
 			{
-				if (_authorIds is null)
+				if (_authorIds is null || _authorIds.Length == 0)
 				{
 					return null;
 				}
 
 				return _authorIds[0];
 			}
-			init => SetFirstElement(value, ref _authorIds);
+			init => Internals.SetFirstElement(value, ref _authorIds);
 		}
 
 		/// <summary>
 		/// Collection of ids of all possible authors of the returned quote.
 		/// </summary>
-		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
 		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use Authors instead.")]
 		[JsonProperty("authorIds", Order = 4)]
 		public string[]? AuthorIds
 		{
 			get => _authorIds;
-			init => _authorIds = value is null || value.Length == 0 ? null : value;
+			init => _authorIds = value;
 		}
 
 		/// <summary>
@@ -179,17 +176,34 @@ namespace JollyQuotes.Quotable.Models
 			int? maxLength = default,
 			TagExpression? tags = default,
 			params string[]? authors
+#pragma warning disable CS0618 // Type or member is obsolete
 		) : this(minLength, maxLength, tags, authors, default)
+#pragma warning restore CS0618 // Type or member is obsolete
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class with a <paramref name="minLength"/>, <paramref name="maxLength"/>,
+		/// <paramref name="tags"/>, <paramref name="authors"/> and <paramref name="authorIds"/> specified.
+		/// </summary>
+		/// <param name="minLength">Minimum length in characters of the quote.</param>
+		/// <param name="maxLength">Maximum length in characters of the quote.</param>
+		/// <param name="tags">Tags associated with the quote searched for.</param>
+		/// <param name="authors">Collection of all possible authors of the returned quote.</param>
+		/// <param name="authorIds">Collection of ids of all possible authors of the returned quote.</param>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="maxLength"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="minLength"/> must be greater than or equal to <c>0</c>. -or-
+		/// <paramref name="minLength"/> must be less than or equal to <paramref name="maxLength"/>.
+		/// </exception>
 		[JsonConstructor]
-		private QuoteSearchModel(
-			int minLength,
-			int? maxLength,
-			TagExpression? tags,
-			string[]? authors,
-			string[]? authorIds
+		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use other constructor instead.")]
+		public QuoteSearchModel(
+			int minLength = default,
+			int? maxLength = default,
+			TagExpression? tags = default,
+			string[]? authors = default,
+			string[]? authorIds = default
 		)
 		{
 			if (minLength < 0)
@@ -233,8 +247,9 @@ namespace JollyQuotes.Quotable.Models
 			return
 				other._maxLength == _maxLength &&
 				other._minLength == _minLength &&
-				ArraysAreEqual(other._authors, _authors) &&
-				ArraysAreEqual(other._authorIds, other._authorIds);
+				other.Tags == Tags &&
+				Internals.SequenceEqual(other._authors, _authors) &&
+				Internals.SequenceEqual(other._authorIds, other._authorIds);
 		}
 
 		/// <inheritdoc/>
@@ -244,59 +259,11 @@ namespace JollyQuotes.Quotable.Models
 
 			hash.Add(_maxLength);
 			hash.Add(_minLength);
-
-			if (_authors is not null)
-			{
-				foreach (string author in _authors)
-				{
-					hash.Add(author);
-				}
-			}
-
-			if (_authorIds is not null)
-			{
-				foreach (string id in _authorIds)
-				{
-					hash.Add(id);
-				}
-			}
+			hash.Add(Tags);
+			hash.AddSequence(_authors);
+			hash.AddSequence(_authorIds);
 
 			return hash.ToHashCode();
-		}
-
-		private static bool ArraysAreEqual(string[]? left, string[]? right)
-		{
-			if (left is null)
-			{
-				return right is null;
-			}
-
-			if (right is null)
-			{
-				return false;
-			}
-
-			return left.Length == right.Length && left.SequenceEqual(right);
-		}
-
-		private static void SetFirstElement(string? value, ref string[]? array)
-		{
-			if (string.IsNullOrWhiteSpace(value))
-			{
-				array = null;
-				return;
-			}
-
-			if (array is null || array.Length == 0)
-			{
-				array = new string[] { value };
-				return;
-			}
-
-			string[] newArray = new string[array.Length];
-			array.CopyTo(newArray, 0);
-			newArray[0] = value;
-			array = newArray;
 		}
 	}
 }

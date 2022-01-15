@@ -6,7 +6,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a link.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record LinkModel
 	{
@@ -16,7 +15,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Actual link.
 		/// </summary>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
-		[JsonProperty("href", Required = Required.Always)]
+		[JsonProperty("href", Order = 0, Required = Required.Always)]
 		public string Href
 		{
 			get => _href;

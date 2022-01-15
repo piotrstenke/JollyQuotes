@@ -7,18 +7,11 @@ namespace JollyQuotes.TronaldDump.Models
 	/// Represents a source of a quote (e.g. a twit, article or interview).
 	/// </summary>
 	[JsonObject]
-	public sealed record QuoteSourceModel
+	public sealed record QuoteSourceModel : DatabaseModel
 	{
 		private readonly string _id;
 		private readonly string _url;
 		private readonly SelfLinkModel _links;
-		private readonly DateTime _updatedAt;
-
-		/// <summary>
-		/// Date the quote source was added to the database at.
-		/// </summary>
-		[JsonProperty("created_at", Order = 2, Required = Required.Always)]
-		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Name of file associated with the quote.
@@ -69,25 +62,6 @@ namespace JollyQuotes.TronaldDump.Models
 		/// </summary>
 		[JsonProperty("remarks", Order = 5)]
 		public string? Remarks { get; init; }
-
-		/// <summary>
-		/// Date the quote source was last updated at.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
-		[JsonProperty("updated_at", Order = 3, Required = Required.DisallowNull)]
-		public DateTime UpdatedAt
-		{
-			get => _updatedAt;
-			init
-			{
-				if (value < CreatedAt)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
-				}
-
-				_updatedAt = value;
-			}
-		}
 
 		/// <summary>
 		/// URL of the actual quote source.
@@ -152,7 +126,7 @@ namespace JollyQuotes.TronaldDump.Models
 			SelfLinkModel links,
 			DateTime createdAt,
 			DateTime updatedAt
-		)
+		) : base(createdAt, updatedAt)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -169,15 +143,8 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			if (updatedAt < createdAt)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
-			}
-
 			_id = id;
 			_url = url;
-			CreatedAt = createdAt;
-			_updatedAt = updatedAt;
 			FileName = filename;
 			Remarks = remarks;
 			_links = links;

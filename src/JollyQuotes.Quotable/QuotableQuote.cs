@@ -7,7 +7,6 @@ namespace JollyQuotes.Quotable
 	/// <summary>
 	/// Represents a quote created by the <c>quotable</c> API.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record QuotableQuote : IQuote
 	{
@@ -242,14 +241,14 @@ namespace JollyQuotes.Quotable
 			}
 
 			return
-				other.Id == Id &&
-				other.Author == Author &&
-				other.AuthorSlug == AuthorSlug &&
-				other.Value == Value &&
+				other._id == _id &&
+				other._author == _author &&
+				other._authorSlug == _authorSlug &&
+				other._value == _value &&
 				other.CreatedAt == CreatedAt &&
-				other.UpdatedAt == UpdatedAt &&
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags);
+				other._updatedAt == _updatedAt &&
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags);
 		}
 
 		/// <inheritdoc/>
@@ -257,17 +256,13 @@ namespace JollyQuotes.Quotable
 		{
 			HashCode hash = new();
 
-			hash.Add(Id);
-			hash.Add(Author);
-			hash.Add(AuthorSlug);
-			hash.Add(Value);
+			hash.Add(_id);
+			hash.Add(_author);
+			hash.Add(_authorSlug);
+			hash.Add(_value);
 			hash.Add(CreatedAt);
-			hash.Add(UpdatedAt);
-
-			foreach (string tag in Tags)
-			{
-				hash.Add(tag);
-			}
+			hash.Add(_updatedAt);
+			hash.AddSequence(_tags);
 
 			return hash.ToHashCode();
 		}

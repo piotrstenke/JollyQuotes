@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JollyQuotes.TronaldDump.Models;
 using Newtonsoft.Json;
 
 namespace JollyQuotes.TronaldDump
@@ -7,9 +8,8 @@ namespace JollyQuotes.TronaldDump
 	/// <summary>
 	/// Represents a quote that was created from data returned by the <c>Tronald Dump</c> API.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record TronaldDumpQuote : IQuote
+	public sealed record TronaldDumpQuote : DatabaseModel, IQuote
 	{
 		private const string AUTHOR = "Donald Trump";
 
@@ -17,32 +17,6 @@ namespace JollyQuotes.TronaldDump
 		private readonly string _source;
 		private readonly string _value;
 		private readonly Id _id;
-		private readonly DateTime _updatedAt;
-
-		/// <summary>
-		/// Date the quote was added to the database at.
-		/// </summary>
-		[JsonProperty("createdAt", Order = 3, Required = Required.Always)]
-		public DateTime CreatedAt { get; init; }
-
-		/// <summary>
-		/// Date the quote was last updated at.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
-		[JsonProperty("updatedAt", Order = 4)]
-		public DateTime UpdatedAt
-		{
-			get => _updatedAt;
-			init
-			{
-				if (value < CreatedAt)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
-				}
-
-				_updatedAt = value;
-			}
-		}
 
 		/// <summary>
 		/// Date the quote was said/written at.
@@ -71,7 +45,7 @@ namespace JollyQuotes.TronaldDump
 		/// Array of tags associated with this quote.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("tags", Order = 5, Required = Required.Always)]
+		[JsonProperty("tags", Order = 3, Required = Required.Always)]
 		public string[] Tags
 		{
 			get => _tags;
@@ -105,7 +79,7 @@ namespace JollyQuotes.TronaldDump
 
 		/// <inheritdoc/>
 		/// <exception cref="ArgumentException">Value is <see langword="null"/> or empty.</exception>
-		[JsonProperty("source", Order = 6, Required = Required.Always)]
+		[JsonProperty("source", Order = 4, Required = Required.Always)]
 		public string Source
 		{
 			get => _source;
@@ -179,7 +153,7 @@ namespace JollyQuotes.TronaldDump
 			DateTime appearedAt,
 			DateTime createdAt,
 			DateTime updatedAt
-		)
+		) : base(createdAt, updatedAt)
 		{
 			if (id == default)
 			{
@@ -201,18 +175,11 @@ namespace JollyQuotes.TronaldDump
 				throw Error.Null(nameof(tags));
 			}
 
-			if (updatedAt < createdAt)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
-			}
-
 			_id = id;
 			_value = value;
 			_source = source;
 			_tags = tags;
-			_updatedAt = updatedAt;
 			AppearedAt = appearedAt;
-			CreatedAt = createdAt;
 		}
 
 		/// <inheritdoc/>
@@ -229,14 +196,14 @@ namespace JollyQuotes.TronaldDump
 			}
 
 			return
-				other.Id == Id &&
-				other.Value == Value &&
-				other.Source == Source &&
+				other._id == _id &&
+				other._value == _value &&
+				other._source == _source &&
 				other.AppearedAt == AppearedAt &&
 				other.UpdatedAt == UpdatedAt &&
 				other.CreatedAt == CreatedAt &&
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags);
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags);
 		}
 
 		/// <inheritdoc/>
@@ -244,17 +211,13 @@ namespace JollyQuotes.TronaldDump
 		{
 			HashCode hash = new();
 
-			hash.Add(Id);
-			hash.Add(Value);
-			hash.Add(Source);
+			hash.Add(_id);
+			hash.Add(_value);
+			hash.Add(_source);
 			hash.Add(AppearedAt);
 			hash.Add(CreatedAt);
 			hash.Add(UpdatedAt);
-
-			foreach (string tag in Tags)
-			{
-				hash.Add(tag);
-			}
+			hash.AddSequence(_tags);
 
 			return hash.ToHashCode();
 		}

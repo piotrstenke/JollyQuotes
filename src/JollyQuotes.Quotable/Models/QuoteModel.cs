@@ -9,9 +9,8 @@ namespace JollyQuotes.Quotable.Models
 	/// <summary>
 	/// Represents a quote that was created from raw data returned by the <c>quotable</c> API.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record QuoteModel
+	public sealed record QuoteModel : DatabaseModel
 	{
 		private readonly string[] _tags;
 		private readonly string _id;
@@ -19,7 +18,6 @@ namespace JollyQuotes.Quotable.Models
 		private readonly string _author;
 		private readonly string _authorSlug;
 		private readonly int _length;
-		private readonly DateTime _dateModified;
 
 		/// <summary>
 		/// Id of the quote.
@@ -136,33 +134,6 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// Date the quote was added at.
-		/// </summary>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateAdded", Order = 6, Required = Required.Always)]
-		public DateTime DateAdded { get; init; }
-
-		/// <summary>
-		/// Date of the quote's most recent update.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="DateAdded"/>.</exception>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateModified", Order = 7)]
-		public DateTime DateModified
-		{
-			get => _dateModified;
-			init
-			{
-				if (value < DateAdded)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(DateAdded));
-				}
-
-				_dateModified = value;
-			}
-		}
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteModel"/> class with an <paramref name="id"/>, actual <paramref name="content"/>, <paramref name="author"/>, <paramref name="authorSlug"/>, associated <paramref name="tags"/> and date of the quote's creation specified.
 		/// </summary>
 		/// <param name="id">Id of the quote.</param>
@@ -249,7 +220,7 @@ namespace JollyQuotes.Quotable.Models
 			DateTime dateAdded,
 			DateTime dateModified,
 			int length
-		)
+		) : base(dateAdded, dateModified)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -276,11 +247,6 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.Null(nameof(tags));
 			}
 
-			if (dateModified < dateAdded)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(dateModified), nameof(dateAdded));
-			}
-
 			if (length < 0)
 			{
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(length), 0);
@@ -292,8 +258,6 @@ namespace JollyQuotes.Quotable.Models
 			_authorSlug = authorSlug;
 			_length = length;
 			_tags = tags;
-			DateAdded = dateAdded;
-			DateModified = dateModified;
 		}
 
 		/// <inheritdoc/>
@@ -310,14 +274,14 @@ namespace JollyQuotes.Quotable.Models
 			}
 
 			return
-				other.Id == Id &&
-				other.Author == Author &&
-				other.AuthorSlug == AuthorSlug &&
-				other.Content == Content &&
-				other.DateAdded == DateAdded &&
+				other._id == _id &&
+				other._author == _author &&
+				other._authorSlug == _authorSlug &&
+				other._content == _content &&
 				other.DateModified == DateModified &&
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags);
+				other.DateAdded == DateAdded &&
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags);
 		}
 
 		/// <inheritdoc/>
@@ -325,17 +289,13 @@ namespace JollyQuotes.Quotable.Models
 		{
 			HashCode hash = new();
 
-			hash.Add(Id);
-			hash.Add(Author);
-			hash.Add(AuthorSlug);
-			hash.Add(Content);
-			hash.Add(DateAdded);
+			hash.Add(_id);
+			hash.Add(_author);
+			hash.Add(_authorSlug);
+			hash.Add(_content);
 			hash.Add(DateModified);
-
-			foreach (string tag in Tags)
-			{
-				hash.Add(tag);
-			}
+			hash.Add(DateAdded);
+			hash.AddSequence(_tags);
 
 			return hash.ToHashCode();
 		}

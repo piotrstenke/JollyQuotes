@@ -63,9 +63,9 @@ namespace JollyQuotes.TronaldDump
 		Task<TagModel> GetTag(string tag);
 
 		/// <summary>
-		/// Searches for quotes that satisfy the conditions specified in the <paramref name="searchModel"/>.
+		/// Searches for quotes that fulfill every prerequisite specified in the <paramref name="searchModel"/>.
 		/// </summary>
-		/// <param name="searchModel">A set of condition a quote must satisfy in order to be included in the search result.</param>
+		/// <param name="searchModel"><see cref="QuoteSearchModel"/> that defines all prerequisites that all returned quotes must fulfill.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="searchModel"/> is <see langword="null"/>.</exception>
 		Task<SearchResultModel<QuoteListModel>> SearchQuotes(QuoteSearchModel searchModel);
 	}

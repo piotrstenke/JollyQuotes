@@ -6,8 +6,8 @@ namespace JollyQuotes
 	/// <summary>
 	/// Represents an id of a quote.
 	/// </summary>
-	[Serializable]
 	[JsonConverter(typeof(Converter))]
+	[JsonObject]
 	public readonly struct Id : IEquatable<Id>
 	{
 		/// <summary>

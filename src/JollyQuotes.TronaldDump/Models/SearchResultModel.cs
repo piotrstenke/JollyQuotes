@@ -6,7 +6,6 @@ namespace JollyQuotes.TronaldDump.Models
 {
 	/// <inheritdoc cref="ISearchResultModel"/>
 	/// <typeparam name="T">Type of data searched for.</typeparam>
-	[Serializable]
 	[JsonObject]
 	public sealed record SearchResultModel<T> : ISearchResultModel where T : IEnumerable
 	{
@@ -149,18 +148,18 @@ namespace JollyQuotes.TronaldDump.Models
 				return true;
 			}
 
-			if (other.Count != Count || other.Links != Links)
+			if (other._count != _count || other.Links != Links)
 			{
 				return false;
 			}
 
-			if (other.Embedded is IEquatable<T> eq)
+			if (other._embedded is IEquatable<T> eq)
 			{
-				return eq.Equals(Embedded);
+				return eq.Equals(_embedded);
 			}
 
-			IEnumerator e1 = other.Embedded.GetEnumerator();
-			IEnumerator e2 = Embedded.GetEnumerator();
+			IEnumerator e1 = other._embedded.GetEnumerator();
+			IEnumerator e2 = _embedded.GetEnumerator();
 
 			while (true)
 			{
@@ -184,24 +183,21 @@ namespace JollyQuotes.TronaldDump.Models
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			HashCode code = new();
+			HashCode hash = new();
 
-			code.Add(Count);
-			code.Add(Links);
+			hash.Add(_count);
+			hash.Add(Links);
 
-			if (Embedded is IEquatable<T>)
+			if (_embedded is IEquatable<T>)
 			{
-				code.Add(Embedded);
+				hash.Add(_embedded);
 			}
 			else
 			{
-				foreach (T obj in Embedded)
-				{
-					code.Add(obj);
-				}
+				hash.AddSequence(_embedded);
 			}
 
-			return code.ToHashCode();
+			return hash.ToHashCode();
 		}
 	}
 }

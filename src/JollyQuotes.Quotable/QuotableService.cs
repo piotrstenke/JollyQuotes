@@ -63,6 +63,11 @@ namespace JollyQuotes.Quotable
 		/// <inheritdoc/>
 		public Task<AuthorModel> GetAuthor(string slug)
 		{
+			if (string.IsNullOrWhiteSpace(slug))
+			{
+				throw Error.NullOrEmpty(nameof(slug));
+			}
+
 			return Resolver.TryResolveAsync<AuthorModel>($"author/{slug}").OnResponse(t =>
 			{
 				if (!t.HasResult)
@@ -75,9 +80,47 @@ namespace JollyQuotes.Quotable
 		}
 
 		/// <inheritdoc/>
+		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use GetAuthor(string) instead.")]
+		public Task<AuthorModel> GetAuthorById(string id)
+		{
+			if (string.IsNullOrWhiteSpace(id))
+			{
+				throw Error.NullOrEmpty(nameof(id));
+			}
+
+			return Resolver.TryResolveAsync<AuthorModel>($"authors/{id}").OnResponse(t =>
+			{
+				if (!t.HasResult)
+				{
+					throw Error.Quote($"Author with id '{id}' does not exist");
+				}
+
+				return t.Result;
+			});
+		}
+
+		/// <inheritdoc/>
 		public Task<SearchResultModel<AuthorModel>> GetAuthors()
 		{
 			return Resolver.ResolveAsync<SearchResultModel<AuthorModel>>("authors");
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<AuthorModel>> GetAuthors(AuthorSearchModel searchModel)
+		{
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "authors";
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.TryResolveAsync<SearchResultModel<AuthorModel>>(link).OnResponse(t =>
+			{
+				if (!t.HasResult)
+				{
+					throw Error.Quote("Could not find any matching authors");
+				}
+
+				return t.Result;
+			});
 		}
 
 		/// <inheritdoc/>
@@ -169,6 +212,26 @@ namespace JollyQuotes.Quotable
 
 				return t.Result;
 			});
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<AuthorModel>> SearchAuthors(AuthorNameSearchModel searchModel)
+		{
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "search/authors";
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.ResolveAsync<SearchResultModel<AuthorModel>>(link);
+		}
+
+		/// <inheritdoc/>
+		public Task<SearchResultModel<QuoteModel>> SearchQuotes(QuoteContentSearchModel searchModel)
+		{
+			string query = ModelConverter.GetSearchQuery(searchModel);
+			string link = "search/quotes";
+			Internals.ApplyQuery(ref link, query);
+
+			return Resolver.ResolveAsync<SearchResultModel<QuoteModel>>(link);
 		}
 	}
 }

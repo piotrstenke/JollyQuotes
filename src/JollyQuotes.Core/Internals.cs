@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -7,6 +10,28 @@ namespace JollyQuotes
 {
 	internal static class Internals
 	{
+		public static void AddSequence<T>(this ref HashCode hash, IEnumerable<T>? collection)
+		{
+			if(collection is not null)
+			{
+				foreach (T item in collection)
+				{
+					hash.Add(item);
+				}
+			}
+		}
+
+		public static void AddSequence(this ref HashCode hash, IEnumerable? collection)
+		{
+			if (collection is not null)
+			{
+				foreach (object item in collection)
+				{
+					hash.Add(item);
+				}
+			}
+		}
+
 		public static void ApplyParameter(this StringBuilder builder)
 		{
 			builder.Append('&');
@@ -21,6 +46,21 @@ namespace JollyQuotes
 			}
 
 			return false;
+		}
+
+		public static bool SequenceEqual(string[]? left, string[]? right)
+		{
+			if (left is null)
+			{
+				return right is null;
+			}
+
+			if (right is null)
+			{
+				return false;
+			}
+
+			return left.Length == right.Length && left.SequenceEqual(right);
 		}
 
 		public static HttpClient CreateDefaultClient()
@@ -103,6 +143,26 @@ namespace JollyQuotes
 			}
 
 			return str;
+		}
+
+		public static void SetFirstElement(string? value, ref string[]? array)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				array = null;
+				return;
+			}
+
+			if (array is null || array.Length == 0)
+			{
+				array = new string[] { value };
+				return;
+			}
+
+			string[] newArray = new string[array.Length];
+			array.CopyTo(newArray, 0);
+			newArray[0] = value;
+			array = newArray;
 		}
 
 		public static bool TryDispose(object? obj)

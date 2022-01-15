@@ -6,7 +6,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a hierarchy of pages.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record PageHierarchyModel
 	{

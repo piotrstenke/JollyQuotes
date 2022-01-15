@@ -6,15 +6,13 @@ namespace JollyQuotes.Quotable.Models
 	/// <summary>
 	/// Represents a quote tag.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record TagModel
+	public sealed record TagModel : DatabaseModel
 	{
 		private readonly string _id;
 		private readonly string _name;
 		private readonly int _quoteCount;
 		private readonly int _v;
-		private readonly DateTime _dateModified;
 
 		/// <summary>
 		/// Id of the tag.
@@ -69,33 +67,6 @@ namespace JollyQuotes.Quotable.Models
 				}
 
 				_quoteCount = value;
-			}
-		}
-
-		/// <summary>
-		/// Date the tag was added at.
-		/// </summary>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateAdded", Order = 3, Required = Required.Always)]
-		public DateTime DateAdded { get; init; }
-
-		/// <summary>
-		/// Date of the tag's most recent update.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="DateAdded"/>.</exception>
-		[JsonConverter(typeof(Quote.DateOnlyConverter))]
-		[JsonProperty("dateModified", Order = 4)]
-		public DateTime DateModified
-		{
-			get => _dateModified;
-			init
-			{
-				if (value < DateAdded)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(DateAdded));
-				}
-
-				_dateModified = value;
 			}
 		}
 
@@ -173,7 +144,7 @@ namespace JollyQuotes.Quotable.Models
 			DateTime dateAdded,
 			DateTime dateModified,
 			int v
-		)
+		) : base(dateAdded, dateModified)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -195,17 +166,10 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.MustBeGreaterThanOrEqualTo(nameof(v), 0);
 			}
 
-			if (dateModified < dateAdded)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(dateModified), nameof(dateAdded));
-			}
-
 			_id = id;
 			_name = name;
 			_quoteCount = quoteCount;
-			_dateModified = dateModified;
 			_v = v;
-			DateAdded = dateAdded;
 		}
 	}
 }

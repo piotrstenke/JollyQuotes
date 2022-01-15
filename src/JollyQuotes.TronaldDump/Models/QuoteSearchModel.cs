@@ -6,7 +6,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Contains data needed to perform a quote search.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record QuoteSearchModel
 	{

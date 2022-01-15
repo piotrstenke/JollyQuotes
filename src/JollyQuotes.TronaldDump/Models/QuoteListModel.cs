@@ -9,7 +9,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a collection of quotes.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record QuoteListModel : IEnumerable<QuoteModel>
 	{
@@ -19,7 +18,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Quotes this list contains.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("quotes", Required = Required.Always)]
+		[JsonProperty("quotes", Order = 0, Required = Required.Always)]
 		public QuoteModel[] Quotes
 		{
 			get => _quotes;
@@ -64,20 +63,15 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return
-				other.Quotes.Length == Quotes.Length &&
-				other.Quotes.SequenceEqual(Quotes);
+				other._quotes.Length == _quotes.Length &&
+				other._quotes.SequenceEqual(_quotes);
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			HashCode hash = new();
-
-			foreach (QuoteModel quote in Quotes)
-			{
-				hash.Add(quote);
-			}
-
+			hash.AddSequence(_quotes);
 			return hash.ToHashCode();
 		}
 

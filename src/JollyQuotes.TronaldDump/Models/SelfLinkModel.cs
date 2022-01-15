@@ -6,7 +6,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a link that was used to access the current resource.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record SelfLinkModel
 	{
@@ -16,7 +15,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link that was used to access the current resource.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("self", Required = Required.Always)]
+		[JsonProperty("self", Order = 0, Required = Required.Always)]
 		public LinkModel Self
 		{
 			get => _self;

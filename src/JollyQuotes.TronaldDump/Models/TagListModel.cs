@@ -9,7 +9,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a collection of tags.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record TagListModel : IEnumerable<TagModel>
 	{
@@ -19,7 +18,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// An array of underlaying tags.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("tag", Required = Required.Always)]
+		[JsonProperty("tag", Order = 0, Required = Required.Always)]
 		public TagModel[] Tags
 		{
 			get => _tags;
@@ -64,20 +63,15 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return
-				other.Tags.Length == Tags.Length &&
-				other.Tags.SequenceEqual(Tags);
+				other._tags.Length == _tags.Length &&
+				other._tags.SequenceEqual(_tags);
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			HashCode hash = new();
-
-			foreach (TagModel tag in Tags)
-			{
-				hash.Add(tag);
-			}
-
+			hash.AddSequence(_tags);
 			return hash.ToHashCode();
 		}
 

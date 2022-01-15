@@ -6,27 +6,19 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents an author of the current resource.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
-	public sealed record AuthorModel
+	public sealed record AuthorModel : DatabaseModel
 	{
 		private readonly SelfLinkModel _links;
 		private readonly string _name;
 		private readonly string _slug;
 		private readonly string _id;
-		private readonly DateTime _updatedAt;
 
 		/// <summary>
 		/// Bio of the author.
 		/// </summary>
 		[JsonProperty("bio", Order = 3)]
 		public string? Bio { get; init; }
-
-		/// <summary>
-		/// Date the data of the author was created at.
-		/// </summary>
-		[JsonProperty("created_at", Order = 4, Required = Required.Always)]
-		public DateTime CreatedAt { get; init; }
 
 		/// <summary>
 		/// Id of the author.
@@ -51,7 +43,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Link to the author data.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("_links", Order = 6, Required = Required.Always)]
+		[JsonProperty("_links", Order = 4, Required = Required.Always)]
 		public SelfLinkModel Links
 		{
 			get => _links;
@@ -101,25 +93,6 @@ namespace JollyQuotes.TronaldDump.Models
 				}
 
 				_slug = value;
-			}
-		}
-
-		/// <summary>
-		/// Date the data of the author was updated at.
-		/// </summary>
-		/// <exception cref="ArgumentOutOfRangeException">Value must be greater than or equal to <see cref="CreatedAt"/>.</exception>
-		[JsonProperty("updated_at", Order = 5)]
-		public DateTime UpdatedAt
-		{
-			get => _updatedAt;
-			init
-			{
-				if (value < CreatedAt)
-				{
-					throw Error.MustBeGreaterThanOrEqualTo(nameof(value), nameof(CreatedAt));
-				}
-
-				_updatedAt = value;
 			}
 		}
 
@@ -174,7 +147,8 @@ namespace JollyQuotes.TronaldDump.Models
 			string? bio,
 			SelfLinkModel links,
 			DateTime createdAt,
-			DateTime updatedAt)
+			DateTime updatedAt
+		) : base(createdAt, updatedAt)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -196,18 +170,11 @@ namespace JollyQuotes.TronaldDump.Models
 				throw Error.Null(nameof(links));
 			}
 
-			if (updatedAt < createdAt)
-			{
-				throw Error.MustBeGreaterThanOrEqualTo(nameof(updatedAt), nameof(createdAt));
-			}
-
 			_id = id;
 			_name = name;
 			_slug = slug;
 			Bio = bio;
 			_links = links;
-			CreatedAt = createdAt;
-			_updatedAt = updatedAt;
 		}
 	}
 }

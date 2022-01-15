@@ -9,7 +9,6 @@ namespace JollyQuotes.Quotable.Models
 	/// Represents a tag expression found in a search query.
 	/// </summary>
 	[DebuggerDisplay("base.ToString()")]
-	[Serializable]
 	[JsonObject]
 	public sealed record TagExpression
 	{
@@ -56,9 +55,9 @@ namespace JollyQuotes.Quotable.Models
 					throw Error.Arg("Either value or child nodes must be specified", nameof(value));
 				}
 
-				if (!@operator.IsValidOperator())
+				if (!@operator.IsValid())
 				{
-					throw QuotableResources.Exc_InvalidOperator(@operator);
+					throw Error.InvalidEnumValue(@operator);
 				}
 
 				Left = left;
@@ -93,7 +92,7 @@ namespace JollyQuotes.Quotable.Models
 		/// <param name="right">Child node on the right.</param>
 		/// <param name="op">Operator that is applied to the expression.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>. -or- <paramref name="right"/> is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentException"><paramref name="op"/> is not a valid <see cref="SearchOperator"/> value.</exception>
+		/// <exception cref="ArgumentException"><paramref name="op"/> is not a valid enum value.</exception>
 		public TagExpression(TagExpression left, TagExpression right, SearchOperator op)
 		{
 			if (left is null)
@@ -106,7 +105,12 @@ namespace JollyQuotes.Quotable.Models
 				throw Error.Null(nameof(right));
 			}
 
-			Operator = op.EnsureValidOperator();
+			if (!op.IsValid())
+			{
+				throw Error.InvalidEnumValue(op);
+			}
+
+			Operator = op;
 			Left = left;
 			Right = right;
 		}

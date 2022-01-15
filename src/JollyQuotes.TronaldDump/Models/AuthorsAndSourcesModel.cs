@@ -7,7 +7,6 @@ namespace JollyQuotes.TronaldDump.Models
 	/// <summary>
 	/// Represents a collection of authors and sources of the current resource.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public sealed record AuthorsAndSourcesModel
 	{
@@ -18,7 +17,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Array of authors of the current resource.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("author", Required = Required.Always)]
+		[JsonProperty("author", Order = 0, Required = Required.Always)]
 		public AuthorModel[] Authors
 		{
 			get => _authors;
@@ -37,7 +36,7 @@ namespace JollyQuotes.TronaldDump.Models
 		/// Array of sources of the current resource.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		[JsonProperty("source", Required = Required.Always)]
+		[JsonProperty("source", Order = 1, Required = Required.Always)]
 		public QuoteSourceModel[] Sources
 		{
 			get => _sources;
@@ -111,10 +110,10 @@ namespace JollyQuotes.TronaldDump.Models
 			}
 
 			return
-				other.Authors.Length == Authors.Length &&
-				other.Sources.Length == Sources.Length &&
-				other.Authors.SequenceEqual(Authors) &&
-				other.Sources.SequenceEqual(Sources);
+				other._authors.Length == Authors.Length &&
+				other._sources.Length == Sources.Length &&
+				other._authors.SequenceEqual(Authors) &&
+				other._sources.SequenceEqual(Sources);
 		}
 
 		/// <inheritdoc/>
@@ -122,15 +121,8 @@ namespace JollyQuotes.TronaldDump.Models
 		{
 			HashCode hash = new();
 
-			foreach (AuthorModel author in Authors)
-			{
-				hash.Add(author);
-			}
-
-			foreach (QuoteSourceModel source in Sources)
-			{
-				hash.Add(source);
-			}
+			hash.AddSequence(_authors);
+			hash.AddSequence(_sources);
 
 			return hash.ToHashCode();
 		}

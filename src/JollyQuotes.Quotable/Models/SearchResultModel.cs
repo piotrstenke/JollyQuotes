@@ -11,7 +11,6 @@ namespace JollyQuotes.Quotable.Models
 	/// </summary>
 	/// <typeparam name="T">Type of data searched for.</typeparam>
 	[JsonObject]
-	[Serializable]
 	public sealed record SearchResultModel<T> where T : IEquatable<T>
 	{
 		private readonly int _page;
@@ -140,7 +139,7 @@ namespace JollyQuotes.Quotable.Models
 		/// Results of the request.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">Value is <see langword="null"/>.</exception>
-		/// <exception cref="ArgumentOutOfRangeException">Length of value must be less than or equal to <see cref="QuotableResources.MaxResultsPerPage"/>. -or-
+		/// <exception cref="ArgumentOutOfRangeException">Length of value must be less than or equal to <see cref="QuotableResources.ResultsPerPageMax"/>. -or-
 		/// Length of value must be less than or equal to <see cref="TotalCount"/>.</exception>
 		[JsonProperty("results", Order = 5, Required = Required.Always)]
 		public T[] Results
@@ -160,7 +159,7 @@ namespace JollyQuotes.Quotable.Models
 
 				if (value.Length != _results.Length)
 				{
-					if (value.Length > QuotableResources.MaxResultsPerPage)
+					if (value.Length > QuotableResources.ResultsPerPageMax)
 					{
 						throw Exc_LengthOfResultsMustBeLessThanOrEqualToMaxResultsPerPage(nameof(value));
 					}
@@ -189,7 +188,7 @@ namespace JollyQuotes.Quotable.Models
 		/// Initializes a new instance of the <see cref="SearchResultModel{T}"/> class with a collection of <paramref name="results"/> specified.
 		/// </summary>
 		/// <param name="results">Results of the request.</param>
-		/// <exception cref="ArgumentException">Length of <paramref name="results"/> must be less than or equal to <see cref="QuotableResources.MaxResultsPerPage"/>.</exception>
+		/// <exception cref="ArgumentException">Length of <paramref name="results"/> must be less than or equal to <see cref="QuotableResources.ResultsPerPageMax"/>.</exception>
 		public SearchResultModel(T[]? results)
 		{
 			if (results is null || results.Length == 0)
@@ -200,7 +199,7 @@ namespace JollyQuotes.Quotable.Models
 				Count = 0;
 				TotalCount = 0;
 			}
-			else if (results.Length > QuotableResources.MaxResultsPerPage)
+			else if (results.Length > QuotableResources.ResultsPerPageMax)
 			{
 				throw Exc_LengthOfResultsMustBeLessThanOrEqualToMaxResultsPerPage(nameof(results));
 			}
@@ -226,7 +225,7 @@ namespace JollyQuotes.Quotable.Models
 		/// <paramref name="page"/> cannot be equal to <c>1</c> when length of <paramref name="results"/> is null or empty and either <paramref name="totalCount"/> or <paramref name="totalPages"/> is greater than <c>0</c>.
 		/// </exception>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// Length of <paramref name="results"/> must be less than or equal to <see cref="QuotableResources.MaxResultsPerPage"/>. -or-
+		/// Length of <paramref name="results"/> must be less than or equal to <see cref="QuotableResources.ResultsPerPageMax"/>. -or-
 		/// Length of <paramref name="results"/> must be less than or equal to <paramref name="totalCount"/>. -or-
 		/// <paramref name="page"/> must be greater than <c>0</c>. -or-
 		/// <paramref name="totalCount"/> must be greater than or equal to <c>0</c>. -or-
@@ -322,30 +321,24 @@ namespace JollyQuotes.Quotable.Models
 			}
 
 			return
-				other.Count == Count &&
-				other.Page == Page &&
-				other.TotalPages == TotalPages &&
-				other.TotalCount == TotalCount &&
-				other.LastItemIndex == LastItemIndex &&
-				other.Results.Length == Results.Length &&
-				other.Results.SequenceEqual(Results);
+				other._page == _page &&
+				other._totalPages == _totalPages &&
+				other._totalCount == _totalCount &&
+				other._results.Length == _results.Length &&
+				other._results.SequenceEqual(_results);
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			HashCode code = new();
+			HashCode hash = new();
 
-			code.Add(Page);
-			code.Add(TotalCount);
-			code.Add(TotalPages);
+			hash.Add(_page);
+			hash.Add(_totalCount);
+			hash.Add(_totalPages);
+			hash.AddSequence(_results);
 
-			foreach (T obj in Results)
-			{
-				code.Add(obj);
-			}
-
-			return code.ToHashCode();
+			return hash.ToHashCode();
 		}
 
 		[DebuggerStepThrough]
@@ -399,7 +392,7 @@ namespace JollyQuotes.Quotable.Models
 				}
 			}
 
-			if (results.Length > QuotableResources.MaxResultsPerPage)
+			if (results.Length > QuotableResources.ResultsPerPageMax)
 			{
 				if (serialized)
 				{

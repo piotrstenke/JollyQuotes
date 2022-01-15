@@ -6,7 +6,6 @@ namespace JollyQuotes
 	/// <summary>
 	/// A <see cref="Quote"/> with a manually-specified id.
 	/// </summary>
-	[Serializable]
 	[JsonObject]
 	public record QuoteWithId : Quote
 	{
