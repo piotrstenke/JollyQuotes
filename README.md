@@ -171,9 +171,9 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
 			foreach (string tag in tags)
 			{
-				if (GetRandomQuote(tag) is T t)
+				if (GetRandomQuote(tag) is TestQuote quote)
 				{
-					return t;
+					return quote;
 				}
 			}
 		}
@@ -213,9 +213,9 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
 			foreach (string tag in tags)
 			{
-				if (DownloadRandomQuote(tag) is T t)
+				if (DownloadRandomQuote(tag) is TestQuote quote)
 				{
-					return t;
+					return quote;
 				}
 			}
 		}
