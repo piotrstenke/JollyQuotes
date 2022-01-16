@@ -36,10 +36,7 @@ Currently, **JollyQuotes** provides access to the following APIs:
 
  - [[nuget]](https://www.nuget.org/packages/JollyQuotes.KanyeRest) [kanye.rest](https://kanye.rest/)
  - [[nuget]](https://www.nuget.org/packages/JollyQuotes.TronaldDump) [Tronald Dump](https://www.tronalddump.io/)
-
-The following APIs are not supported, but will be in not-yet-specified future:
-
- - [quotable](https://github.com/lukePeavey/quotable)
+- [[nuget]](https://www.nuget.org/packages/JollyQuotes.Quotable) [quotable](https://github.com/lukePeavey/quotable)
 
 If you have any suggestions regarding additional API support, feel free to ask or create your own push request!
 
@@ -58,7 +55,7 @@ Some packages provide more functionality, such as converters or additional model
 
 To wire up a custom or unsupported API with **JollyQuotes**, you need to do the following:
 
- 1. Download [this](https://www.nuget.org/packages/JollyQuotes) NuGet package.
+ 1. Download [this](https://www.nuget.org/packages/JollyQuotes.Core) NuGet package.
 
  2. Create a quote model (preferably a record) named *[api-name]Quote* and implement the [*JollyQuotes.IQuote*](src/JollyQuotes.Core/_intf/IQuote.cs) interface. 
 
@@ -131,13 +128,13 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 
  5. Create a class named *[api-name]QuoteGenerator* that generates quotes on demand, preferably by using a *[api-name]Service*. There are multiple ways to achieve that, but by far the easiest and the least painful is to inherit one of the following pre-built abstract classes:
 
-	- [*JollyQuotes.RandomQuoteGenerator*](src/JollyQuotes.Core/RandomQuoteGenerator.cs) - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IRandomQuoteGenerator.cs) interface; does not provide any additional features.
+	- [*JollyQuotes.RandomQuoteGenerator*](src/JollyQuotes.Core/QuoteGenerator.cs) - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IQuoteGenerator.cs) interface; does not provide any additional features.
 
 	- [*JollyQuotes.QuoteResolver*](src/JollyQuotes.Core/QuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes.Core/_intf/IResourceResolver.cs) and implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
 
 	- [*JollyQuotes.QuoteClient*](src/JollyQuotes.Core/QuoteClient.cs) - good choice for web-based APIs; provides a [*System.Net.Http.HttpClient*](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-6.0) and a [*JollyQuotes.HttpResolver*](src/JollyQuotes.Core/HttpResolver.cs); implements the [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interface.
 
-	- [*JollyQuotes.EnumerableQuoteGenerator*](src/JollyQuotes.Core/EnumerableQuoteGenerator.cs)  - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IRandomQuoteGenerator.cs) interface; implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) interface.
+	- [*JollyQuotes.EnumerableQuoteGenerator*](src/JollyQuotes.Core/EnumerableQuoteGenerator.cs)  - basic implementation of the [*JollyQuotes.IRandomQuoteGenerator*](src/JollyQuotes.Core/_intf/IQuoteGenerator.cs) interface; implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) interface.
 
 	- [*JollyQuotes.EnumerableQuoteResolver*](src/JollyQuotes.Core/EnumerableQuoteResolver.cs) - provides a [*JollyQuotes.IResourceResolver*](src/JollyQuotes.Core/_intf/IResourceResolver.cs) and implements the [*System.Collections.Generic.IEnumerable\<T\>*](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-6.0) and [*System.IDisposable*](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=net-6.0) interfaces.
 

@@ -295,28 +295,27 @@ namespace JollyQuotes
 				throw Error.Null(nameof(resolver));
 			}
 
-			if (api == JollyQuotesApi.KanyeRest)
+			switch (api)
 			{
-				generator = new KanyeRestQuoteGenerator(resolver, possibility: possibility);
-			}
-			else if (api == JollyQuotesApi.TronaldDump)
-			{
-				if (resolver is not IStreamResolver s)
-				{
-					throw Error.Arg($"The Tronald Dump API requires the '{nameof(resolver)}' to implement the {nameof(IStreamResolver)} interface");
-				}
+				case JollyQuotesApi.KanyeRest:
+					generator = new KanyeRestQuoteGenerator(resolver, possibility: possibility);
+					break;
 
-				generator = new TronaldDumpQuoteGenerator(s, possibility: possibility);
-			}
+				case JollyQuotesApi.TronaldDump:
+					if (resolver is not IStreamResolver s)
+					{
+						throw Error.Arg($"The Tronald Dump API requires the '{nameof(resolver)}' to implement the {nameof(IStreamResolver)} interface");
+					}
 
-			// TODO: Add support for quotable.io IRandomQuoteGenerator
-			//else if(api == JollyQuotesApi.Quotable)
-			//{
-			//}
-			else
-			{
-				generator = default;
-				return false;
+					generator = new TronaldDumpQuoteGenerator(s, possibility: possibility);
+					break;
+
+				case JollyQuotesApi.Quotable:
+					generator = new QuotableQuoteGenerator(resolver, possibility: possibility);
+					break;
+
+				default:
+					throw Exc_InvalidEnum(nameof(api));
 			}
 
 			return true;
