@@ -19,9 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\JollyQuotes.Core\JollyQuotes.Core.csproj" />
     <ProjectReference Include="..\..\src\JollyQuotes.KanyeRest\JollyQuotes.KanyeRest.csproj" />
     <ProjectReference Include="..\..\src\JollyQuotes.TronaldDump\JollyQuotes.TronaldDump.csproj" />
-    <ProjectReference Include="..\..\src\JollyQuotes.Core\JollyQuotes.Core.csproj" />
+    <ProjectReference Include="..\..\src\JollyQuotes.Quotable\JollyQuotes.Quotable.csproj" />
   </ItemGroup>
 
 </Project>

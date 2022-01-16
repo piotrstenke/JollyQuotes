@@ -62,12 +62,5 @@ namespace JollyQuotes.Quotable
 		/// <param name="searchModel"><see cref="QuoteContentSearchModel"/> to build the query from.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="searchModel"/> is <see langword="null"/>.</exception>
 		string GetSearchQuery(QuoteContentSearchModel searchModel);
-
-		/// <summary>
-		/// Builds a tag query from the specified <paramref name="expression"/>.
-		/// </summary>
-		/// <param name="expression"><see cref="TagExpression"/> model to create the actual tag expression from.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="expression"/> is <see langword="null"/>.</exception>
-		string GetTagQuery(TagExpression expression);
 	}
 }

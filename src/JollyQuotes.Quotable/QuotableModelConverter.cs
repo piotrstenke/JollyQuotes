@@ -140,7 +140,7 @@ namespace JollyQuotes.Quotable
 				builder.Append((int)searchModel.MatchTreshold);
 			}
 
-			bool hasParam = false;
+			bool hasParam = true;
 			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
 
 			return builder.ToString();
@@ -182,22 +182,8 @@ namespace JollyQuotes.Quotable
 				builder.Append(searchModel.FuzzyMaxExpansions);
 			}
 
-			bool hasParam = false;
+			bool hasParam = true;
 			WriteLimitPage(builder, searchModel.Limit, searchModel.Page, ref hasParam);
-
-			return builder.ToString();
-		}
-
-		/// <inheritdoc/>
-		public string GetTagQuery(TagExpression expression)
-		{
-			if (expression is null)
-			{
-				throw Error.Null(nameof(expression));
-			}
-
-			StringBuilder builder = new();
-			WriteTagExpression(builder, expression);
 
 			return builder.ToString();
 		}
@@ -278,11 +264,11 @@ namespace JollyQuotes.Quotable
 				builder.Append(searchModel.MaxLength);
 			}
 
-			if (searchModel.Tags is not null)
+			if (!string.IsNullOrWhiteSpace(searchModel.Tags))
 			{
 				builder.EnsureParameter(ref hasParam);
 				builder.Append("tags=");
-				WriteTagExpression(builder, searchModel.Tags);
+				builder.Append(searchModel.Tags);
 			}
 
 			if (searchModel.HasAuthor)
@@ -344,20 +330,6 @@ namespace JollyQuotes.Quotable
 			}
 
 			WriteSortOrder(builder, order, defaultOrder, ref hasParam);
-		}
-
-		private static void WriteTagExpression(StringBuilder builder, TagExpression expression)
-		{
-			if (expression.IsEndNode)
-			{
-				builder.Append(expression.Value);
-			}
-			else
-			{
-				WriteTagExpression(builder, expression.Left);
-				builder.Append(expression.Operator.ToChar());
-				WriteTagExpression(builder, expression.Left);
-			}
 		}
 	}
 }

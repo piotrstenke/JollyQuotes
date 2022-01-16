@@ -140,7 +140,7 @@ namespace JollyQuotes.Quotable.Models
 			int limit = QuotableResources.ResultsPerPageDefault,
 			QuoteSortBy sortBy = default,
 			SortOrder order = default,
-			TagExpression? tags = default,
+			string? tags = default,
 			params string[]? authors
 #pragma warning disable CS0618 // Type or member is obsolete
 		) : this(minLength, maxLength, page, limit, sortBy, order, tags, authors, default)
@@ -180,7 +180,7 @@ namespace JollyQuotes.Quotable.Models
 			int limit = QuotableResources.ResultsPerPageDefault,
 			QuoteSortBy sortBy = default,
 			SortOrder order = default,
-			TagExpression? tags = default,
+			string? tags = default,
 			string[]? authors = default,
 			string[]? authorIds = default
 		) : base(minLength, maxLength, tags, authors, authorIds)

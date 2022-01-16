@@ -10,13 +10,13 @@ namespace JollyQuotes.Quotable
 	/// </summary>
 	public interface IQuotableService : IQuoteService
 	{
-		/// <summary>
-		/// Returns an author by the associated <paramref name="slug"/>.
-		/// </summary>
-		/// <param name="slug">Slug to get the author associated with.</param>
-		/// <exception cref="ArgumentException"><paramref name="slug"/> is <see langword="null"/> or empty.</exception>
-		/// <exception cref="QuoteException">Author with the specified <paramref name="slug"/> does not exist.</exception>
-		Task<AuthorModel> GetAuthor(string slug);
+		///// <summary>
+		///// Returns an author by the associated <paramref name="slug"/>.
+		///// </summary>
+		///// <param name="slug">Slug to get the author associated with.</param>
+		///// <exception cref="ArgumentException"><paramref name="slug"/> is <see langword="null"/> or empty.</exception>
+		///// <exception cref="QuoteException">Author with the specified <paramref name="slug"/> does not exist.</exception>
+		//Task<AuthorModel> GetAuthor(string slug);
 
 		/// <summary>
 		/// Returns an author by his <paramref name="id"/>.
@@ -24,8 +24,7 @@ namespace JollyQuotes.Quotable
 		/// <param name="id">Id of author to return.</param>
 		/// <exception cref="ArgumentException"><paramref name="id"/> is <see langword="null"/> or empty.</exception>
 		/// <exception cref="QuoteException">Author with the specified <paramref name="id"/> does not exist.</exception>
-		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use GetAuthor(string) instead.")]
-		Task<AuthorModel> GetAuthorById(string id);
+		Task<AuthorModel> GetAuthor(string id);
 
 		/// <summary>
 		/// Returns all existing authors.
@@ -77,7 +76,7 @@ namespace JollyQuotes.Quotable
 		/// <summary>
 		/// Returns all existing tags.
 		/// </summary>
-		Task<TagModel> GetTags();
+		Task<List<TagModel>> GetTags();
 
 		/// <summary>
 		/// Returns all tags that fulfill every prerequisite specified in the given <paramref name="searchModel"/>.

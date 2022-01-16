@@ -60,28 +60,27 @@ namespace JollyQuotes.Quotable
 			ModelConverter = modelConverter ?? new QuotableModelConverter();
 		}
 
+		///// <inheritdoc/>
+		//public Task<AuthorModel> GetAuthor(string slug)
+		//{
+		//	if (string.IsNullOrWhiteSpace(slug))
+		//	{
+		//		throw Error.NullOrEmpty(nameof(slug));
+		//	}
+
+		//	return Resolver.TryResolveAsync<AuthorModel>($"authors/{slug}").OnResponse(t =>
+		//	{
+		//		if (!t.HasResult)
+		//		{
+		//			throw Error.Quote($"Author with slug '{slug}' does not exist");
+		//		}
+
+		//		return t.Result;
+		//	});
+		//}
+
 		/// <inheritdoc/>
-		public Task<AuthorModel> GetAuthor(string slug)
-		{
-			if (string.IsNullOrWhiteSpace(slug))
-			{
-				throw Error.NullOrEmpty(nameof(slug));
-			}
-
-			return Resolver.TryResolveAsync<AuthorModel>($"author/{slug}").OnResponse(t =>
-			{
-				if (!t.HasResult)
-				{
-					throw Error.Quote($"Author with slug '{slug}' does not exist");
-				}
-
-				return t.Result;
-			});
-		}
-
-		/// <inheritdoc/>
-		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use GetAuthor(string) instead.")]
-		public Task<AuthorModel> GetAuthorById(string id)
+		public Task<AuthorModel> GetAuthor(string id)
 		{
 			if (string.IsNullOrWhiteSpace(id))
 			{
@@ -191,9 +190,9 @@ namespace JollyQuotes.Quotable
 		}
 
 		/// <inheritdoc/>
-		public Task<TagModel> GetTags()
+		public Task<List<TagModel>> GetTags()
 		{
-			return Resolver.ResolveAsync<TagModel>("tags");
+			return Resolver.ResolveAsync<List<TagModel>>("tags");
 		}
 
 		/// <inheritdoc/>

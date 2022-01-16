@@ -150,7 +150,7 @@ namespace JollyQuotes.Quotable.Models
 		/// Tags associated with the quote searched for.
 		/// </summary>
 		[JsonProperty("tags", Order = 5)]
-		public TagExpression? Tags { get; init; }
+		public string? Tags { get; init; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteSearchModel"/> class.
@@ -174,7 +174,7 @@ namespace JollyQuotes.Quotable.Models
 		public QuoteSearchModel(
 			int minLength = default,
 			int? maxLength = default,
-			TagExpression? tags = default,
+			string? tags = default,
 			params string[]? authors
 #pragma warning disable CS0618 // Type or member is obsolete
 		) : this(minLength, maxLength, tags, authors, default)
@@ -200,7 +200,7 @@ namespace JollyQuotes.Quotable.Models
 		public QuoteSearchModel(
 			int minLength = default,
 			int? maxLength = default,
-			TagExpression? tags = default,
+			string? tags = default,
 			string[]? authors = default,
 			string[]? authorIds = default
 		)

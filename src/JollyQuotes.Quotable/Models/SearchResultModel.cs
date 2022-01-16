@@ -196,9 +196,9 @@ namespace JollyQuotes.Quotable.Models
 			{
 				_results = results ?? Array.Empty<T>();
 				_page = 1;
-				TotalPages = 1;
+				_totalPages = 1;
 				Count = 0;
-				TotalCount = 0;
+				_totalCount = 0;
 			}
 			else if (results.Length > QuotableResources.ResultsPerPageMax)
 			{
@@ -208,8 +208,8 @@ namespace JollyQuotes.Quotable.Models
 			{
 				_results = results;
 				_page = 1;
-				TotalPages = 1;
-				TotalCount = results.Length;
+				_totalPages = 1;
+				_totalCount = results.Length;
 				Count = results.Length;
 				LastItemIndex = results.Length;
 			}
@@ -282,13 +282,13 @@ namespace JollyQuotes.Quotable.Models
 
 				_results = results ?? Array.Empty<T>();
 				_page = page;
-				TotalPages = totalPages;
-				TotalCount = totalCount;
+				_totalPages = totalPages;
+				_totalCount = totalCount;
 				Count = 0;
 			}
 			else
 			{
-				ValidateResults(results, totalCount, count, lastItemIndex, serialized);
+				ValidateResults(results, totalCount, totalPages, count, lastItemIndex, serialized);
 
 				if (serialized)
 				{
@@ -301,8 +301,8 @@ namespace JollyQuotes.Quotable.Models
 					LastItemIndex = GetLastItemIndex(results, count, page);
 				}
 
-				TotalCount = totalCount;
-				TotalPages = totalPages;
+				_totalCount = totalCount;
+				_totalPages = totalPages;
 				_page = page;
 				_results = results;
 			}
@@ -370,6 +370,7 @@ namespace JollyQuotes.Quotable.Models
 		private static void ValidateResults(
 			T[] results,
 			int totalCount,
+			int totalPages,
 			int count,
 			int? lastItemIndex,
 			bool serialized
@@ -378,31 +379,6 @@ namespace JollyQuotes.Quotable.Models
 			if (results.Length > totalCount)
 			{
 				throw Exc_LengthOfResultsMustBeLessThanOrEqualToTotalCount(nameof(results), nameof(totalCount));
-			}
-
-			if (serialized)
-			{
-				if (count != results.Length)
-				{
-					throw Error.Arg($"'{nameof(count)}' must be equal to '{nameof(results)}.Length' if '{nameof(results)}' is not empty", nameof(count));
-				}
-
-				int limit = count;
-
-				if (results.Length == limit)
-				{
-					if (!lastItemIndex.HasValue || lastItemIndex <= 0)
-					{
-						throw Error.Arg($"'{nameof(lastItemIndex)} must be larger than 0 if length of '{nameof(results)}' is equal to current limit");
-					}
-				}
-				else
-				{
-					if (lastItemIndex.HasValue && lastItemIndex > 0)
-					{
-						throw Error.Arg($"'{nameof(lastItemIndex)} must be null if length of '{nameof(results)} is less than the current limit");
-					}
-				}
 			}
 
 			if (results.Length > QuotableResources.ResultsPerPageMax)
@@ -414,6 +390,29 @@ namespace JollyQuotes.Quotable.Models
 				else
 				{
 					throw Exc_LengthOfResultsMustBeLessThanOrEqualToMaxResultsPerPage(nameof(results));
+				}
+			}
+
+			if (serialized)
+			{
+				if (count != results.Length)
+				{
+					throw Error.Arg($"'{nameof(count)}' must be equal to '{nameof(results)}.Length' if '{nameof(results)}' is not empty", nameof(count));
+				}
+
+				if (count == totalCount || results.Length == (totalCount - count) / totalPages)
+				{
+					if (lastItemIndex.HasValue && lastItemIndex > 0)
+					{
+						throw Error.Arg($"'{nameof(lastItemIndex)} must be null if length of '{nameof(results)} is less than the current limit");
+					}
+				}
+				else
+				{
+					if (!lastItemIndex.HasValue || lastItemIndex <= 0)
+					{
+						throw Error.Arg($"'{nameof(lastItemIndex)} must be larger than 0 if length of '{nameof(results)}' is equal to current limit");
+					}
 				}
 			}
 		}
