@@ -173,7 +173,6 @@ namespace JollyQuotes.Quotable.Models
 		/// <paramref name="limit"/> must be less than or equal to <see cref="QuotableResources.ResultsPerPageMax"/>.
 		/// </exception>
 		[JsonConstructor]
-		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use other constructor instead")]
 		public QuoteListSearchModel(
 			int minLength = default,
 			int? maxLength = default,

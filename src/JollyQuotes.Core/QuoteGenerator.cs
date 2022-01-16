@@ -36,23 +36,7 @@ namespace JollyQuotes
 		public abstract T? GetRandomQuote(string tag);
 
 		/// <inheritdoc cref="IQuoteGenerator.GetRandomQuote(string[])"/>
-		public virtual T? GetRandomQuote(params string[]? tags)
-		{
-			if (tags is null || tags.Length == 0)
-			{
-				return default;
-			}
-
-			foreach (string tag in tags)
-			{
-				if (GetRandomQuote(tag) is T t)
-				{
-					return t;
-				}
-			}
-
-			return default;
-		}
+		public abstract T? GetRandomQuote(params string[]? tags);
 
 		IQuote IQuoteGenerator.GetRandomQuote()
 		{

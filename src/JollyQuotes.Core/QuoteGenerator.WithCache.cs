@@ -259,23 +259,7 @@ namespace JollyQuotes
 			/// Downloads a random quote associated with any of the specified <paramref name="tags"/> from the <see cref="Source"/>.
 			/// </summary>
 			/// <param name="tags">Tags to download a quote associated with.</param>
-			protected virtual T? DownloadRandomQuote(params string[]? tags)
-			{
-				if (tags is null || tags.Length == 0)
-				{
-					return default;
-				}
-
-				foreach (string tag in tags)
-				{
-					if (DownloadRandomQuote(tag) is T t)
-					{
-						return t;
-					}
-				}
-
-				return default;
-			}
+			protected abstract T? DownloadRandomQuote(params string[]? tags);
 		}
 	}
 }

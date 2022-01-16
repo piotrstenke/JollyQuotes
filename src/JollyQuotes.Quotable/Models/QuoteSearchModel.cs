@@ -197,7 +197,6 @@ namespace JollyQuotes.Quotable.Models
 		/// <paramref name="minLength"/> must be less than or equal to <paramref name="maxLength"/>.
 		/// </exception>
 		[JsonConstructor]
-		[Obsolete(QuotableResources.AUTHOR_ID_OBSOLETE + "Use other constructor instead.")]
 		public QuoteSearchModel(
 			int minLength = default,
 			int? maxLength = default,

@@ -130,8 +130,9 @@ namespace JollyQuotes.Quotable.Models
 		}
 
 		/// <summary>
-		/// 1-based index of the last result in the response.
+		/// 1-based index of the last result in the response. This shows the current pagination offset.
 		/// </summary>
+		/// <remarks>This value is <see langword="null"/> if the value of <see cref="Results"/> is empty or its length is less than <see cref="QuotableResources.ResultsPerPageDefault"/>.</remarks>
 		[JsonProperty("lastItemIndex", Order = 4)]
 		public int? LastItemIndex { get; private set; }
 
@@ -297,7 +298,7 @@ namespace JollyQuotes.Quotable.Models
 				else
 				{
 					Count = results.Length;
-					LastItemIndex = Count;
+					LastItemIndex = GetLastItemIndex(results, count, page);
 				}
 
 				TotalCount = totalCount;
@@ -381,14 +382,26 @@ namespace JollyQuotes.Quotable.Models
 
 			if (serialized)
 			{
-				if (!lastItemIndex.HasValue || lastItemIndex <= 0)
-				{
-					throw Error.Arg($"'{nameof(lastItemIndex)}' must be larger than 0 if '{nameof(results)}' is not empty", nameof(lastItemIndex));
-				}
-
 				if (count != results.Length)
 				{
 					throw Error.Arg($"'{nameof(count)}' must be equal to '{nameof(results)}.Length' if '{nameof(results)}' is not empty", nameof(count));
+				}
+
+				int limit = count;
+
+				if (results.Length == limit)
+				{
+					if (!lastItemIndex.HasValue || lastItemIndex <= 0)
+					{
+						throw Error.Arg($"'{nameof(lastItemIndex)} must be larger than 0 if length of '{nameof(results)}' is equal to current limit");
+					}
+				}
+				else
+				{
+					if (lastItemIndex.HasValue && lastItemIndex > 0)
+					{
+						throw Error.Arg($"'{nameof(lastItemIndex)} must be null if length of '{nameof(results)} is less than the current limit");
+					}
 				}
 			}
 
@@ -435,6 +448,17 @@ namespace JollyQuotes.Quotable.Models
 					throw Error.Arg($"'{nameof(count)}' must be equal to 0 if 'results' is null or empty", nameof(count));
 				}
 			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static int? GetLastItemIndex(T[]? results, int limit, int page)
+		{
+			if (results is null || results.Length < limit)
+			{
+				return null;
+			}
+
+			return page * limit;
 		}
 	}
 }

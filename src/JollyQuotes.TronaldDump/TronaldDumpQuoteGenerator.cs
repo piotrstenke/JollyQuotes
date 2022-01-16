@@ -203,13 +203,15 @@ namespace JollyQuotes.TronaldDump
 		{
 			if (tags is null || tags.Length == 0)
 			{
-				return Array.Empty<TronaldDumpQuote>();
+				return DownloadAllQuotes();
 			}
 
 			return Yield();
 
 			IEnumerable<TronaldDumpQuote> Yield()
 			{
+				HashSet<string> quotes = new();
+
 				foreach (string tag in tags)
 				{
 					if (string.IsNullOrWhiteSpace(tag))
@@ -219,7 +221,10 @@ namespace JollyQuotes.TronaldDump
 
 					foreach (TronaldDumpQuote quote in DownloadAllQuotes(tag))
 					{
-						yield return quote;
+						if(quotes.Add(quote.Id))
+						{
+							yield return quote;
+						}
 					}
 				}
 			}
@@ -245,7 +250,7 @@ namespace JollyQuotes.TronaldDump
 
 			if (result.Count == 0)
 			{
-				return null;
+				return default;
 			}
 
 			int numPages = ModelConverter.CountPages(result);
@@ -267,6 +272,20 @@ namespace JollyQuotes.TronaldDump
 			QuoteModel model = result.Embedded.Quotes[targetQuote];
 
 			return ModelConverter.ConvertQuoteModel(model);
+		}
+
+		/// <inheritdoc/>
+		protected override TronaldDumpQuote? DownloadRandomQuote(params string[]? tags)
+		{
+			if(tags is null || tags.Length == 0)
+			{
+				return default;
+			}
+
+			int randomIndex = RandomNumberGenerator.RandomNumber(0, tags.Length);
+			string randomTag = tags[randomIndex];
+
+			return DownloadRandomQuote(randomTag);
 		}
 
 		private static ITronaldDumpModelConverter CreateConverter(ITronaldDumpService service)

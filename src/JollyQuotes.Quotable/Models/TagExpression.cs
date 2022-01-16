@@ -180,5 +180,166 @@ namespace JollyQuotes.Quotable.Models
 
 			return Left.ToString() + Operator.ToChar() + Right.ToString();
 		}
+
+		/// <summary>
+		/// Parses a <see cref="TagExpression"/> from the specified <paramref name="text"/>.
+		/// </summary>
+		/// <param name="text">Text to parse.</param>
+		/// <exception cref="ArgumentException"><paramref name="text"/> is <see langword="null"/> or empty. -or-
+		/// <paramref name="text"/> could not be parsed.</exception>
+		public static TagExpression Parse(string text)
+		{
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				throw Error.NullOrEmpty(nameof(text));
+			}
+
+			return Parse(text.AsSpan());
+		}
+
+		/// <summary>
+		/// Parses a <see cref="TagExpression"/> from the specified <paramref name="text"/>.
+		/// </summary>
+		/// <param name="text">Text to parse.</param>
+		/// <exception cref="ArgumentException"><paramref name="text"/> could not be parsed.</exception>
+		public static TagExpression Parse(ReadOnlySpan<char> text)
+		{
+			if (!TryParse(text, out TagExpression? expression))
+			{
+				throw Error.Arg("Text could not be parsed", nameof(text));
+			}
+
+			return expression;
+		}
+
+		/// <summary>
+		/// Attempts to parse <see cref="TagExpression"/> from the specified <paramref name="text"/>.
+		/// </summary>
+		/// <param name="text">Text to parse.</param>
+		/// <param name="expression">Parsed <see cref="TagExpression"/>.</param>
+		public static bool TryParse([NotNullWhen(true)] string? text, [NotNullWhen(true)] out TagExpression? expression)
+		{
+			return TryParse(text.AsSpan(), out expression);
+		}
+
+		/// <summary>
+		/// Attempts to parse <see cref="TagExpression"/> from the specified <paramref name="text"/>.
+		/// </summary>
+		/// <param name="text">Text to parse.</param>
+		/// <param name="expression">Parsed <see cref="TagExpression"/>.</param>
+		public static bool TryParse(ReadOnlySpan<char> text, [NotNullWhen(true)] out TagExpression? expression)
+		{
+			ReadOnlySpan<char> span = text.Trim();
+			return TryParse_Internal(span, out expression);
+		}
+
+		private static bool TryParse_Internal(ReadOnlySpan<char> span, [NotNullWhen(true)] out TagExpression? expression)
+		{
+			if (span.IsEmpty)
+			{
+				goto RETURN_DEFAULT;
+			}
+
+			int leftLength = FindTag(span);
+
+			if (leftLength == 0)
+			{
+				goto RETURN_DEFAULT;
+			}
+
+			if (leftLength == span.Length)
+			{
+				expression = new(span.ToString());
+				return true;
+			}
+
+			ReadOnlySpan<char> left = span[..leftLength];
+			ReadOnlySpan<char> right = span[leftLength..].TrimStart();
+
+			char nextChar = right[0];
+
+			right = right[1..].TrimStart();
+
+			if (nextChar == QuotableHelpers.CharOr)
+			{
+				if (TryParse_Internal(right, out TagExpression? rightExpr))
+				{
+					expression = new(new(left.ToString()), rightExpr, SearchOperator.Or);
+					return true;
+				}
+				else
+				{
+					goto RETURN_DEFAULT;
+				}
+			}
+			else if (nextChar == QuotableHelpers.CharAnd)
+			{
+				int rightLength = FindTag(right);
+
+				if (rightLength == 0)
+				{
+					goto RETURN_DEFAULT;
+				}
+
+				ReadOnlySpan<char> and = right[..rightLength];
+				right = right[rightLength..].TrimStart();
+				nextChar = right[rightLength];
+
+				SearchOperator op;
+
+				if (nextChar == QuotableHelpers.CharOr)
+				{
+					op = SearchOperator.Or;
+				}
+				else if (nextChar == QuotableHelpers.CharAnd)
+				{
+					op = SearchOperator.And;
+				}
+				else
+				{
+					goto RETURN_DEFAULT;
+				}
+
+				right = right[1..].TrimStart();
+
+				if (TryParse_Internal(right, out TagExpression? rightExpression))
+				{
+					TagExpression leftExpression = new(new(left.ToString()), new(and.ToString()), SearchOperator.And);
+
+					expression = new(leftExpression, rightExpression, op);
+					return true;
+				}
+				else
+				{
+					goto RETURN_DEFAULT;
+				}
+			}
+
+		RETURN_DEFAULT:
+			expression = default;
+			return false;
+		}
+
+		private static int FindTag(ReadOnlySpan<char> span)
+		{
+			for (int currentIndex = 0; currentIndex < span.Length; currentIndex++)
+			{
+				char current = span[currentIndex];
+
+				if (!char.IsLetter(current))
+				{
+					if (current == '-' && char.IsLetter(span[currentIndex + 1]))
+					{
+						currentIndex++;
+					}
+					else
+					{
+						return currentIndex;
+					}
+				}
+			}
+
+			return span.Length;
+		}
 	}
 }

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 
 using JollyQuotes.KanyeRest;
 using JollyQuotes.TronaldDump;
+using JollyQuotes.Quotable;
 
 namespace JollyQuotes
 {
@@ -255,8 +256,14 @@ namespace JollyQuotes
 					api
 				),
 
-				// TODO: Add support for quotable.io instance of QuoteApiDescription.
-				//JollyQuotesApi.Quotable =>
+				JollyQuotesApi.Quotable => new QuoteApiDescription(
+					apiName,
+					typeof(QuotableQuoteGenerator),
+					typeof(QuotableService),
+					typeof(QuotableQuote),
+					typeof(QuotableResources),
+					api
+				),
 
 				_ => null
 			};

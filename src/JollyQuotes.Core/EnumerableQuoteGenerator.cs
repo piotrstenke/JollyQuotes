@@ -25,31 +25,7 @@ namespace JollyQuotes
 		public abstract IEnumerable<T> GetAllQuotes(string tag);
 
 		/// <inheritdoc cref="IEnumerableQuoteGenerator.GetAllQuotes(string[])"/>
-		public virtual IEnumerable<T> GetAllQuotes(params string[]? tags)
-		{
-			if (tags is null || tags.Length == 0)
-			{
-				return Array.Empty<T>();
-			}
-
-			return Yield();
-
-			IEnumerable<T> Yield()
-			{
-				foreach (string tag in tags)
-				{
-					if (string.IsNullOrWhiteSpace(tag))
-					{
-						continue;
-					}
-
-					foreach (T quote in GetAllQuotes(tag))
-					{
-						yield return quote;
-					}
-				}
-			}
-		}
+		public abstract IEnumerable<T> GetAllQuotes(params string[]? tags);
 
 		/// <summary>
 		/// Returns an <see cref="IEnumerator{T}"/> that iterates through all the available <see cref="IQuote"/>s.

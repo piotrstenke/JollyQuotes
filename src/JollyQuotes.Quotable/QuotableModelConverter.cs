@@ -258,7 +258,7 @@ namespace JollyQuotes.Quotable
 
 		private static void WriteOrQuery(StringBuilder builder, string[] values)
 		{
-			string text = string.Join(SearchOperator.Or.ToChar(), values);
+			string text = string.Join(QuotableHelpers.CharOr, values);
 			builder.Append(text);
 		}
 

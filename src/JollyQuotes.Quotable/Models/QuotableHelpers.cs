@@ -8,6 +8,16 @@ namespace JollyQuotes.Quotable.Models
 	public static class QuotableHelpers
 	{
 		/// <summary>
+		/// Character used as an AND operator.
+		/// </summary>
+		public const char CharAnd = ',';
+
+		/// <summary>
+		/// Character used as an OR operator.
+		/// </summary>
+		public const char CharOr = '|';
+
+		/// <summary>
 		/// Returns the default <see cref="SortOrder"/> for the specified <paramref name="sortBy"/> field.
 		/// </summary>
 		/// <param name="sortBy">Field to get the default sort order for.</param>
@@ -158,8 +168,8 @@ namespace JollyQuotes.Quotable.Models
 		{
 			return value switch
 			{
-				SearchOperator.And => ',',
-				SearchOperator.Or => '|',
+				SearchOperator.And => CharAnd,
+				SearchOperator.Or => CharOr,
 				_ => throw Error.InvalidEnumValue(value)
 			};
 		}
