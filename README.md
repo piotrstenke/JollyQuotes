@@ -157,9 +157,25 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 			return Service.GetRandomQuote().Result;
 		}
 
-		public override TestQuote GetRandomQuote(string tag)
+		public override TestQuote? GetRandomQuote(string tag)
 		{
 			return Service.GetRandomQuote(tag).Result;
+		}
+
+		public override TestQuote? GetRandomQuote(string[]? tags)
+		{
+			if (tags is null || tags.Length == 0)
+			{
+				return GetRandomQuote();
+			}
+
+			foreach (string tag in tags)
+			{
+				if (GetRandomQuote(tag) is T t)
+				{
+					return t;
+				}
+			}
 		}
 	}
 	```
@@ -183,9 +199,25 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 			return Service.GetRandomQuote().Result;
 		}
 
-		protected override TestQuote DownloadRandomQuote(string tag)
+		protected override TestQuote? DownloadRandomQuote(string tag)
 		{
 			return Service.GetRandomQuote(tag).Result;
+		}
+
+		protected override TestQuote? DownloadRandomQuote(string[]? tags)
+		{
+			if (tags is null || tags.Length == 0)
+			{
+				return GetRandomQuote();
+			}
+
+			foreach (string tag in tags)
+			{
+				if (DownloadRandomQuote(tag) is T t)
+				{
+					return t;
+				}
+			}
 		}
 	}
 	```
