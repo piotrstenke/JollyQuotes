@@ -208,7 +208,7 @@ To wire up a custom or unsupported API with **JollyQuotes**, you need to do the 
 		{
 			if (tags is null || tags.Length == 0)
 			{
-				return GetRandomQuote();
+				return DownloadRandomQuote();
 			}
 
 			foreach (string tag in tags)
