@@ -1,4 +1,5 @@
 ﻿using JollyQuotes.KanyeRest;
+using JollyQuotes.Quotable;
 using JollyQuotes.TronaldDump;
 
 namespace JollyQuotes
@@ -21,7 +22,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Name of the <c>quotable</c> API.
 		/// </summary>
-		public const string Quotable = "quotable";
+		public const string Quotable = QuotableResources.ApiName;
 
 		/// <summary>
 		/// Name of the <c>Tronald Dump</c> API.
