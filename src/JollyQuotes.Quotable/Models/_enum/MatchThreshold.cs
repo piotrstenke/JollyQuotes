@@ -8,12 +8,12 @@
 		/// <summary>
 		/// No threshold specified.
 		/// </summary>
-		None,
+		None = 0,
 
 		/// <summary>
 		/// At least one matched term is required.
 		/// </summary>
-		One,
+		One = 1,
 
 		/// <summary>
 		/// Minimum threshold, which is <see cref="One"/>.
@@ -23,7 +23,7 @@
 		/// <summary>
 		/// At least two matched terms are required.
 		/// </summary>
-		Two,
+		Two = 2,
 
 		/// <summary>
 		/// Default value, which is <see cref="Two"/>.
@@ -33,7 +33,7 @@
 		/// <summary>
 		/// At least three matched terms are required.
 		/// </summary>
-		Three,
+		Three = 3,
 
 		/// <summary>
 		/// Maximum threshold, which is <see cref="Three"/>.

@@ -157,15 +157,18 @@ namespace JollyQuotes
 				return;
 			}
 
-			if (!TryDisable(api))
+			if(TryDisable(api))
 			{
-				foreach (JollyQuotesApi flag in api.GetFlags())
-				{
-					TryDisable(flag);
-				}
+				return;
 			}
 
-			throw Exc_InvalidApi(api);
+			foreach (JollyQuotesApi flag in api.GetFlags())
+			{
+				if (!TryDisable(flag))
+				{
+					throw Exc_InvalidApi(api);
+				}
+			}
 
 			bool TryDisable(JollyQuotesApi api)
 			{
@@ -203,15 +206,18 @@ namespace JollyQuotes
 				return;
 			}
 
-			if (!TryEnable(api))
+			if(TryEnable(api))
 			{
-				foreach (JollyQuotesApi flag in api.GetFlags())
-				{
-					TryEnable(flag);
-				}
+				return;
 			}
 
-			throw Exc_InvalidApi(api);
+			foreach (JollyQuotesApi flag in api.GetFlags())
+			{
+				if(!TryEnable(flag))
+				{
+					throw Exc_InvalidApi(api);
+				}
+			}
 
 			bool TryEnable(JollyQuotesApi api)
 			{

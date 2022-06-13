@@ -14,24 +14,24 @@ namespace JollyQuotes.Quotable.Models
 		/// Sorts the objects by their name.
 		/// </summary>
 		[EnumMember(Value = "name")]
-		Name,
+		Name = 0,
 
 		/// <summary>
 		/// Sorts the objects by the date they were added.
 		/// </summary>
 		[EnumMember(Value = "dateAdded")]
-		DateAddded,
+		DateAddded = 1,
 
 		/// <summary>
 		/// Sorts the objects by the date of their last modification.
 		/// </summary>
 		[EnumMember(Value = "dateModified")]
-		DateModified,
+		DateModified = 2,
 
 		/// <summary>
 		/// Sorts the objects by the number of assigned quotes.
 		/// </summary>
 		[EnumMember(Value = "quoteCount")]
-		QuoteCount
+		QuoteCount = 3
 	}
 }

@@ -177,31 +177,33 @@ namespace JollyQuotes.Quotable
 
 			SearchResultModel<QuoteModel> searchResult = Service.GetQuotes(searchModel).Result;
 
-			if (searchResult.Count > 0)
+			if (searchResult.Count <= 0)
 			{
-				int current = 0;
+				yield break;
+			}
 
-				while (true)
+			int current = 0;
+
+			while (true)
+			{
+				foreach (QuoteModel quote in searchResult.Results)
 				{
-					foreach (QuoteModel quote in searchResult.Results)
-					{
-						yield return ModelConverter.ConvertQuoteModel(quote);
-					}
-
-					current += searchResult.Count;
-
-					if (current >= searchResult.TotalCount)
-					{
-						break;
-					}
-
-					searchModel = searchModel with
-					{
-						Page = searchModel.Page + 1
-					};
-
-					searchResult = Service.GetQuotes(searchModel).Result;
+					yield return ModelConverter.ConvertQuoteModel(quote);
 				}
+
+				current += searchResult.Count;
+
+				if (current >= searchResult.TotalCount)
+				{
+					break;
+				}
+
+				searchModel = searchModel with
+				{
+					Page = searchModel.Page + 1
+				};
+
+				searchResult = Service.GetQuotes(searchModel).Result;
 			}
 		}
 

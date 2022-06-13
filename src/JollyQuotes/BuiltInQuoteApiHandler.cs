@@ -32,12 +32,12 @@ namespace JollyQuotes
 		/// <inheritdoc/>
 		public QuoteApiDescription CreateDescription(string apiName)
 		{
-			if (QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
+			if (!QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
 			{
-				return CreateDescription(api);
+				throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
 			}
 
-			throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
+			return CreateDescription(api);
 		}
 
 		/// <inheritdoc/>
@@ -59,12 +59,12 @@ namespace JollyQuotes
 		/// </exception>
 		public IQuoteGenerator CreateGenerator(string apiName, IResourceResolver resolver)
 		{
-			if (QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
+			if (!QuoteUtility.TryParseApi(apiName, out JollyQuotesApi api))
 			{
-				return CreateGenerator(api, resolver);
+				throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
 			}
 
-			throw QuoteUtility.Exc_UnknownApiNameOrNull(apiName);
+			return CreateGenerator(api, resolver);
 		}
 
 		/// <summary>

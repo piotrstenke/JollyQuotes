@@ -13,7 +13,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="HttpClient"/> that is used to resolve the requested resources or <see langword="null"/> if <see cref="IsHttpBased"/> is <see langword="false"/>.
 		/// </summary>
-		public HttpClient? BaseClient => Resolver is HttpResolver r ? r.BaseClient : null;
+		public HttpClient? BaseClient => HttpResolver?.BaseClient;
 
 		/// <summary>
 		/// Returns the <see cref="QuoteResolver{T}.Resolver"/> as a <see cref="JollyQuotes.HttpResolver"/>.

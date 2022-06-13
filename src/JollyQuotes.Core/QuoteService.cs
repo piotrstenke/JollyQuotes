@@ -14,7 +14,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Determines whether the current instance has been already disposed.
 		/// </summary>
-		protected bool Disposed { get; private set; }
+		protected bool Disposed { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QuoteService"/> class with a <paramref name="client"/> as the target <see cref="IResourceResolver"/> specified.

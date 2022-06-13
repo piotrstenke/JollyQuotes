@@ -16,7 +16,7 @@ namespace JollyQuotes
 			/// <summary>
 			/// Determines whether the current instance has been already disposed.
 			/// </summary>
-			protected bool Disposed { get; private set; }
+			protected bool Disposed { get; set; }
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="WithCache"/> class with an underlaying <paramref name="resolver"/> and <paramref name="source"/> specified.

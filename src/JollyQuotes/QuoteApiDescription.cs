@@ -12,7 +12,7 @@ namespace JollyQuotes
 		/// <summary>
 		/// Name of the API.
 		/// </summary>
-		public string Name { get; init; }
+		public string Name { get; }
 
 		/// <summary>
 		/// Determines whether the API is a custom, non <c>JollyQuotes</c> API.
@@ -22,22 +22,22 @@ namespace JollyQuotes
 		/// <summary>
 		/// <see cref="Type"/> of main <see cref="IRandomNumberGenerator"/> implementation in the target API.
 		/// </summary>
-		public Type GeneratorType { get; init; }
+		public Type GeneratorType { get; }
 
 		/// <summary>
 		/// <see cref="Type"/> of main <see cref="IQuoteService"/> implementation in the target API.
 		/// </summary>
-		public Type ServiceType { get; init; }
+		public Type ServiceType { get; }
 
 		/// <summary>
 		/// <see cref="Type"/> of main <see cref="IQuote"/> implementation in the target API.
 		/// </summary>
-		public Type QuoteType { get; init; }
+		public Type QuoteType { get; }
 
 		/// <summary>
 		/// <see cref="Type"/> of a static class containing required resources such as links, paths or keys in the target API.
 		/// </summary>
-		public Type ResourcesType { get; init; }
+		public Type ResourcesType { get; }
 
 		internal QuoteApiDescription(
 			string name,

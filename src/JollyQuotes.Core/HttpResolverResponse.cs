@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 
 namespace JollyQuotes
 {
@@ -41,12 +42,7 @@ namespace JollyQuotes
 		/// <exception cref="ArgumentNullException"><paramref name="response"/> is <see langword="null"/>.</exception>
 		public HttpResolverResponse(HttpResponseMessage response, Exception? exception) : base(exception)
 		{
-			if (response is null)
-			{
-				throw Error.Null(nameof(response));
-			}
-
-			Response = response;
+			Response = EnsureNotNull(response);
 		}
 
 		/// <summary>
@@ -57,13 +53,8 @@ namespace JollyQuotes
 		/// <param name="result">Result of the request.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="response"/> is <see langword="null"/>.</exception>
 		public HttpResolverResponse(HttpResponseMessage response, string? content = default, T? result = default)
-			: base(response.IsSuccessStatusCode, content, result)
+			: base(EnsureNotNull(response).IsSuccessStatusCode, content, result)
 		{
-			if (response is null)
-			{
-				throw Error.Null(nameof(response));
-			}
-
 			Response = response;
 		}
 
@@ -71,12 +62,19 @@ namespace JollyQuotes
 		/// Initializes a new instance of the <see cref="HttpResolverResponse{T}"/> class with an underlaying <paramref name="exception"/> specified.
 		/// </summary>
 		/// <param name="exception"><see cref="Exception"/> that caused the request to fail.</param>
-		public HttpResolverResponse(Exception exception) : base(exception)
+		public HttpResolverResponse(Exception? exception) : base(exception)
 		{
-			if (exception is null)
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static HttpResponseMessage EnsureNotNull(HttpResponseMessage response)
+		{
+			if (response is null)
 			{
-				throw Error.Null(nameof(exception));
+				throw Error.Null(nameof(response));
 			}
+
+			return response;
 		}
 	}
 }

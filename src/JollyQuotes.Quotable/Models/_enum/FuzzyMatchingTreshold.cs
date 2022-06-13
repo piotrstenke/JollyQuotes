@@ -8,7 +8,7 @@
 		/// <summary>
 		/// Fuzzy matching is disabled.
 		/// </summary>
-		Zero,
+		Zero = 0,
 
 		/// <summary>
 		/// Minimum threshold, which is <see cref="Zero"/>.
@@ -23,12 +23,12 @@
 		/// <summary>
 		/// At most one character can be different.
 		/// </summary>
-		One,
+		One = 1,
 
 		/// <summary>
 		/// At most two characters can be different.
 		/// </summary>
-		Two,
+		Two = 2,
 
 		/// <summary>
 		/// Max threshold, which is <see cref="Two"/>.

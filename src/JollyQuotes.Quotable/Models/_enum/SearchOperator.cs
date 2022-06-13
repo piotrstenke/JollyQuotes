@@ -14,18 +14,18 @@ namespace JollyQuotes.Quotable.Models
 		/// No operator.
 		/// </summary>
 		[EnumMember(Value = "none")]
-		None,
+		None = 0,
 
 		/// <summary>
 		/// Represents the AND operator.
 		/// </summary>
 		[EnumMember(Value = "and")]
-		And,
+		And = 1,
 
 		/// <summary>
 		/// Represents the OR operator.
 		/// </summary>
 		[EnumMember(Value = "or")]
-		Or
+		Or = 2
 	}
 }

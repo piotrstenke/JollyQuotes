@@ -14,12 +14,12 @@ namespace JollyQuotes.Quotable.Models
 		/// The collection is sorted ascending.
 		/// </summary>
 		[EnumMember(Value = "asc")]
-		Ascending,
+		Ascending = 0,
 
 		/// <summary>
 		/// The collection is sorted descending.
 		/// </summary>
 		[EnumMember(Value = "desc")]
-		Descending
+		Descending = 1
 	}
 }
